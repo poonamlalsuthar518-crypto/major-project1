@@ -301,6 +301,11 @@
             display: block;
         }
 
+        .success-message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
         @media (max-width: 968px) {
             .container {
                 flex-direction: column;
@@ -471,7 +476,17 @@
     </div>
 
     <script>
-        // Toggle between login and register forms
+        async function submitForm(url, payload) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            return { response, result };
+        }
+
         function showForm(formType) {
             const loginForm = document.getElementById('loginForm');
             const registerForm = document.getElementById('registerForm');
@@ -480,8 +495,8 @@
             const formHeaderP = document.querySelector('.form-header p');
             const successMessage = document.getElementById('successMessage');
 
-            // Hide success message when switching forms
             successMessage.classList.remove('show');
+            successMessage.classList.remove('error');
 
             if (formType === 'login') {
                 loginForm.classList.add('active');
@@ -500,110 +515,138 @@
             }
         }
 
-        // Validate email format
+        function showMessage(message, isError = false) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+            successMessage.classList.add('show');
+            successMessage.classList.toggle('error', isError);
+        }
+
         function validateEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
         }
 
-        // Validate phone number (basic validation)
         function validatePhone(phone) {
             const re = /^[0-9]{10}$/;
             return re.test(phone);
         }
 
-        // Handle login form submission
-        function handleLogin(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('loginEmail');
-            const password = document.getElementById('loginPassword');
-            let isValid = true;
-
-            // Reset errors
-            email.parentElement.classList.remove('error');
-            password.parentElement.classList.remove('error');
-
-            // Validate email
-            if (!validateEmail(email.value)) {
-                email.parentElement.classList.add('error');
-                isValid = false;
-            }
-
-            // Validate password
-            if (password.value.length < 6) {
-                password.parentElement.classList.add('error');
-                isValid = false;
-            }
-
-            if (isValid) {
-                alert('Login successful! (Demo)');
-                // Here you would typically send data to server
-            }
+        function clearErrors() {
+            document.querySelectorAll('.form-group').forEach(group => {
+                group.classList.remove('error');
+            });
         }
 
-        // Handle register form submission
-        function handleRegister(event) {
+        async function handleLogin(event) {
             event.preventDefault();
-            
-            const fullName = document.getElementById('fullName');
-            const email = document.getElementById('registerEmail');
-            const phone = document.getElementById('phoneNumber');
-            const password = document.getElementById('registerPassword');
-            const confirmPassword = document.getElementById('confirmPassword');
+
+            const emailInput = document.getElementById('loginEmail');
+            const passwordInput = document.getElementById('loginPassword');
+            const email = emailInput.value.trim().toLowerCase();
+            const password = passwordInput.value;
             let isValid = true;
 
-            // Reset errors
-            [fullName, email, phone, password, confirmPassword].forEach(input => {
-                input.parentElement.classList.remove('error');
+            clearErrors();
+
+            if (!validateEmail(email)) {
+                emailInput.parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (password.length < 6) {
+                passwordInput.parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                showMessage('Please enter a valid email and password.', true);
+                return;
+            }
+
+            const { response, result } = await submitForm('login.php', { email, password });
+
+            if (!response.ok || !result.success) {
+                emailInput.parentElement.classList.add('error');
+                passwordInput.parentElement.classList.add('error');
+                showMessage(result.message || 'Login failed', true);
+                return;
+            }
+
+            showMessage(`Welcome back, ${result.user.fullName}!`, false);
+            document.getElementById('loginForm').reset();
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+
+            const fullNameInput = document.getElementById('fullName');
+            const emailInput = document.getElementById('registerEmail');
+            const phoneInput = document.getElementById('phoneNumber');
+            const passwordInput = document.getElementById('registerPassword');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+
+            const fullName = fullNameInput.value.trim();
+            const email = emailInput.value.trim().toLowerCase();
+            const phone = phoneInput.value.trim();
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            let isValid = true;
+
+            clearErrors();
+
+            if (fullName.length < 2) {
+                fullNameInput.parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (!validateEmail(email)) {
+                emailInput.parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (!validatePhone(phone)) {
+                phoneInput.parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (password.length < 6) {
+                passwordInput.parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (password !== confirmPassword) {
+                confirmPasswordInput.parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                showMessage('Please fix the highlighted fields.', true);
+                return;
+            }
+
+            const { response, result } = await submitForm('register.php', {
+                fullName,
+                email,
+                phone,
+                password,
+                confirmPassword
             });
 
-            // Validate full name
-            if (fullName.value.trim().length < 2) {
-                fullName.parentElement.classList.add('error');
-                isValid = false;
+            if (!response.ok || !result.success) {
+                emailInput.parentElement.classList.add('error');
+                showMessage(result.message || 'Registration failed', true);
+                return;
             }
 
-            // Validate email
-            if (!validateEmail(email.value)) {
-                email.parentElement.classList.add('error');
-                isValid = false;
-            }
+            showMessage('Account created successfully! You can now log in.', false);
+            document.getElementById('registerForm').reset();
 
-            // Validate phone number
-            if (!validatePhone(phone.value)) {
-                phone.parentElement.classList.add('error');
-                isValid = false;
-            }
-
-            // Validate password
-            if (password.value.length < 6) {
-                password.parentElement.classList.add('error');
-                isValid = false;
-            }
-
-            // Validate confirm password
-            if (password.value !== confirmPassword.value) {
-                confirmPassword.parentElement.classList.add('error');
-                isValid = false;
-            }
-
-            if (isValid) {
-                // Show success message
-                const successMessage = document.getElementById('successMessage');
-                successMessage.classList.add('show');
-                
-                // Clear form
-                document.getElementById('registerForm').reset();
-                
-                // Switch to login form after delay
-                setTimeout(() => {
-                    showForm('login');
-                }, 2000);
-            }
+            setTimeout(() => {
+                showForm('login');
+            }, 2000);
         }
 
-        // Add input event listeners for real-time validation
         document.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', function() {
                 this.parentElement.classList.remove('error');
