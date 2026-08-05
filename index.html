@@ -573,8 +573,8 @@
                 return;
             }
 
-            showMessage(`Welcome back, ${result.user.fullName}!`, false);
-            document.getElementById('loginForm').reset();
+            localStorage.setItem('secureStepUserName', result.user.fullName);
+            window.location.href = 'dashboard.html';
         }
 
         async function handleRegister(event) {
