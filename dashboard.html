@@ -3,19 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecureStep Dashboard</title>
+    <title>SecureStep – Smart Personal Safety & Navigation Dashboard</title>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        /* ==========================================================================
+           COLOR PALETTE & DESIGN SYSTEM (Blue, White, Dark Gray)
+           ========================================================================== */
         :root {
-            --primary: #1e3a5f;
-            --primary-light: #2c5282;
-            --accent: #4fc3f7;
-            --bg: #eef5fb;
-            --surface: #ffffff;
-            --muted: #6b7280;
-            --shadow: 0 20px 50px rgba(30, 58, 95, 0.12);
+            --primary: #1e3a5f;         /* Deep Navy Blue */
+            --primary-light: #2c5282;   /* Medium Blue */
+            --accent: #4fc3f7;          /* Sky Blue Accent */
+            --accent-dark: #0284c7;     /* Ocean Blue */
+            --dark-bg: #0f172a;        /* Dark Slate Gray */
+            --sidebar-bg: #1e293b;     /* Slate Gray */
+            --light-bg: #eff6ff;       /* Soft Blue Tint */
+            --surface: #ffffff;        /* Pure White */
+            --muted: #64748b;          /* Neutral Gray */
+            --danger: #ef4444;         /* Emergency Red */
+            --success: #10b981;        /* Safety Green */
+            --warning: #f59e0b;        /* Alert Yellow */
+            --border: #e2e8f0;         /* Card Border Gray */
+            --shadow: 0 10px 25px rgba(30, 58, 95, 0.08);
         }
 
+        /* General Reset */
         * {
             margin: 0;
             padding: 0;
@@ -26,329 +39,1124 @@
         body {
             min-height: 100vh;
             background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
-            color: #1f2937;
+            color: #1e293b;
         }
 
-        .dashboard {
-            display: grid;
-            grid-template-columns: 280px 1fr;
+        /* Anchor offset for sticky header when scrolling to targets */
+        .anchor { scroll-margin-top: 110px; }
+
+        /* App Container */
+        .app-container {
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
         }
 
-        .sidebar {
-            background: #0f172a;
+        /* ==========================================================================
+           1. TOP NAVIGATION BAR (Header)
+           ========================================================================== */
+        .topnav {
+            background: var(--dark-bg);
             color: white;
-            padding: 30px 20px;
+            padding: 14px 28px;
             display: flex;
-            flex-direction: column;
-            gap: 30px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
-        .sidebar .brand {
+        .topnav-brand {
             display: flex;
             align-items: center;
             gap: 12px;
             font-size: 22px;
             font-weight: 700;
+            color: white;
+            text-decoration: none;
             letter-spacing: 0.02em;
         }
 
-        .sidebar .brand i {
-            font-size: 28px;
+        .topnav-brand i {
             color: var(--accent);
+            font-size: 26px;
         }
 
-        .nav-links {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .nav-links a {
-            display: flex;
+        .topnav-menu {
+            display: none;
             align-items: center;
-            gap: 14px;
-            padding: 14px 16px;
-            border-radius: 12px;
+            gap: 8px;
+            list-style: none;
+        }
+
+        .topnav-menu a {
             color: #cbd5e1;
             text-decoration: none;
-            transition: background 0.25s ease, color 0.25s ease;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
 
-        .nav-links a:hover,
-        .nav-links a.active {
-            background: rgba(79, 195, 247, 0.12);
+        .topnav-menu a:hover,
+        .topnav-menu a.active {
+            background: rgba(79, 195, 247, 0.16);
             color: white;
         }
 
-        .nav-links a i {
+        .topnav-menu a.sos-link {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        .topnav-menu a.sos-link:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .topnav-datetime {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            color: var(--accent);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        /* ==========================================================================
+           2. MAIN DASHBOARD LAYOUT (Sidebar + Content)
+           ========================================================================== */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            flex: 1;
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(79, 195, 247, 0.15);
+            color: white;
+        }
+
+        .sidebar-menu a i {
             width: 20px;
             text-align: center;
+            color: var(--accent);
+        }
+
+        .sidebar-menu a.logout-link {
+            color: #fca5a5 !important;
+            margin-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 16px !important;
+        }
+
+        .sidebar-menu a.logout-link:hover {
+            background: rgba(239, 68, 68, 0.2) !important;
+            color: #fecaca !important;
+        }
+
+        .sidebar-menu a.logout-link i {
+            color: #f87171;
         }
 
         .sidebar-footer {
             margin-top: auto;
             padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             color: #94a3b8;
-            font-size: 14px;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
-        .main {
-            padding: 28px 32px;
+        .sidebar-footer strong {
+            color: white;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            padding: 28px;
             display: flex;
             flex-direction: column;
             gap: 24px;
+            overflow-y: auto;
         }
 
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .topbar .breadcrumbs {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 12px;
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        .topbar .breadcrumbs span {
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .topbar .actions {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .action-btn {
-            border: none;
+        /* ==========================================================================
+           3. CARD GRID LAYOUTS & COMPONENTS
+           ========================================================================== */
+        .card {
             background: var(--surface);
-            color: var(--primary);
-            padding: 10px 16px;
-            border-radius: 999px;
+            border-radius: 18px;
             box-shadow: var(--shadow);
-            cursor: pointer;
+            padding: 24px;
+            border: 1px solid var(--border);
+            position: relative;
         }
 
-        .card-grid {
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--accent-dark);
+        }
+
+        /* Grid: 3 Columns (Welcome, Tip, Safety Score) */
+        .grid-3 {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
         }
 
-        .card {
-            background: var(--surface);
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            padding: 28px;
-            min-height: 210px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: -22px;
-            right: -22px;
-            width: 96px;
-            height: 96px;
-            background: rgba(79, 195, 247, 0.16);
-            border-radius: 50%;
-        }
-
-        .welcome-card {
+        /* Grid: 4 Columns (Quick Action Cards) */
+        .grid-4 {
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
         }
 
-        .welcome-card h1 {
-            font-size: 30px;
-            margin-bottom: 10px;
+        /* Grid: 2 Columns (Police, Hospital, Info Cards) */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
         }
 
-        .welcome-card p {
+        /* Welcome Card */
+        .welcome-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-text h2 {
+            font-size: 22px;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .welcome-text p {
             color: var(--muted);
-            line-height: 1.8;
+            font-size: 14px;
+            line-height: 1.5;
         }
 
         .welcome-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+            color: white;
             display: grid;
             place-items: center;
-            width: 100px;
-            height: 100px;
-            border-radius: 28px;
-            background: linear-gradient(135deg, #4fc3f7 0%, #1e3a5f 100%);
-            color: white;
-            font-size: 32px;
+            font-size: 26px;
             font-weight: 700;
-            box-shadow: 0 18px 40px rgba(79, 195, 247, 0.3);
+            box-shadow: 0 8px 20px rgba(79, 195, 247, 0.3);
+            flex-shrink: 0;
         }
 
-        .tip-card {
+        /* Safety Tip Card */
+        .tip-card p {
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .tip-footer {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        /* Safety Score Card */
+        .score-display {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin: 10px 0 12px 0;
+        }
+
+        .score-number {
+            font-size: 38px;
+            font-weight: 800;
+            color: var(--success);
+        }
+
+        .score-max {
+            font-size: 16px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .score-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .score-bar-fill {
+            width: 94%;
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #0284c7);
+            border-radius: 999px;
+        }
+
+        .score-status {
+            font-size: 13px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Quick Action Cards */
+        .quick-action-box {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.25s ease;
+        }
+
+        .quick-action-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(30, 58, 95, 0.12);
+        }
+
+        .quick-action-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: rgba(79, 195, 247, 0.15);
+            color: var(--accent-dark);
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+        }
+
+        .quick-action-icon.sos {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .quick-action-box h3 {
+            font-size: 16px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .quick-action-box p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* Google Maps Placeholder Card */
+        .map-card {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 340px;
+            background: #e2e8f0;
+            border-radius: 14px;
+            position: relative;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(#cbd5e1 2px, transparent 2px),
+                linear-gradient(to right, rgba(203, 213, 225, 0.3) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(203, 213, 225, 0.3) 1px, transparent 1px);
+            background-size: 24px 24px, 40px 40px, 40px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #cbd5e1;
+        }
+
+        .map-overlay-route {
+            position: absolute;
+            width: 65%;
+            height: 6px;
+            background: linear-gradient(90deg, #10b981 0%, #0284c7 100%);
+            border-radius: 3px;
+            transform: rotate(-12deg);
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.4);
+        }
+
+        .map-marker {
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            color: white;
+            font-size: 16px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        }
+
+        .map-marker.user { top: 32%; left: 22%; background: var(--accent-dark); }
+        .map-marker.police { top: 25%; right: 28%; background: var(--primary); }
+        .map-marker.hospital { bottom: 25%; right: 22%; background: var(--danger); }
+
+        .map-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .map-controls {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .map-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* Facility Cards (Police & Hospital) */
+        .facility-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .facility-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .facility-icon.police {
+            background: rgba(30, 58, 95, 0.12);
+            color: var(--primary);
+        }
+
+        .facility-icon.hospital {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger);
+        }
+
+        .facility-details h4 {
+            font-size: 16px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .facility-details p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .btn-sm {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sm:hover {
+            background: #e2e8f0;
+        }
+
+        /* Recent Community Reports List */
+        .reports-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .report-item {
+            padding: 14px;
+            background: #f8fafc;
+            border-left: 4px solid var(--accent-dark);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .report-item.success { border-left-color: var(--success); }
+        .report-item.warning { border-left-color: var(--warning); }
+
+        .report-text {
+            color: #334155;
+            line-height: 1.4;
+        }
+
+        .report-time {
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        /* Info Cards (How SecureStep Works & About SecureStep) */
+        .info-card {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
 
-        .tip-card h2 {
-            font-size: 22px;
-            margin-bottom: 18px;
+        .steps-container {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0 20px 0;
+            flex-wrap: wrap;
         }
 
-        .tip-card p {
-            line-height: 1.8;
+        .step-item {
+            flex: 1 1 130px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .step-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: rgba(79, 195, 247, 0.15);
+            color: var(--accent-dark);
+            display: grid;
+            place-items: center;
+            font-size: 15px;
+        }
+
+        .step-item h4 {
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .step-item p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .about-description {
             color: #334155;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
         }
 
-        .tip-footer {
-            margin-top: 22px;
+        .highlights-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .highlights-list li {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            color: var(--muted);
+            gap: 10px;
             font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
         }
 
+        .btn-learn-more {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
 
+        .btn-learn-more:hover {
+            opacity: 0.9;
+        }
+
+        /* ==========================================================================
+           4. RESPONSIVE DESIGN (Media Queries for Mobile & Tablet)
+           ========================================================================== */
         @media (max-width: 1024px) {
-            .dashboard {
+            .dashboard-layout {
                 grid-template-columns: 1fr;
             }
 
             .sidebar {
                 flex-direction: row;
-                align-items: flex-start;
                 flex-wrap: wrap;
+                align-items: center;
                 justify-content: space-between;
-                padding: 24px;
-                gap: 12px;
+                padding: 16px 20px;
             }
 
-            .nav-links {
-                width: 100%;
+            .sidebar-menu {
                 flex-direction: row;
                 flex-wrap: wrap;
             }
 
-            .nav-links a {
-                flex: 1 1 48%;
-            }
-
-            .card-grid,
-            .overview {
+            .grid-3, .grid-4, .grid-2 {
                 grid-template-columns: 1fr;
-            }
-
-            .welcome-card {
-                grid-template-columns: 1fr;
-            }
-
-            .topbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .topbar .actions {
-                justify-content: flex-start;
             }
         }
 
         @media (max-width: 640px) {
-            .sidebar {
-                padding: 18px;
+            .topnav {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 14px 18px;
             }
 
-            .nav-links a {
-                flex: 1 1 100%;
+            .topnav-menu {
+                flex-wrap: wrap;
+                width: 100%;
             }
 
-            .main {
-                padding: 20px;
+            .main-content {
+                padding: 16px;
             }
 
-            .action-btn {
-                padding: 10px 14px;
+            .steps-container {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <aside class="sidebar">
-            <div class="brand">
+    <div class="app-container">
+        <!-- TOP NAVIGATION BAR -->
+        <header class="topnav">
+            <a href="#" class="topnav-brand">
                 <i class="fas fa-shield-alt"></i>
                 <span>SecureStep</span>
-            </div>
+            </a>
 
-            <nav class="nav-links">
-                <a href="#" class="active"><i class="fas fa-home"></i> Home</a>
-                <a href="#"><i class="fas fa-route"></i> Safe Navigation</a>
-                <a href="#"><i class="fas fa-city"></i> CivicSense</a>
-                <a href="#"><i class="fas fa-bell"></i> Emergency SOS</a>
-                <a href="#"><i class="fas fa-user"></i> Profile</a>
-                <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <nav class="topnav-menu">
+                <a href="#home" class="active"><i class="fas fa-home"></i> Home</a>
+                <a href="#navigation"><i class="fas fa-route"></i> Safe Navigation</a>
+                <a href="#civicsense"><i class="fas fa-city"></i> CivicSense</a>
+                <a href="#sos" class="sos-link"><i class="fas fa-bell"></i> Emergency SOS</a>
+                <a href="#profile"><i class="fas fa-user"></i> Profile</a>
+                <a onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
 
-            <div class="sidebar-footer">
-                <div><strong>Quick stats</strong></div>
-                <div>2 alerts today • 98% route safety</div>
+            <div class="topnav-datetime" id="liveDateTime">
+                <i class="far fa-clock"></i> Loading Clock...
             </div>
-        </aside>
+        </header>
 
-        <main class="main">
-            <div class="topbar">
-                <div class="breadcrumbs">
-                    <span>Dashboard</span> / SecureStep – Smart Personal Safety and Navigation Platform
+        <!-- DASHBOARD LAYOUT (Sidebar + Main Content) -->
+        <div class="dashboard-layout">
+            <!-- LEFT SIDEBAR -->
+            <aside class="sidebar">
+                <div>
+                    <div class="sidebar-title">Menu Overview</div>
+                    <nav class="sidebar-menu">
+                        <a href="#home" class="active"><i class="fas fa-home"></i> Home Dashboard</a>
+                        <a href="#navigation"><i class="fas fa-map-marked-alt"></i> Safe Navigation</a>
+                        <a href="#civicsense"><i class="fas fa-users-viewfinder"></i> CivicSense Watch</a>
+                        <a href="#sos"><i class="fas fa-exclamation-triangle"></i> Emergency SOS</a>
+                        <a href="#profile"><i class="fas fa-user-shield"></i> User Safety Profile</a>
+                        <a onclick="handleLogout()" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </nav>
                 </div>
-                <div class="actions">
-                    <button class="action-btn"><i class="fas fa-search"></i> Search</button>
-                    <button class="action-btn"><i class="fas fa-bell"></i> Alerts</button>
-                </div>
-            </div>
 
-            <div class="card-grid">
-                <section class="card welcome-card">
-                    <div>
-                        <h1 id="dashboardGreeting">Good morning, Alex!</h1>
-                        <p>Welcome back to SecureStep. Your personal safety dashboard keeps you informed with the latest route insights, emergency tools, and neighborhood awareness.</p>
+                <div class="sidebar-footer">
+                    <div><strong>SecureStep Platform</strong></div>
+                    <div>Final Year Project • Major Demo</div>
+                </div>
+            </aside>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="main-content">
+                <div id="home" class="anchor"></div>
+
+                <!-- ROW 1: Welcome Card, Safety Tip of the Day -->
+                <div class="grid-2">
+                    <!-- Welcome Card -->
+                    <section class="card welcome-card">
+                        <div class="welcome-text">
+                            <h2 id="dashboardGreeting">Good morning, Alex!</h2>
+                            <p>Welcome back to SecureStep. Your personal safety and route optimization platform is active.</p>
+                        </div>
+                        <div class="welcome-avatar" id="dashboardAvatar">AJ</div>
+                    </section>
+
+                    <!-- Safety Tip of the Day Card -->
+                    <section class="card tip-card">
+                        <div class="card-title"><i class="fas fa-lightbulb"></i> Safety Tip of the Day</div>
+                        <p>When walking at night, stick to main roads with active streetlighting. Share your live trip status with a trusted emergency contact.</p>
+                        <div class="tip-footer">
+                            <span><i class="fas fa-shield"></i> Stay Vigilant</span>
+                            <span>Updated Today</span>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="sos" class="anchor"></div>
+                <!-- ROW 2: Quick Action Cards -->
+                <div class="grid-4">
+                    <div class="quick-action-box">
+                        <div class="quick-action-icon"><i class="fas fa-directions"></i></div>
+                        <h3>Navigate</h3>
+                        <p>Plan optimal safe routes with high streetlighting and patrol coverage.</p>
                     </div>
-                    <div class="welcome-avatar" id="dashboardAvatar">A</div>
+
+                    <div class="quick-action-box">
+                        <div class="quick-action-icon sos"><i class="fas fa-bell"></i></div>
+                        <h3>Emergency SOS</h3>
+                        <p>1-tap alert to dispatch live GPS coordinates to trusted contacts.</p>
+                    </div>
+
+                    <div class="quick-action-box">
+                        <div class="quick-action-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h3>Report Incident</h3>
+                        <p>Submit hazards, broken streetlights, or unsafe spots to CivicSense.</p>
+                    </div>
+
+                    <div class="quick-action-box">
+                        <div class="quick-action-icon"><i class="fas fa-address-book"></i></div>
+                        <h3>Emergency Contacts</h3>
+                        <p>Manage primary response numbers and family alert notifications.</p>
+                    </div>
+                </div>
+
+                <div id="civicsense" class="anchor"></div>
+                <!-- ROW 5: Recent Community Reports -->
+                <section class="card">
+                    <div class="card-title"><i class="fas fa-users-viewfinder"></i> Recent Community Safety Reports</div>
+                    <div class="reports-list">
+                        <div class="report-item success">
+                            <div class="report-text"><strong><i class="fas fa-check-circle" style="color: var(--success);"></i> High Patrol Area:</strong> Main Street corridor well lit & patrolled by local officers.</div>
+                            <div class="report-time">12 mins ago</div>
+                        </div>
+                        <div class="report-item warning">
+                            <div class="report-text"><strong><i class="fas fa-exclamation-circle" style="color: var(--warning);"></i> Maintenance Warning:</strong> Street light maintenance active on 5th Avenue near Metro Gate 2.</div>
+                            <div class="report-time">45 mins ago</div>
+                        </div>
+                        <div class="report-item">
+                            <div class="report-text"><strong><i class="fas fa-info-circle" style="color: var(--accent-dark);"></i> Resolved Incident:</strong> Road obstruction cleared on Park Road intersection.</div>
+                            <div class="report-time">2 hours ago</div>
+                        </div>
+                    </div>
                 </section>
 
-                <section class="card tip-card">
-                    <div>
-                        <h2>Safety Tip of the Day</h2>
-                        <p>When walking at night, stay in well-lit areas and keep your phone easily accessible. Share your live location with a trusted contact before you start your journey.</p>
-                    </div>
-                    <div class="tip-footer">
-                        <span><i class="fas fa-lightbulb"></i> Stay aware of your surroundings</span>
-                        <span>Updated today</span>
-                    </div>
-                </section>
-            </div>
+                <!-- ROW 5.5: Safety Score, Nearby Facilities & Map -->
+                <div class="grid-2">
+                    <!-- Left Column: Safety Score + Facilities -->
+                    <div style="display:flex;flex-direction:column;gap:24px;">
+                        <!-- Safety Score Card -->
+                        <section class="card">
+                            <div class="card-title"><i class="fas fa-shield-alt"></i> Safety Score</div>
+                            <div style="margin-top:12px;">
+                                <div class="score-display">
+                                    <div class="score-number" id="safetyScore">--</div>
+                                    <div class="score-max">/ 100</div>
+                                </div>
 
-        </main>
+                                <div class="score-bar-bg" aria-hidden>
+                                    <div class="score-bar-fill" id="scoreBar" style="width:0%"></div>
+                                </div>
+
+                                <div class="score-status" id="scoreStatus">Calculating safety...</div>
+                                <p style="margin-top:12px;color:var(--muted);font-size:13px;">Your safety score estimates route safety using lighting, patrol presence, and recent community reports.</p>
+                            </div>
+                        </section>
+
+                        <!-- Facilities (Police & Hospital) stacked for small screens -->
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <!-- Nearby Police Station Card -->
+                            <section class="card facility-card">
+                                <div class="card-title"><i class="fas fa-search-location"></i> Nearby Police Station</div>
+                                <div style="margin-top:12px;" class="facility-item">
+                                    <div class="facility-icon police"><i class="fas fa-shield-alt"></i></div>
+                                    <div class="facility-details">
+                                        <h4 id="policeName">Central Precinct</h4>
+                                        <p id="policeAddr">123 Main St • 1.2 km</p>
+                                        <button class="btn-sm" onclick="openInMap('police')"><i class="fas fa-map-marked-alt"></i> View on Map</button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Nearby Hospital Card -->
+                            <section class="card facility-card">
+                                <div class="card-title"><i class="fas fa-hospital-symbol"></i> Nearby Hospital</div>
+                                <div style="margin-top:12px;" class="facility-item">
+                                    <div class="facility-icon hospital"><i class="fas fa-hospital"></i></div>
+                                    <div class="facility-details">
+                                        <h4 id="hospitalName">City General Hospital</h4>
+                                        <p id="hospitalAddr">45 Park Ave • 2.0 km</p>
+                                        <button class="btn-sm" onclick="openInMap('hospital')"><i class="fas fa-map-marker-alt"></i> View on Map</button>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+
+                    <div id="navigation" class="anchor"></div>
+                    <!-- Right Column: Large Map Placeholder -->
+                    <section class="card map-card">
+                        <div class="card-title"><i class="fas fa-map"></i> Map Overview</div>
+                        <div class="map-container" id="mapPlaceholder">
+                            <div class="map-overlay-route"></div>
+                            <div class="map-marker user">You</div>
+                            <div class="map-marker police">P</div>
+                            <div class="map-marker hospital">H</div>
+                            <div class="map-badge"><i class="fas fa-map-marker-alt"></i> Map Disabled (Placeholder)</div>
+                            <div class="map-controls">
+                                <button class="map-btn" onclick="zoomMap('in')">Zoom In</button>
+                                <button class="map-btn" onclick="zoomMap('out')">Zoom Out</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                    <!-- How SecureStep Works Card -->
+                    <section class="card info-card">
+                        <div>
+                            <div class="card-title"><i class="fas fa-cogs"></i> How SecureStep Works</div>
+                            <div class="steps-container">
+                                <div class="step-item">
+                                    <div class="step-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                    <h4>1. Enter Destination</h4>
+                                    <p>Enter your starting point and destination.</p>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-icon"><i class="fas fa-route"></i></div>
+                                    <h4>2. Choose a Route</h4>
+                                    <p>View available route options for your journey.</p>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-icon"><i class="fas fa-location-arrow"></i></div>
+                                    <h4>3. Start Navigation</h4>
+                                    <p>Select your preferred route and begin your journey.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-learn-more">Learn More</button>
+                    </section>
+
+                    <div id="profile" class="anchor"></div>
+                    <!-- About SecureStep Card -->
+                    <section class="card info-card">
+                        <div>
+                            <div class="card-title"><i class="fas fa-info-circle"></i> About SecureStep</div>
+                            <p class="about-description">SecureStep is a smart personal security and navigation platform designed to help users plan and navigate their journeys with safety in mind.</p>
+                            <ul class="highlights-list">
+                                <li><span style="color: var(--accent-dark); font-size: 18px;">•</span> Smart Navigation</li>
+                                <li><span style="color: var(--accent-dark); font-size: 18px;">•</span> Emergency Assistance</li>
+                                <li><span style="color: var(--accent-dark); font-size: 18px;">•</span> Community Reporting</li>
+                            </ul>
+                        </div>
+                        <button class="btn-learn-more">Learn More</button>
+                    </section>
+                </div>
+
+            </main>
+        </div>
     </div>
-    <script>
-        function loadDashboardUser() {
-            const userName = localStorage.getItem('secureStepUserName') || 'Alex';
-            const greeting = document.getElementById('dashboardGreeting');
-            const avatar = document.getElementById('dashboardAvatar');
-            greeting.textContent = `Good morning, ${userName}!`;
-            avatar.textContent = userName.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase();
-        }
 
-        loadDashboardUser();
+    <!-- Debug status (visible on page to confirm JS initialization) -->
+    <div id="debugStatus" style="position:fixed;bottom:16px;right:16px;padding:8px 10px;background:#0f172a;color:white;border-radius:8px;font-size:13px;z-index:9999;opacity:0.95">JS: initializing…</div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Expose dashboard helpers on window and initialize after DOM ready
+        (function(){
+            // Expose functions to window so inline onclick handlers work
+            window.updateDateTime = function() {
+                const now = new Date();
+                const options = {
+                    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                };
+                const dateTimeStr = now.toLocaleDateString('en-US', options);
+                const clockElem = document.getElementById('liveDateTime');
+                if (clockElem) clockElem.innerHTML = `<i class="far fa-clock"></i> ${dateTimeStr}`;
+            };
+
+            window.loadDashboardUser = function() {
+                const userName = localStorage.getItem('secureStepUserName') || 'Alex Johnson';
+                const greetingElem = document.getElementById('dashboardGreeting');
+                const avatarElem = document.getElementById('dashboardAvatar');
+                const hour = new Date().getHours();
+                let timeStr = 'morning';
+                if (hour >= 12 && hour < 17) timeStr = 'afternoon';
+                else if (hour >= 17) timeStr = 'evening';
+                if (greetingElem) greetingElem.textContent = `Good ${timeStr}, ${userName}!`;
+                if (avatarElem) avatarElem.textContent = userName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            };
+
+            window.handleLogout = function() {
+                localStorage.removeItem('secureStepUserName');
+                localStorage.removeItem('secureStepUserEmail');
+                window.location.href = 'index.html';
+            };
+
+            window.generateSafetyScore = function() {
+                const base = 88;
+                const reportsPenalty = Math.floor(Math.random() * 15);
+                const hour = new Date().getHours();
+                const nightPenalty = (hour >= 20 || hour < 6) ? 12 : 0;
+                return Math.max(25, base - reportsPenalty - nightPenalty);
+            };
+
+            window.populateSafetyScore = function(){
+                const score = window.generateSafetyScore();
+                const scoreElem = document.getElementById('safetyScore');
+                const bar = document.getElementById('scoreBar');
+                const status = document.getElementById('scoreStatus');
+                if (scoreElem) scoreElem.textContent = score;
+                if (bar) bar.style.width = score + '%';
+                if (status) {
+                    if (score > 80) status.textContent = 'Very Safe • Low recent incidents';
+                    else if (score > 60) status.textContent = 'Moderately Safe • Stay alert';
+                    else status.textContent = 'Caution • Avoid isolated routes';
+                }
+            };
+
+            window.populateFacilities = function(){
+                const p = document.getElementById('policeName');
+                const pa = document.getElementById('policeAddr');
+                const h = document.getElementById('hospitalName');
+                const ha = document.getElementById('hospitalAddr');
+                if(p) p.textContent = 'Central Precinct';
+                if(pa) pa.textContent = '123 Main St • 1.2 km';
+                if(h) h.textContent = 'City General Hospital';
+                if(ha) ha.textContent = '45 Park Ave • 2.0 km';
+            };
+
+            window.openInMap = function(type){
+                const badge = document.querySelector('.map-badge');
+                if(!badge) return;
+                if (type === 'police') badge.textContent = 'Showing: Nearby Police Station (Placeholder)';
+                if (type === 'hospital') badge.textContent = 'Showing: Nearby Hospital (Placeholder)';
+            };
+
+            window.zoomMap = function(direction){
+                const container = document.getElementById('mapPlaceholder');
+                if (!container) return;
+                const current = container.style.transform || 'scale(1)';
+                let scale = 1;
+                const match = current.match(/scale\(([^)]+)\)/);
+                if (match) scale = parseFloat(match[1]);
+                if (direction === 'in') scale = Math.min(2, scale + 0.1);
+                else scale = Math.max(0.7, scale - 0.1);
+                container.style.transform = `scale(${scale})`;
+            };
+
+            // Initialize after DOM is ready
+            document.addEventListener('DOMContentLoaded', function(){
+                try{
+                    setInterval(window.updateDateTime, 1000);
+                    window.updateDateTime();
+                    window.loadDashboardUser();
+                    window.populateSafetyScore();
+                    window.populateFacilities();
+                    setInterval(window.populateSafetyScore, 30 * 1000);
+                    console.log('Dashboard scripts initialized');
+                    // Attach interactive handlers for navigation and quick actions
+                    // Topnav links: smooth scroll for anchors, SOS handles specially
+                    document.querySelectorAll('.topnav-menu a').forEach(a=>{
+                        a.addEventListener('click', function(e){
+                            const href = a.getAttribute('href');
+                            if(a.classList.contains('sos-link')){
+                                e.preventDefault();
+                                alert('Emergency SOS (demo): alert sent to trusted contacts.');
+                                return;
+                            }
+                            // Open dedicated Safe Navigation page instead of scrolling
+                            if(href === '#navigation'){
+                                e.preventDefault();
+                                window.location.href = 'safe-navigation.html';
+                                return;
+                            }
+                            if(href && href.startsWith('#')){
+                                e.preventDefault();
+                                const target = document.querySelector(href);
+                                if(target) target.scrollIntoView({behavior:'smooth'});
+                            }
+                        });
+                    });
+
+                    // Sidebar links: similar behavior
+                    document.querySelectorAll('.sidebar-menu a').forEach(a=>{
+                        a.addEventListener('click', function(e){
+                            const href = a.getAttribute('href');
+                            if(href === '#navigation'){
+                                e.preventDefault();
+                                window.location.href = 'safe-navigation.html';
+                                return;
+                            }
+                            if(href && href.startsWith('#')){
+                                e.preventDefault();
+                                const target = document.querySelector(href);
+                                if(target) target.scrollIntoView({behavior:'smooth'});
+                            }
+                        });
+                    });
+
+                    // Quick action boxes
+                    document.querySelectorAll('.quick-action-box').forEach(box=>{
+                        box.style.cursor = 'pointer';
+                        box.setAttribute('tabindex','0');
+                        box.addEventListener('click', function(){
+                            const titleEl = box.querySelector('h3');
+                            const title = titleEl? titleEl.textContent.trim().toLowerCase() : '';
+                            console.log('Quick action clicked:', title);
+                            if(title.includes('navigate')){
+                                window.location.href = 'safe-navigation.html';
+                            } else if(title.includes('sos')){
+                                alert('Emergency SOS triggered (demo).');
+                            } else if(title.includes('report')){
+                                const reports = document.querySelector('.reports-list');
+                                if(reports) reports.scrollIntoView({behavior:'smooth'});
+                            } else if(title.includes('contact')){
+                                alert('Open Emergency Contacts (demo).');
+                            }
+                        });
+                        box.addEventListener('keypress', function(e){ if(e.key==='Enter') box.click(); });
+                    });
+                    // Update debug status with counts
+                    try{
+                        const debug = document.getElementById('debugStatus');
+                        const topnavCount = document.querySelectorAll('.topnav-menu a').length;
+                        const sidebarCount = document.querySelectorAll('.sidebar-menu a').length;
+                        const quickCount = document.querySelectorAll('.quick-action-box').length;
+                        if(debug) debug.textContent = `JS: OK — topnav:${topnavCount}, sidebar:${sidebarCount}, quick:${quickCount}`;
+                    }catch(e){ console.warn('Debug status update failed', e); }
+                }catch(err){
+                    console.error('Dashboard init error', err);
+                }
+            });
+        })();
     </script>
 </body>
 </html>

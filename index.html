@@ -476,15 +476,70 @@
     </div>
 
     <script>
-        async function submitForm(url, payload) {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+        // Local storage demo fallback storage
+        function getLocalUsers() {
+            try {
+                return JSON.parse(localStorage.getItem('secureStepUsers') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
 
-            const result = await response.json();
-            return { response, result };
+        function saveLocalUsers(users) {
+            localStorage.setItem('secureStepUsers', JSON.stringify(users));
+        }
+
+        function handleLocalRegister(fullName, email, phone, password) {
+            const users = getLocalUsers();
+            if (users.some(u => u.email === email)) {
+                return { success: false, message: 'An account with this email already exists' };
+            }
+            const user = { fullName, email, phone, password };
+            users.push(user);
+            saveLocalUsers(users);
+            return { success: true, message: 'Account created successfully', user: { fullName, email } };
+        }
+
+        function handleLocalLogin(email, password) {
+            const users = getLocalUsers();
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                return {
+                    success: true,
+                    message: 'Login successful',
+                    user: { fullName: user.fullName, email: user.email }
+                };
+            }
+
+            // Default demo credentials fallback for quick testing
+            if (email === 'alex@example.com' && password === 'password123') {
+                return {
+                    success: true,
+                    message: 'Login successful (Demo Account)',
+                    user: { fullName: 'Alex Johnson', email: 'alex@example.com' }
+                };
+            }
+
+            return { success: false, message: 'Invalid email or password' };
+        }
+
+        async function submitForm(url, payload) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    const result = await response.json();
+                    return { response, result, networkSuccess: true };
+                }
+            } catch (e) {
+                console.warn('Network request failed or server not running. Falling back to local mode.', e);
+            }
+            return { networkSuccess: false };
         }
 
         function showForm(formType) {
@@ -538,6 +593,12 @@
             });
         }
 
+        function setLoggedInUser(user) {
+            if (!user || !user.fullName || !user.email) return;
+            localStorage.setItem('secureStepUserName', user.fullName);
+            localStorage.setItem('secureStepUserEmail', user.email);
+        }
+
         async function handleLogin(event) {
             event.preventDefault();
 
@@ -564,17 +625,33 @@
                 return;
             }
 
-            const { response, result } = await submitForm('login.php', { email, password });
+            const { networkSuccess, response, result } = await submitForm('login.php', { email, password });
 
-            if (!response.ok || !result.success) {
-                emailInput.parentElement.classList.add('error');
-                passwordInput.parentElement.classList.add('error');
-                showMessage(result.message || 'Login failed', true);
+            if (networkSuccess && result) {
+                if (!response.ok || !result.success) {
+                    emailInput.parentElement.classList.add('error');
+                    passwordInput.parentElement.classList.add('error');
+                    showMessage(result.message || 'Login failed', true);
+                    return;
+                }
+                setLoggedInUser(result.user);
+                showMessage('Login successful! Redirecting...', false);
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
                 return;
             }
 
-            localStorage.setItem('secureStepUserName', result.user.fullName);
-            window.location.href = 'dashboard.html';
+            // Fallback to local storage mode
+            const localRes = handleLocalLogin(email, password);
+            if (!localRes.success) {
+                emailInput.parentElement.classList.add('error');
+                passwordInput.parentElement.classList.add('error');
+                showMessage(localRes.message, true);
+                return;
+            }
+
+            setLoggedInUser(localRes.user);
+            showMessage(localRes.message + '! Redirecting...', false);
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
         }
 
         async function handleRegister(event) {
@@ -625,7 +702,7 @@
                 return;
             }
 
-            const { response, result } = await submitForm('register.php', {
+            const { networkSuccess, response, result } = await submitForm('register.php', {
                 fullName,
                 email,
                 phone,
@@ -633,18 +710,31 @@
                 confirmPassword
             });
 
-            if (!response.ok || !result.success) {
-                emailInput.parentElement.classList.add('error');
-                showMessage(result.message || 'Registration failed', true);
+            if (networkSuccess && result) {
+                if (!response.ok || !result.success) {
+                    emailInput.parentElement.classList.add('error');
+                    showMessage(result.message || 'Registration failed', true);
+                    return;
+                }
+                setLoggedInUser(result.user);
+                showMessage('Account created successfully! Redirecting to dashboard...', false);
+                document.getElementById('registerForm').reset();
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
                 return;
             }
 
-            showMessage('Account created successfully! You can now log in.', false);
-            document.getElementById('registerForm').reset();
+            // Fallback to local storage mode
+            const localRes = handleLocalRegister(fullName, email, phone, password);
+            if (!localRes.success) {
+                emailInput.parentElement.classList.add('error');
+                showMessage(localRes.message, true);
+                return;
+            }
 
-            setTimeout(() => {
-                showForm('login');
-            }, 2000);
+            setLoggedInUser(localRes.user);
+            showMessage('Account created successfully! Redirecting to dashboard...', false);
+            document.getElementById('registerForm').reset();
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
         }
 
         document.querySelectorAll('input').forEach(input => {

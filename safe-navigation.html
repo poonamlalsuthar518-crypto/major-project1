@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SecureStep — Safe Navigation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root{
+            --primary:#1e3a5f; --accent:#4fc3f7; --bg:#f8fafc; --card:#fff; --muted:#64748b; --danger:#ef4444; --success:#10b981; --unsafe:#f59e0b;
+        }
+        *{box-sizing:border-box}
+        body{font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;margin:0;background:linear-gradient(180deg,#eff6ff 0%,#f8fafc 100%);color:#0f172a}
+        .container{max-width:1200px;margin:22px auto;padding:18px}
+        .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+        .brand{display:flex;align-items:center;gap:10px}
+        .brand i{color:var(--accent);font-size:22px}
+        .card{background:var(--card);border-radius:12px;padding:14px;border:1px solid #e2e8f0;box-shadow:0 8px 20px rgba(30,58,95,0.06)}
+        .layout{display:grid;grid-template-columns:360px 1fr;gap:18px}
+        .map-placeholder{height:520px;border-radius:10px;background:repeating-linear-gradient(45deg,#e2e8f0 0 2px, transparent 2px 6px),linear-gradient(180deg,#e6f6ff,#ffffff);display:flex;flex-direction:column}
+        .map-top{padding:12px;display:flex;align-items:center;justify-content:space-between}
+        .map-canvas{flex:1;display:flex;align-items:center;justify-content:center;border-top:1px dashed #cbd5e1}
+        .form-group{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+        input[type=text]{padding:10px;border-radius:8px;border:1px solid #e2e8f0}
+        .btn{background:linear-gradient(135deg,var(--primary),#2c5282);color:white;padding:10px 12px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+        .btn-ghost{background:transparent;border:1px solid #cbd5e1;padding:8px 10px;border-radius:8px;color:var(--primary);cursor:pointer}
+        .control-panel{display:flex;flex-direction:column;gap:12px}
+        .suggested-routes{display:flex;flex-direction:column;gap:10px}
+        .route-item{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:10px}
+        .route-meta{display:flex;gap:12px;align-items:center}
+        .badge{padding:6px 8px;border-radius:999px;font-weight:700;font-size:12px}
+        .badge.safe{background:linear-gradient(90deg,var(--success),#0284c7);color:white}
+        .badge.moderate{background:#f59e0b;color:white}
+        .badge.unsafe{background:#ef4444;color:white}
+        .legend{display:flex;gap:8px;align-items:center}
+        .legend .dot{width:12px;height:12px;border-radius:3px}
+        .dot.safe{background:linear-gradient(90deg,var(--success),#0284c7)}
+        .dot.moderate{background:#f59e0b}
+        .dot.unsafe{background:#ef4444}
+        .route-details p{margin:0;color:var(--muted)}
+        .nearby-list{display:flex;flex-direction:column;gap:8px}
+        .nearby-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:8px;background:#f8fafc}
+        @media(max-width:980px){.layout{grid-template-columns:1fr}.map-placeholder{height:360px}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <div class="brand"><i class="fas fa-shield-alt"></i><h2>SecureStep — Safe Navigation</h2></div>
+        </div>
+
+        <div class="layout">
+            <!-- LEFT CONTROLS -->
+            <aside class="card control-panel">
+                <div>
+                    <h3 style="margin:0 0 8px 0">Plan a Safe Route</h3>
+                    <div class="form-group">
+                        <label style="font-weight:700;font-size:13px">Source</label>
+                        <input type="text" id="sourceInput" placeholder="Enter starting location">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:700;font-size:13px">Destination</label>
+                        <input type="text" id="destInput" placeholder="Enter destination">
+                    </div>
+                    <div style="display:flex;gap:10px;margin-bottom:8px">
+                        <button class="btn-ghost" id="locBtn"><i class="fas fa-location-arrow"></i> Current Location</button>
+                        <button class="btn" id="findRouteBtn"><i class="fas fa-route"></i> Find Safest Route</button>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 style="margin:0 0 8px 0">Suggested Routes</h4>
+                    <div class="suggested-routes" id="routesList">
+                        <!-- JS populates routes here -->
+                    </div>
+                </div>
+
+                <div>
+                    <h4 style="margin:0 0 8px 0">Nearby Resources</h4>
+                    <div class="nearby-list">
+                        <div class="nearby-item"><div><strong>Police Stations</strong></div><div id="nearPoliceCount">2</div></div>
+                        <div class="nearby-item"><div><strong>Hospitals</strong></div><div id="nearHospitalCount">3</div></div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- RIGHT MAP & DETAILS -->
+            <section class="map-placeholder card">
+                <div class="map-top">
+                    <div style="display:flex;gap:12px;align-items:center">
+                        <div class="legend">
+                            <div style="display:flex;flex-direction:column;align-items:flex-start">
+                                <div style="font-weight:700">Route Legend</div>
+                                <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+                                    <div class="dot safe"></div><span style="font-size:13px;color:var(--muted)">Safe</span>
+                                    <div class="dot moderate"></div><span style="font-size:13px;color:var(--muted)">Moderate</span>
+                                    <div class="dot unsafe"></div><span style="font-size:13px;color:var(--muted)">Unsafe</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:10px;align-items:center">
+                        <div style="text-align:right;color:var(--muted);font-weight:700">Route Safety</div>
+                        <div id="overallSafetyBadge" class="badge safe">--</div>
+                    </div>
+                </div>
+
+                <div class="map-canvas" id="mapCanvas">
+                    <div style="text-align:center;color:var(--muted)">
+                        <div style="font-size:20px;font-weight:800;margin-bottom:8px">Google Maps Placeholder</div>
+                        <div style="max-width:520px">This area is a placeholder for Google Maps. Replace with the Maps JavaScript API and Directions Service. The UI below simulates suggested routes with safety metadata.</div>
+                    </div>
+                </div>
+
+                <div style="padding:12px;display:grid;grid-template-columns:1fr 300px;gap:12px">
+                    <div class="card route-details" style="padding:12px;">
+                        <h4 style="margin:0 0 8px 0">Selected Route Details</h4>
+                        <div id="routeInfo">
+                            <p><strong>Distance:</strong> <span id="routeDistance">--</span></p>
+                            <p><strong>Estimated Time:</strong> <span id="routeTime">--</span></p>
+                            <p><strong>Crime Risk:</strong> <span id="routeRisk">--</span></p>
+                            <p><strong>Explanation:</strong></p>
+                            <p id="routeExplanation" style="color:var(--muted)">No route selected.</p>
+                        </div>
+                    </div>
+
+                    <div class="card" style="padding:12px;">
+                        <h4 style="margin:0 0 8px 0">Nearby Facilities</h4>
+                        <div style="display:flex;flex-direction:column;gap:8px">
+                            <div style="display:flex;align-items:center;justify-content:space-between"><div>Central Precinct</div><div style="color:var(--muted)">1.2 km</div></div>
+                            <div style="display:flex;align-items:center;justify-content:space-between"><div>City General Hospital</div><div style="color:var(--muted)">2.0 km</div></div>
+                            <div style="display:flex;align-items:center;justify-content:space-between"><div>Westside Station</div><div style="color:var(--muted)">2.4 km</div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Beginner-friendly simulated routing logic for Safe Navigation page
+        document.addEventListener('DOMContentLoaded', function(){
+            const sampleRoutes = [
+            {id:'r1',label:'Safe Route (longer)',safety:92,distance_km:5.2,time_min:18,explain:'Uses main roads with good lighting and active patrols.' ,color:'safe'},
+            {id:'r2',label:'Moderate Route (balanced)',safety:68,distance_km:3.8,time_min:12,explain:'Mix of main roads and quieter streets; some unlit segments.' ,color:'moderate'},
+            {id:'r3',label:'Quickest Route (unsafe)',safety:42,distance_km:2.9,time_min:9,explain:'Shortest path through alleys and poorly lit areas; higher risk.' ,color:'unsafe'}
+        ];
+
+            function renderSuggestedRoutes(){
+                const list = document.getElementById('routesList');
+                list.innerHTML='';
+                sampleRoutes.forEach(r=>{
+                    const item = document.createElement('div');
+                    item.className='route-item card';
+                    item.style.borderLeft = `6px solid ${r.color==='safe'? '#10b981' : r.color==='moderate'? '#f59e0b' : '#ef4444'}`;
+                    item.innerHTML = `
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <div style="font-weight:800">${r.label}</div>
+                            <div style="display:flex;gap:8px;align-items:center">
+                                <div class="badge ${r.color}">${r.safety}</div>
+                                <button class="btn-ghost select-btn" data-route="${r.id}">Select</button>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:12px;margin-top:8px;color:var(--muted)">
+                            <div><i class="fas fa-route"></i> ${r.distance_km} km</div>
+                            <div><i class="far fa-clock"></i> ${r.time_min} min</div>
+                            <div><i class="fas fa-exclamation-triangle"></i> Risk: ${r.safety<50?'High':r.safety<70?'Medium':'Low'}</div>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+
+            function selectRoute(id){
+                const route = sampleRoutes.find(r=>r.id===id);
+                if(!route) return;
+                document.getElementById('routeDistance').textContent = route.distance_km + ' km';
+                document.getElementById('routeTime').textContent = route.time_min + ' min';
+                document.getElementById('routeRisk').textContent = route.safety<50? 'High' : route.safety<70? 'Medium' : 'Low';
+                document.getElementById('routeExplanation').textContent = route.explain;
+                const badge = document.getElementById('overallSafetyBadge');
+                badge.textContent = route.safety + '/100';
+                badge.className = 'badge ' + (route.color==='safe'?'safe':route.color==='moderate'?'moderate':'unsafe');
+
+                // Simulate map drawing by updating the canvas text
+                const mapCanvas = document.getElementById('mapCanvas');
+                mapCanvas.innerHTML = `<div style="text-align:center;color:var(--muted)"><div style="font-size:18px;font-weight:800">Displaying: ${route.label}</div><p style='max-width:540px'>${route.explain}</p></div>`;
+                // Color-coded faux route bar at top
+                mapCanvas.style.borderTop = `6px solid ${route.color==='safe'? '#10b981' : route.color==='moderate'? '#f59e0b' : '#ef4444'}`;
+            }
+
+            document.getElementById('findRouteBtn').addEventListener('click', function(){
+                // Basic validation and simulation
+                const src = document.getElementById('sourceInput').value.trim();
+                const dst = document.getElementById('destInput').value.trim();
+                if(!src || !dst){
+                    alert('Please enter both source and destination (or use Current Location).');
+                    return;
+                }
+                // In a real app, call Directions API here. We simulate suggested routes.
+                renderSuggestedRoutes();
+                // Auto-select the balanced route
+                selectRoute('r2');
+            });
+
+            document.getElementById('locBtn').addEventListener('click', function(){
+                // Simulate getting current location (beginner-friendly)
+                document.getElementById('sourceInput').value = 'Current Location (simulated)';
+            });
+
+            // Use event delegation for select buttons
+            document.getElementById('routesList').addEventListener('click', function(e){
+                const btn = e.target.closest('.select-btn');
+                if(btn && btn.dataset.route){
+                    selectRoute(btn.dataset.route);
+                }
+            });
+
+            // Init
+            renderSuggestedRoutes();
+        });
+    </script>
+</body>
+</html>

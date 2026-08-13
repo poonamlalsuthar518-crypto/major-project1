@@ -1,5 +1,6 @@
 <?php
 require_once 'db.php';
+require_once 'database-handler.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -45,33 +46,42 @@ if ($password !== $confirmPassword) {
     exit;
 }
 
-$conn = getDbConnection();
+// Initialize database handler
+$db = new UserDatabaseHandler('users.json');
 
-$stmt = $conn->prepare('SELECT id FROM users WHERE email = ?');
-$stmt->bind_param('s', $email);
-$stmt->execute();
-$stmt->store_result();
-
-if ($stmt->num_rows > 0) {
+// Check if user already exists
+if ($db->userExists($email)) {
     http_response_code(409);
     echo json_encode(['success' => false, 'message' => 'An account with this email already exists']);
-    $stmt->close();
-    $conn->close();
     exit;
 }
 
-$stmt->close();
-
+// Hash password for security
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-$insertStmt = $conn->prepare('INSERT INTO users (full_name, email, phone, password_hash) VALUES (?, ?, ?, ?)');
-$insertStmt->bind_param('ssss', $fullName, $email, $phone, $hashedPassword);
 
-if ($insertStmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Account created successfully']);
+// Add user to database (updates users.json)
+$result = $db->addUser([
+    'fullName' => $fullName,
+    'email' => $email,
+    'phone' => $phone,
+    'password_hash' => $hashedPassword
+]);
+
+if ($result['success']) {
+    $_SESSION['user_id'] = $result['user']['id'];
+    $_SESSION['full_name'] = $fullName;
+    $_SESSION['email'] = $email;
+
+    http_response_code(201);
+    echo json_encode([
+        'success' => true,
+        'message' => $result['message'],
+        'user' => [
+            'fullName' => $fullName,
+            'email' => $email
+        ]
+    ]);
 } else {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Registration failed']);
+    echo json_encode(['success' => false, 'message' => $result['message']]);
 }
-
-$insertStmt->close();
-$conn->close();
