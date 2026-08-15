@@ -1,0 +1,39 @@
+:root{
+    --primary:#1e3a5f; --accent:#4fc3f7; --bg:#f8fafc; --card:#fff; --muted:#64748b; --danger:#ef4444; --success:#10b981; --unsafe:#f59e0b;
+}
+*{box-sizing:border-box}
+body{font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;margin:0;background:linear-gradient(180deg,#eff6ff 0%,#f8fafc 100%);color:#0f172a}
+.container{max-width:1200px;margin:22px auto;padding:18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand i{color:var(--accent);font-size:22px}
+.card{background:var(--card);border-radius:12px;padding:14px;border:1px solid #e2e8f0;box-shadow:0 8px 20px rgba(30,58,95,0.06)}
+.layout{display:grid;grid-template-columns:360px 1fr;gap:18px}
+.map-placeholder{height:520px;border-radius:10px;background:repeating-linear-gradient(45deg,#e2e8f0 0 2px, transparent 2px 6px),linear-gradient(180deg,#e6f6ff,#ffffff);display:flex;flex-direction:column}
+.map-top{padding:12px;display:flex;align-items:center;justify-content:space-between}
+.map-canvas{flex:1;display:flex;align-items:center;justify-content:center;border-top:1px dashed #cbd5e1}
+.form-group{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+input[type=text]{padding:10px;border-radius:8px;border:1px solid #e2e8f0}
+.btn{background:linear-gradient(135deg,var(--primary),#2c5282);color:white;padding:10px 12px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+.btn-ghost{background:transparent;border:1px solid #cbd5e1;padding:8px 10px;border-radius:8px;color:var(--primary);cursor:pointer}
+.control-panel{display:flex;flex-direction:column;gap:12px}
+.suggested-routes{display:flex;flex-direction:column;gap:10px}
+.route-item{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:10px}
+.route-meta{display:flex;gap:12px;align-items:center}
+.badge{padding:6px 8px;border-radius:999px;font-weight:700;font-size:12px}
+.badge.safe{background:linear-gradient(90deg,var(--success),#0284c7);color:white}
+.badge.moderate{background:#f59e0b;color:white}
+.badge.unsafe{background:#ef4444;color:white}
+.legend{display:flex;gap:8px;align-items:center}
+.legend .dot{width:12px;height:12px;border-radius:3px}
+.dot.safe{background:linear-gradient(90deg,var(--success),#0284c7)}
+.dot.moderate{background:#f59e0b}
+.dot.unsafe{background:#ef4444}
+.route-details p{margin:0;color:var(--muted)}
+.nearby-list{display:flex;flex-direction:column;gap:8px}
+.nearby-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:8px;background:#f8fafc}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.map-placeholder{height:360px}}
+
+/* Map canvas should fill available area when Google Maps is active */
+#map{width:100%;height:420px;border-radius:8px;overflow:hidden}
+@media(max-width:980px){#map{height:300px}}
