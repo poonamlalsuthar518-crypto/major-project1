@@ -22,16 +22,6 @@ Now uses the `UserDatabaseHandler` instead of MySQL:
 - ✅ Automatically updates `users.json` file
 - ✅ Returns proper HTTP status codes
 
-### 3. **database-usage-examples.php** (NEW)
-Reference guide with code examples for:
-- Checking if user exists
-- Getting user by email
-- Retrieving all users
-- Updating user information
-- Deleting users
-- Sample login function
-- API endpoints for user management
-
 ## How It Works
 
 ### Registration Flow:

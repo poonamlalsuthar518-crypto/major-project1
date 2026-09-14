@@ -1,0 +1,133 @@
+[
+  {
+    "id": 1,
+    "user_id": "test_user_1788684347928",
+    "latitude": 12.972,
+    "longitude": 77.595,
+    "status": "stopped",
+    "locations": [
+      {
+        "latitude": 12.9716,
+        "longitude": 77.5946,
+        "recorded_at": "2026-09-06T08:45:48.355Z"
+      },
+      {
+        "latitude": 12.972,
+        "longitude": 77.595,
+        "recorded_at": "2026-09-06T08:45:48.361Z"
+      }
+    ],
+    "started_at": "2026-09-06T08:45:48.355Z",
+    "ended_at": "2026-09-06T08:45:48.373Z"
+  },
+  {
+    "id": 2,
+    "user_id": "user_live_1788684871051",
+    "user_name": "Poonam Suthar",
+    "token": "89d6b5c6b9ce8cf168ea98c609c9ef6a",
+    "latitude": 12.97345,
+    "longitude": 77.59678,
+    "status": "resolved",
+    "locations": [
+      {
+        "latitude": 12.971598,
+        "longitude": 77.594562,
+        "recorded_at": "2026-09-06T08:54:31.108Z"
+      },
+      {
+        "latitude": 12.97345,
+        "longitude": 77.59678,
+        "recorded_at": "2026-09-06T08:54:31.135Z"
+      }
+    ],
+    "started_at": "2026-09-06T08:54:31.109Z",
+    "updated_at": "2026-09-06T08:54:31.144Z",
+    "ended_at": "2026-09-06T08:54:31.144Z"
+  },
+  {
+    "id": 3,
+    "user_id": 2,
+    "user_name": "Poonam Lal",
+    "token": "442e642004e016448d8137a7ef0c69da",
+    "latitude": 12.866570049757113,
+    "longitude": 77.58041296953503,
+    "status": "resolved",
+    "locations": [
+      {
+        "latitude": 12.866570049757113,
+        "longitude": 77.58041296953503,
+        "recorded_at": "2026-09-06T09:00:43.096Z"
+      },
+      {
+        "latitude": 12.866570049757113,
+        "longitude": 77.58041296953503,
+        "recorded_at": "2026-09-06T09:01:03.116Z"
+      }
+    ],
+    "started_at": "2026-09-06T09:00:43.096Z",
+    "updated_at": "2026-09-06T09:01:09.298Z",
+    "ended_at": "2026-09-06T09:01:09.298Z"
+  },
+  {
+    "id": 4,
+    "user_id": 1,
+    "user_name": "Alex Johnson",
+    "token": "9d408a0316089fde160fa87f301f14da",
+    "latitude": 12.9716,
+    "longitude": 77.5946,
+    "status": "resolved",
+    "locations": [
+      {
+        "latitude": 12.9716,
+        "longitude": 77.5946,
+        "recorded_at": "2026-09-06T09:03:20.012Z"
+      }
+    ],
+    "started_at": "2026-09-06T09:03:20.012Z",
+    "updated_at": "2026-09-06T09:03:20.035Z",
+    "ended_at": "2026-09-06T09:03:20.035Z"
+  },
+  {
+    "id": 5,
+    "user_id": "alex@example.com",
+    "user_name": "Alex Johnson",
+    "token": "c5e4ca6c6f250a71baedb468d633a98c",
+    "latitude": 12.9716,
+    "longitude": 77.5946,
+    "status": "resolved",
+    "locations": [
+      {
+        "latitude": 12.9716,
+        "longitude": 77.5946,
+        "recorded_at": "2026-09-06T09:06:57.813Z"
+      }
+    ],
+    "started_at": "2026-09-06T09:06:57.813Z",
+    "updated_at": "2026-09-06T09:06:57.824Z",
+    "ended_at": "2026-09-06T09:06:57.824Z"
+  },
+  {
+    "id": 6,
+    "user_id": 2,
+    "user_name": "Poonam Lal",
+    "token": "eb9c789bbd5b491516107eccfbce9bab",
+    "latitude": 12.885797663644265,
+    "longitude": 77.55016980042447,
+    "status": "resolved",
+    "locations": [
+      {
+        "latitude": 12.885816837655776,
+        "longitude": 77.55017822684704,
+        "recorded_at": "2026-09-06T11:46:50.432Z"
+      },
+      {
+        "latitude": 12.885797663644265,
+        "longitude": 77.55016980042447,
+        "recorded_at": "2026-09-06T11:47:02.527Z"
+      }
+    ],
+    "started_at": "2026-09-06T11:46:50.432Z",
+    "updated_at": "2026-09-06T11:47:09.594Z",
+    "ended_at": "2026-09-06T11:47:09.594Z"
+  }
+]

@@ -6,7 +6,6 @@
     <title>SecureStep — Safe Navigation</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
     <div class="container">
@@ -80,7 +79,7 @@
                         <div id="routeInfo">
                             <p><strong>Distance:</strong> <span id="routeDistance">--</span></p>
                             <p><strong>Estimated Time:</strong> <span id="routeTime">--</span></p>
-                            <p><strong>Crime Risk:</strong> <span id="routeRisk">--</span></p>
+                            <p><strong>Safety Score:</strong> <span id="routeSafetyScore">--</span></p>
                             <p><strong>Explanation:</strong></p>
                             <p id="routeExplanation" style="color:var(--muted)">No route selected.</p>
                         </div>
@@ -88,10 +87,8 @@
 
                     <div class="card" style="padding:12px;">
                         <h4 style="margin:0 0 8px 0">Nearby Facilities</h4>
-                        <div style="display:flex;flex-direction:column;gap:8px">
-                            <div style="display:flex;align-items:center;justify-content:space-between"><div>Central Precinct</div><div style="color:var(--muted)">1.2 km</div></div>
-                            <div style="display:flex;align-items:center;justify-content:space-between"><div>City General Hospital</div><div style="color:var(--muted)">2.0 km</div></div>
-                            <div style="display:flex;align-items:center;justify-content:space-between"><div>Westside Station</div><div style="color:var(--muted)">2.4 km</div></div>
+                        <div id="nearbyFacilitiesList" style="display:flex;flex-direction:column;gap:8px">
+                            <div style="color:var(--muted);font-size:13px;">Search for a route to see nearby facilities</div>
                         </div>
                     </div>
                 </div>
@@ -99,10 +96,48 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/google-maps-loader.js"></script>
+    <script src="js/geoUtils.js"></script>
     <script src="js/routing.js"></script>
     <script src="js/safety-score.js"></script>
+    <script src="js/safetyScoreService.js"></script>
     <script src="js/maps.js"></script>
     <script src="js/navigation.js"></script>
+    <script src="js/emergency-contacts.js"></script>
+    <script src="js/emergency-sos.js"></script>
+    <script src="js/location-sharing.js"></script>
+    <script src="js/civicsense-reporting.js"></script>
+    <script src="js/dashboard-map.js"></script>
+    <script>
+        // Load nearby facilities data and update counts
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Wait for map to initialize
+            setTimeout(async () => {
+                try {
+                    // Update nearby counts from API
+                    const policeCount = document.getElementById('nearPoliceCount');
+                    const hospitalCount = document.getElementById('nearHospitalCount');
+                    
+                    if (policeCount) {
+                        const response = await fetch('/api/police-stations');
+                        if (response.ok) {
+                            const stations = await response.json();
+                            policeCount.textContent = stations.length;
+                        }
+                    }
+                    
+                    if (hospitalCount) {
+                        const response = await fetch('/api/hospitals');
+                        if (response.ok) {
+                            const hospitals = await response.json();
+                            hospitalCount.textContent = hospitals.length;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load nearby counts:', error);
+                }
+            }, 1000);
+        });
+    </script>
 </body>
 </html>

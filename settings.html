@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
+    <nav class="nav">
+      <a href="dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a>
+      <a href="safe-navigation.html"><i class="fas fa-route"></i> Safe Navigation</a>
+      <a href="crime-heatmap.html"><i class="fas fa-map-marked-alt"></i> Heatmap</a>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="settings.html" class="active"><i class="fas fa-gear"></i> Settings</a>
+    </nav>
+    <div class="user-chip"><span class="avatar">AS</span> Settings</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Preferences</div>
+        <nav>
+          <a href="settings.html" class="active"><i class="fas fa-user-gear"></i> Account</a>
+          <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+          <a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a>
+          <a href="help.html"><i class="fas fa-circle-question"></i> Help</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1>Settings</h1>
+          <p>Customize your app preferences and privacy controls</p>
+        </div>
+        <button class="btn btn-primary">Save Settings</button>
+      </div>
+
+      <div class="grid-2">
+        <section class="card">
+          <div class="section-head"><h3>Account Settings</h3></div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Full Name</label>
+              <input type="text" value="Alice Sharma" />
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input type="email" value="alice@example.com" />
+            </div>
+            <div class="field full">
+              <label>Language</label>
+              <select>
+                <option>English</option>
+                <option>Hindi</option>
+                <option>Kannada</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head"><h3>Privacy & Security</h3></div>
+          <div class="form-grid">
+            <div class="field full">
+              <label class="checkbox-row"><input type="checkbox" checked /> Enable location sharing for emergency alerts</label>
+            </div>
+            <div class="field full">
+              <label class="checkbox-row"><input type="checkbox" checked /> Allow anonymous incident reports</label>
+            </div>
+            <div class="field full">
+              <label class="checkbox-row"><input type="checkbox" /> Hide my profile in nearby users</label>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head"><h3>Notification Settings</h3></div>
+          <div class="form-grid">
+            <div class="field full"><label class="checkbox-row"><input type="checkbox" checked /> Emergency alerts</label></div>
+            <div class="field full"><label class="checkbox-row"><input type="checkbox" checked /> Route updates</label></div>
+            <div class="field full"><label class="checkbox-row"><input type="checkbox" /> Monthly summary emails</label></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head"><h3>Theme & Actions</h3></div>
+          <div class="form-grid">
+            <div class="field full">
+              <label>Theme Selection</label>
+              <select>
+                <option>Light Theme</option>
+                <option>Dark Theme</option>
+                <option>Blue Safety Theme</option>
+              </select>
+            </div>
+            <div class="field full">
+              <button class="btn btn-danger" style="width:100%;">Delete Account</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • App settings</footer>
+  <script src="js/securestep-ui.js"></script>
+</body>
+</html>

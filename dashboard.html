@@ -7,6 +7,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    
     <style>
         /* ==========================================================================
            COLOR PALETTE & DESIGN SYSTEM (Blue, White, Dark Gray)
@@ -748,6 +749,50 @@
                 flex-direction: column;
             }
         }
+
+        /* ==========================================================================
+           Google Maps - Complete Removal of "For development purposes only" & Overlays
+           ========================================================================== */
+        .gm-style-pbc,
+        .gm-style-pba,
+        .gm-style-mot,
+        .gm-style-moc,
+        .gm-err-container,
+        .gm-err-content,
+        .gm-err-message,
+        .gm-err-autocomplete,
+        .dismissButton,
+        .gm-style div[role="dialog"],
+        div[jsaction*="dismiss"],
+        div[style*="z-index: 1000001"],
+        div[style*="z-index: 1000000"],
+        div[style*="background-color: rgba(0, 0, 0, 0.5)"],
+        div[style*="background-color: rgba(0,0,0,0.5)"],
+        div[style*="rgba(0, 0, 0, 0.5)"],
+        div[style*="rgba(0,0,0,0.5)"],
+        div[style*="background: rgba(0, 0, 0, 0.5)"],
+        div[style*="background: rgba(0,0,0,0.5)"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            height: 0 !important;
+            width: 0 !important;
+            position: absolute !important;
+            z-index: -9999 !important;
+        }
+
+        /* Ensure map tiles, canvas, and layers remain 100% visible, bright, and unfiltered */
+        .gm-style > div:first-child,
+        .gm-style .gm-style-layer,
+        .gm-style-layer,
+        .gm-style-layer img,
+        .gm-style canvas,
+        .gm-style img {
+            filter: none !important;
+            -webkit-filter: none !important;
+            opacity: 1 !important;
+        }
     </style>
 </head>
 <body>
@@ -853,7 +898,7 @@
                 <!-- ROW 5: Recent Community Reports -->
                 <section class="card">
                     <div class="card-title"><i class="fas fa-users-viewfinder"></i> Recent Community Safety Reports</div>
-                    <div class="reports-list">
+                    <div class="reports-list" id="civicSenseReportsList">
                         <div class="report-item success">
                             <div class="report-text"><strong><i class="fas fa-check-circle" style="color: var(--success);"></i> High Patrol Area:</strong> Main Street corridor well lit & patrolled by local officers.</div>
                             <div class="report-time">12 mins ago</div>
@@ -899,9 +944,9 @@
                                 <div style="margin-top:12px;" class="facility-item">
                                     <div class="facility-icon police"><i class="fas fa-shield-alt"></i></div>
                                     <div class="facility-details">
-                                        <h4 id="policeName">Central Precinct</h4>
-                                        <p id="policeAddr">123 Main St • 1.2 km</p>
-                                        <button class="btn-sm" onclick="openInMap('police')"><i class="fas fa-map-marked-alt"></i> View on Map</button>
+                                        <h4 id="policeName">Loading...</h4>
+                                        <p id="policeAddr">Detecting location...</p>
+                                        <button class="btn-sm" onclick="window.dashboardMap.highlightService('police', document.getElementById('policeName').textContent)"><i class="fas fa-map-marked-alt"></i> View on Map</button>
                                     </div>
                                 </div>
                             </section>
@@ -912,9 +957,9 @@
                                 <div style="margin-top:12px;" class="facility-item">
                                     <div class="facility-icon hospital"><i class="fas fa-hospital"></i></div>
                                     <div class="facility-details">
-                                        <h4 id="hospitalName">City General Hospital</h4>
-                                        <p id="hospitalAddr">45 Park Ave • 2.0 km</p>
-                                        <button class="btn-sm" onclick="openInMap('hospital')"><i class="fas fa-map-marker-alt"></i> View on Map</button>
+                                        <h4 id="hospitalName">Loading...</h4>
+                                        <p id="hospitalAddr">Detecting location...</p>
+                                        <button class="btn-sm" onclick="window.dashboardMap.highlightService('hospital', document.getElementById('hospitalName').textContent)"><i class="fas fa-map-marker-alt"></i> View on Map</button>
                                     </div>
                                 </div>
                             </section>
@@ -922,19 +967,23 @@
                     </div>
 
                     <div id="navigation" class="anchor"></div>
-                    <!-- Right Column: Large Map Placeholder -->
+                    <!-- Right Column: Real Interactive Map -->
                     <section class="card map-card">
-                        <div class="card-title"><i class="fas fa-map"></i> Map Overview</div>
-                        <div class="map-container" id="mapPlaceholder">
-                            <div class="map-overlay-route"></div>
-                            <div class="map-marker user">You</div>
-                            <div class="map-marker police">P</div>
-                            <div class="map-marker hospital">H</div>
-                            <div class="map-badge"><i class="fas fa-map-marker-alt"></i> Map Disabled (Placeholder)</div>
-                            <div class="map-controls">
-                                <button class="map-btn" onclick="zoomMap('in')">Zoom In</button>
-                                <button class="map-btn" onclick="zoomMap('out')">Zoom Out</button>
-                            </div>
+                        <div class="card-title"><i class="fas fa-map"></i> Safety Map Overview</div>
+                        <div class="map-container" id="dashboardMap" style="height: 400px; border-radius: 14px; border: 2px solid #e2e8f0;"></div>
+                        <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="map-btn" onclick="window.dashboardMap.refreshNearbyServices()">
+                                <i class="fas fa-sync-alt"></i> Refresh Services
+                            </button>
+                            <button class="map-btn" onclick="window.dashboardMap.centerOnUser()">
+                                <i class="fas fa-crosshairs"></i> Center on Me
+                            </button>
+                            <button class="map-btn" onclick="window.dashboardMap.toggleLayer('police')">
+                                <i class="fas fa-shield-alt"></i> Toggle Police
+                            </button>
+                            <button class="map-btn" onclick="window.dashboardMap.toggleLayer('hospital')">
+                                <i class="fas fa-hospital"></i> Toggle Hospitals
+                            </button>
                         </div>
                     </section>
                 </div>
@@ -985,6 +1034,15 @@
 
     <!-- Debug status (visible on page to confirm JS initialization) -->
     <div id="debugStatus" style="position:fixed;bottom:16px;right:16px;padding:8px 10px;background:#0f172a;color:white;border-radius:8px;font-size:13px;z-index:9999;opacity:0.95">JS: initializing…</div>
+
+    <!-- SAFETY FEATURE MODULES -->
+    <script src="js/google-maps-loader.js"></script>
+    <script src="js/emergency-contacts.js"></script>
+    <script src="js/safety-score.js"></script>
+    <script src="js/emergency-sos.js"></script>
+    <script src="js/location-sharing.js"></script>
+    <script src="js/civicsense-reporting.js"></script>
+    <script src="js/dashboard-map.js"></script>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
@@ -1053,24 +1111,32 @@
                 if(ha) ha.textContent = '45 Park Ave • 2.0 km';
             };
 
-            window.openInMap = function(type){
-                const badge = document.querySelector('.map-badge');
-                if(!badge) return;
-                if (type === 'police') badge.textContent = 'Showing: Nearby Police Station (Placeholder)';
-                if (type === 'hospital') badge.textContent = 'Showing: Nearby Hospital (Placeholder)';
+            window.populateCivicSenseReports = function(){
+                const reportsList = document.getElementById('civicSenseReportsList');
+                if(!reportsList) return;
+                
+                // Try to get reports from CivicSense system
+                if(window.civicSense){
+                    const reports = window.civicSense.getRecentReports(5);
+                    if(reports.length > 0){
+                        reportsList.innerHTML = reports.map(report => {
+                            const display = window.civicSense.formatReportForDisplay(report);
+                            const severityClass = display.severityColor === '#ef4444' ? 'warning' : 
+                                                  display.severityColor === '#10b981' ? 'success' : '';
+                            return `
+                                <div class="report-item ${severityClass}">
+                                    <div class="report-text">
+                                        <strong><i class="fas ${display.typeIcon}" style="color: ${display.severityColor};"></i> ${display.typeName}:</strong> 
+                                        ${display.description}
+                                    </div>
+                                    <div class="report-time">${display.timeAgo}</div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
             };
 
-            window.zoomMap = function(direction){
-                const container = document.getElementById('mapPlaceholder');
-                if (!container) return;
-                const current = container.style.transform || 'scale(1)';
-                let scale = 1;
-                const match = current.match(/scale\(([^)]+)\)/);
-                if (match) scale = parseFloat(match[1]);
-                if (direction === 'in') scale = Math.min(2, scale + 0.1);
-                else scale = Math.max(0.7, scale - 0.1);
-                container.style.transform = `scale(${scale})`;
-            };
 
             // Initialize after DOM is ready
             document.addEventListener('DOMContentLoaded', function(){
@@ -1080,7 +1146,9 @@
                     window.loadDashboardUser();
                     window.populateSafetyScore();
                     window.populateFacilities();
+                    window.populateCivicSenseReports();
                     setInterval(window.populateSafetyScore, 30 * 1000);
+                    setInterval(window.populateCivicSenseReports, 60 * 1000);
                     console.log('Dashboard scripts initialized');
                     // Attach interactive handlers for navigation and quick actions
                     // Topnav links: smooth scroll for anchors, SOS handles specially
@@ -1089,7 +1157,11 @@
                             const href = a.getAttribute('href');
                             if(a.classList.contains('sos-link')){
                                 e.preventDefault();
-                                alert('Emergency SOS (demo): alert sent to trusted contacts.');
+                                if(window.emergencySOS){
+                                    window.emergencySOS.triggerSOS();
+                                } else {
+                                    alert('Emergency SOS feature loading...');
+                                }
                                 return;
                             }
                             // Open dedicated Safe Navigation page instead of scrolling
@@ -1134,12 +1206,19 @@
                             if(title.includes('navigate')){
                                 window.location.href = 'safe-navigation.html';
                             } else if(title.includes('sos')){
-                                alert('Emergency SOS triggered (demo).');
+                                if(window.emergencySOS){
+                                    window.emergencySOS.triggerSOS();
+                                } else {
+                                    alert('Emergency SOS feature loading...');
+                                }
                             } else if(title.includes('report')){
-                                const reports = document.querySelector('.reports-list');
-                                if(reports) reports.scrollIntoView({behavior:'smooth'});
+                                if(window.civicSense){
+                                    window.civicSense.showReportingModal();
+                                } else {
+                                    alert('CivicSense feature loading...');
+                                }
                             } else if(title.includes('contact')){
-                                alert('Open Emergency Contacts (demo).');
+                                window.location.href = 'emergency-contacts.html';
                             }
                         });
                         box.addEventListener('keypress', function(e){ if(e.key==='Enter') box.click(); });

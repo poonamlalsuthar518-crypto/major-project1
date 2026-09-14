@@ -1,0 +1,26 @@
+{
+  "name": "securestep",
+  "version": "1.0.0",
+  "description": "SecureStep – Smart Personal Safety and Navigation Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "securestep",
+    "safety",
+    "navigation",
+    "node",
+    "mysql"
+  ],
+  "author": "SecureStep Team",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.3.1"
+  }
+}

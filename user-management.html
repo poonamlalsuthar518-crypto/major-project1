@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Management | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
+    <nav class="nav">
+      <a href="admin-dashboard.html"><i class="fas fa-gauge-high"></i> Admin</a>
+      <a href="incident-management.html"><i class="fas fa-folder-open"></i> Incidents</a>
+      <a href="user-management.html" class="active"><i class="fas fa-users"></i> Users</a>
+      <a href="analytics.html"><i class="fas fa-chart-line"></i> Analytics</a>
+    </nav>
+    <div class="user-chip"><span class="avatar">AD</span> Team</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Users</div>
+        <nav>
+          <a href="user-management.html" class="active"><i class="fas fa-user-group"></i> Active Users</a>
+          <a href="admin-dashboard.html"><i class="fas fa-house"></i> Dashboard</a>
+          <a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1>User Management</h1>
+          <p>Monitor student and community member access</p>
+        </div>
+        <button class="btn btn-primary"><i class="fas fa-user-plus"></i> Add User</button>
+      </div>
+
+      <section class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Alice Sharma</td>
+                <td>Student</td>
+                <td>+91 98765 43210</td>
+                <td><span class="status active">Active</span></td>
+                <td class="table-actions"><button>Edit</button><button>Delete</button></td>
+              </tr>
+              <tr>
+                <td>Rohan Mehta</td>
+                <td>Volunteer</td>
+                <td>+91 91234 56789</td>
+                <td><span class="status pending">Pending</span></td>
+                <td class="table-actions"><button>Edit</button><button>Delete</button></td>
+              </tr>
+              <tr>
+                <td>Nisha Rao</td>
+                <td>Admin</td>
+                <td>+91 99887 66554</td>
+                <td><span class="status resolved">Verified</span></td>
+                <td class="table-actions"><button>Edit</button><button>Delete</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • User administration</footer>
+  <script src="js/securestep-ui.js"></script>
+</body>
+</html>

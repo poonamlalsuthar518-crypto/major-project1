@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Not Found | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+<style>
+  body { background: linear-gradient(180deg, #eef7ff 0%, #f8fafc 100%); }
+  .not-found {
+    max-width: 780px; margin: 80px auto; text-align: center; padding: 48px 28px; background: #fff; border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow);
+  }
+  .not-found h1 { font-size: clamp(3rem, 7vw, 7rem); color: var(--primary); margin: 12px 0; }
+  .not-found p { color: var(--muted); font-size: 1.08rem; line-height: 1.8; }
+  .not-found .icon { font-size: 5rem; color: var(--accent); }
+</style>
+</head>
+<body>
+  <div class="not-found">
+    <div class="icon"><i class="fas fa-map-location-dot"></i></div>
+    <h1>404</h1>
+    <h2 style="margin-bottom:10px; color:var(--primary);">This route doesn't exist</h2>
+    <p>The page you are looking for may have moved, been removed, or never existed.</p>
+    <div style="margin-top:26px; display:flex; justify-content:center; gap:14px; flex-wrap:wrap;">
+      <a class="btn btn-primary" href="dashboard.html">Go Home</a>
+      <a class="btn btn-outline" href="help.html">Search Help</a>
+    </div>
+  </div>
+  <script src="js/securestep-ui.js"></script>
+</body>
+</html>

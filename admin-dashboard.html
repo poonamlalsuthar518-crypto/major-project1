@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
+    <nav class="nav">
+      <a href="admin-dashboard.html" class="active"><i class="fas fa-gauge-high"></i> Admin</a>
+      <a href="incident-management.html"><i class="fas fa-folder-open"></i> Incident Management</a>
+      <a href="analytics.html"><i class="fas fa-chart-line"></i> Analytics</a>
+      <a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
+    </nav>
+    <div class="user-chip"><span class="avatar">AD</span> Admin</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Admin</div>
+        <nav>
+          <a href="admin-dashboard.html" class="active"><i class="fas fa-house"></i> Overview</a>
+          <a href="incident-management.html"><i class="fas fa-exclamation-triangle"></i> Incidents</a>
+          <a href="user-management.html"><i class="fas fa-users"></i> User Management</a>
+          <a href="analytics.html"><i class="fas fa-chart-bar"></i> Reports</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1>Admin Dashboard</h1>
+          <p>Campus safety operations overview</p>
+        </div>
+        <button class="btn btn-primary"><i class="fas fa-download"></i> Export Report</button>
+      </div>
+
+      <div class="stats-grid" style="margin-bottom:20px;">
+        <div class="stat-card">
+          <div class="stat-label">Total Users</div>
+          <div class="stat-value">24,120</div>
+          <div class="stat-trend">+8.4% this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Reports</div>
+          <div class="stat-value">1,458</div>
+          <div class="stat-trend">+6.1% this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active SOS Alerts</div>
+          <div class="stat-value">14</div>
+          <div class="stat-trend">3 require action</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Crime Hotspots</div>
+          <div class="stat-value">7</div>
+          <div class="stat-trend">2 high risk zones</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:18px;">
+        <section class="card">
+          <div class="section-head"><h3>Monthly Report Trends</h3></div>
+          <div class="map-box" style="min-height:220px;"></div>
+        </section>
+        <section class="card">
+          <div class="section-head"><h3>Hotspot Overview</h3></div>
+          <div class="map-box" style="min-height:220px;"></div>
+        </section>
+      </div>
+
+      <section class="card" style="margin-bottom:18px;">
+        <div class="section-head"><h3>User Management</h3><button class="btn btn-outline">View All</button></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Alice Sharma</td>
+                <td>alice@email.com</td>
+                <td>User</td>
+                <td><span class="status active">Active</span></td>
+                <td class="table-actions"><button>Edit</button><button>Delete</button></td>
+              </tr>
+              <tr>
+                <td>Navin Reddy</td>
+                <td>navin@email.com</td>
+                <td>Volunteer</td>
+                <td><span class="status pending">Review</span></td>
+                <td class="table-actions"><button>Edit</button><button>Delete</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head"><h3>Incident Management</h3><button class="btn btn-outline">Review</button></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Incident</th>
+                <th>Area</th>
+                <th>Severity</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Harassment</td>
+                <td>MG Road</td>
+                <td><span class="severity high">High</span></td>
+                <td><span class="status urgent">Open</span></td>
+                <td class="table-actions"><button>Edit</button><button>Delete</button></td>
+              </tr>
+              <tr>
+                <td>Broken Lights</td>
+                <td>Koramangala</td>
+                <td><span class="severity medium">Medium</span></td>
+                <td><span class="status active">In Review</span></td>
+                <td class="table-actions"><button>Edit</button><button>Delete</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • Admin operations</footer>
+  <script src="js/securestep-ui.js"></script>
+</body>
+</html>

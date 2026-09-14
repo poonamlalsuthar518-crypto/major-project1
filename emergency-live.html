@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emergency Live Location | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+  <style>
+    :root {
+      --primary: #1e3a5f;
+      --danger: #ef4444;
+      --success: #10b981;
+      --dark-bg: #0f172a;
+    }
+
+    body {
+      background: #f8fafc;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #0f172a;
+    }
+
+    .live-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 16px 24px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .header-brand i {
+      color: #38bdf8;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .status-pill.active {
+      background: #fef2f2;
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .status-pill.resolved {
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .status-pill.active .status-dot {
+      background: #ef4444;
+      animation: pulseDot 1.4s infinite;
+    }
+
+    .status-pill.resolved .status-dot {
+      background: #10b981;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.5; }
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+    }
+
+    @media (max-width: 820px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .map-card {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+    }
+
+    #liveMap {
+      width: 100%;
+      height: 460px;
+      background: #e2e8f0;
+    }
+
+    .info-card {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .user-info-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .user-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .user-meta h3 {
+      margin: 0 0 4px 0;
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .user-meta p {
+      margin: 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .detail-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .detail-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+    }
+
+    .detail-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .btn-maps {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #0284c7;
+      color: #ffffff;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+      transition: background 0.15s;
+    }
+
+    .btn-maps:hover {
+      background: #0369a1;
+    }
+
+    .btn-resolve {
+      padding: 12px 16px;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      color: #475569;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+
+    .btn-resolve:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .access-denied-box {
+      max-width: 480px;
+      margin: 80px auto;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 40px 32px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+      border: 1px solid #fee2e2;
+    }
+
+    .access-denied-box i {
+      font-size: 54px;
+      color: #ef4444;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="live-container" id="liveApp">
+    <!-- Content injected by JavaScript -->
+    <div style="text-align: center; padding: 60px 20px; color: #64748b;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 36px; color: #0284c7;"></i>
+      <p style="margin-top: 14px; font-weight: 600;">Authenticating emergency session &amp; loading live location…</p>
+    </div>
+  </div>
+
+  <script src="js/google-maps-loader.js"></script>
+  <script>
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sosId = urlParams.get('sosId');
+      const token = urlParams.get('token');
+
+      const appEl = document.getElementById('liveApp');
+
+      if (!sosId || !token) {
+        renderAccessDenied('Access Token Required', 'This emergency live tracking link requires a valid, secure session token to access.');
+        return;
+      }
+
+      let liveMap = null;
+      let userMarker = null;
+      let pathPolyline = null;
+      let pathCoordinates = [];
+      let pollInterval = null;
+      let isResolved = false;
+
+      async function fetchLiveLocation() {
+        try {
+          const res = await fetch(`/api/sos/live/${sosId}?token=${encodeURIComponent(token)}`);
+          if (res.status === 403 || res.status === 401) {
+            renderAccessDenied('Access Denied', 'Invalid or expired emergency session token. You do not have permission to view this location.');
+            if (pollInterval) clearInterval(pollInterval);
+            return null;
+          }
+          if (res.status === 404) {
+            renderAccessDenied('Session Not Found', 'This emergency alert session was not found.');
+            if (pollInterval) clearInterval(pollInterval);
+            return null;
+          }
+
+          const data = await res.json();
+          if (data.success && data.sos) {
+            return data.sos;
+          }
+          return null;
+        } catch (e) {
+          console.error('Error fetching live location:', e);
+          return null;
+        }
+      }
+
+      function renderAccessDenied(title, message) {
+        appEl.innerHTML = `
+          <div class="access-denied-box">
+            <i class="fas fa-lock"></i>
+            <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 10px;">${title}</h2>
+            <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0 0 24px;">${message}</p>
+            <a href="index.html" class="btn btn-primary" style="display: inline-block; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: 700;">
+              Return to SecureStep Home
+            </a>
+          </div>`;
+      }
+
+      function updateMap(sos) {
+        const pos = { lat: Number(sos.latitude), lng: Number(sos.longitude) };
+
+        if (!liveMap) {
+          const mapDiv = document.getElementById('liveMap');
+          if (!mapDiv || !window.google || !window.google.maps) return;
+
+          liveMap = new google.maps.Map(mapDiv, {
+            center: pos,
+            zoom: 16,
+            mapTypeControl: false,
+            streetViewControl: false,
+            styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
+          });
+
+          userMarker = new google.maps.Marker({
+            position: pos,
+            map: liveMap,
+            title: sos.userName || 'User',
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: sos.status === 'resolved' ? '#10b981' : '#ef4444',
+              fillOpacity: 1,
+              strokeColor: '#ffffff',
+              strokeWeight: 3
+            }
+          });
+
+          pathCoordinates = (sos.locations || []).map(l => ({ lat: Number(l.latitude), lng: Number(l.longitude) }));
+          if (pathCoordinates.length === 0) pathCoordinates.push(pos);
+
+          pathPolyline = new google.maps.Polyline({
+            path: pathCoordinates,
+            geodesic: true,
+            strokeColor: '#ef4444',
+            strokeOpacity: 0.8,
+            strokeWeight: 4,
+            map: liveMap
+          });
+        } else {
+          liveMap.panTo(pos);
+          if (userMarker) {
+            userMarker.setPosition(pos);
+            userMarker.setIcon({
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: sos.status === 'resolved' ? '#10b981' : '#ef4444',
+              fillOpacity: 1,
+              strokeColor: '#ffffff',
+              strokeWeight: 3
+            });
+          }
+
+          if (pathPolyline) {
+            const currentPath = pathPolyline.getPath();
+            const last = currentPath.getLength() > 0 ? currentPath.getAt(currentPath.getLength() - 1) : null;
+            if (!last || Math.abs(last.lat() - pos.lat) > 0.00001 || Math.abs(last.lng() - pos.lng) > 0.00001) {
+              currentPath.push(new google.maps.LatLng(pos.lat, pos.lng));
+            }
+          }
+        }
+      }
+
+      function renderLiveUI(sos) {
+        const initials = (sos.userName || 'User').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+        const isActive = sos.status === 'active';
+        const coordsStr = `${Number(sos.latitude).toFixed(6)}, ${Number(sos.longitude).toFixed(6)}`;
+        const updatedTime = new Date(sos.updated_at || sos.started_at).toLocaleTimeString();
+        const mapsUrl = sos.googleMapsUrl || `https://www.google.com/maps?q=${sos.latitude},${sos.longitude}`;
+
+        appEl.innerHTML = `
+          <div class="header-bar">
+            <div class="header-brand">
+              <i class="fas fa-shield-halved"></i>
+              <span>SecureStep Live Tracking</span>
+            </div>
+            <div class="status-pill ${isActive ? 'active' : 'resolved'}" id="statusBadge">
+              <span class="status-dot"></span>
+              <span>${isActive ? 'Emergency Active' : 'Emergency Resolved'}</span>
+            </div>
+          </div>
+
+          <div class="main-grid">
+            <!-- Left Map Card -->
+            <div class="map-card">
+              <div style="padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+                <div style="font-weight: 700; font-size: 15px;"><i class="fas fa-location-dot" style="color: #ef4444;"></i> Real-Time GPS Tracking</div>
+                <div style="font-size: 12px; color: #64748b;" id="liveTimeIndicator">Last updated: ${updatedTime}</div>
+              </div>
+              <div id="liveMap"></div>
+            </div>
+
+            <!-- Right Details Info Card -->
+            <div class="info-card">
+              <div class="user-info-box">
+                <div class="user-avatar">${initials}</div>
+                <div class="user-meta">
+                  <h3 id="userNameDisplay">${sos.userName || 'SecureStep User'}</h3>
+                  <p><i class="fas fa-circle-check" style="color: #10b981;"></i> Identity Verified</p>
+                </div>
+              </div>
+
+              <div class="detail-row">
+                <div class="detail-label">Status</div>
+                <div class="detail-value" id="statusTextDisplay" style="color: ${isActive ? '#ef4444' : '#10b981'};">
+                  ${isActive ? '🔴 ACTIVE EMERGENCY IN PROGRESS' : '🟢 RESOLVED & COMPLETED'}
+                </div>
+              </div>
+
+              <div class="detail-row">
+                <div class="detail-label">Current Coordinates</div>
+                <div class="detail-value" id="coordsDisplay" style="font-family: monospace;">${coordsStr}</div>
+              </div>
+
+              <div class="detail-row">
+                <div class="detail-label">Started At</div>
+                <div class="detail-value">${new Date(sos.started_at).toLocaleString()}</div>
+              </div>
+
+              <a id="openMapsLink" href="${mapsUrl}" target="_blank" rel="noopener" class="btn-maps">
+                <i class="fas fa-map-location-dot"></i> Open in Google Maps
+              </a>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <a href="tel:100" style="padding: 10px; background: #fef2f2; border-radius: 10px; color: #b91c1c; font-weight: 800; text-align: center; text-decoration: none; font-size: 13px;">
+                  <i class="fas fa-shield-alt"></i> Police 100
+                </a>
+                <a href="tel:108" style="padding: 10px; background: #eff6ff; border-radius: 10px; color: #1d4ed8; font-weight: 800; text-align: center; text-decoration: none; font-size: 13px;">
+                  <i class="fas fa-ambulance"></i> Amb 108
+                </a>
+              </div>
+
+              ${isActive ? `
+                <button id="resolveBtn" class="btn-resolve" onclick="resolveEmergency()">
+                  <i class="fas fa-circle-check"></i> Mark Emergency Resolved
+                </button>
+              ` : `
+                <div style="padding: 10px; background: #f0fdf4; border-radius: 10px; color: #166534; font-size: 13px; font-weight: 700; text-align: center;">
+                  ✓ Emergency has been resolved
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      }
+
+      window.resolveEmergency = async function() {
+        if (!confirm('Confirm: Mark this emergency session as resolved and completed?')) return;
+        try {
+          const res = await fetch('/api/sos/resolve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sosId, token })
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert('Emergency session has been resolved.');
+            if (pollInterval) clearInterval(pollInterval);
+            init();
+          }
+        } catch (e) {
+          alert('Failed to resolve emergency: ' + e.message);
+        }
+      };
+
+      async function init() {
+        const sos = await fetchLiveLocation();
+        if (!sos) return;
+
+        renderLiveUI(sos);
+
+        window.loadGoogleMapsApi().then(() => {
+          updateMap(sos);
+        }).catch(() => {});
+
+        if (sos.status === 'active') {
+          if (pollInterval) clearInterval(pollInterval);
+          pollInterval = setInterval(async () => {
+            const updated = await fetchLiveLocation();
+            if (updated) {
+              const timeEl = document.getElementById('liveTimeIndicator');
+              const coordsEl = document.getElementById('coordsDisplay');
+              const mapsLink = document.getElementById('openMapsLink');
+              const statusBadge = document.getElementById('statusBadge');
+              const statusText = document.getElementById('statusTextDisplay');
+
+              if (timeEl) timeEl.textContent = `Last updated: ${new Date(updated.updated_at || updated.started_at).toLocaleTimeString()}`;
+              if (coordsEl) coordsEl.textContent = `${Number(updated.latitude).toFixed(6)}, ${Number(updated.longitude).toFixed(6)}`;
+              if (mapsLink) mapsLink.href = updated.googleMapsUrl;
+
+              if (updated.status !== 'active') {
+                if (statusBadge) {
+                  statusBadge.className = 'status-pill resolved';
+                  statusBadge.innerHTML = '<span class="status-dot"></span><span>Emergency Resolved</span>';
+                }
+                if (statusText) {
+                  statusText.style.color = '#10b981';
+                  statusText.textContent = '🟢 RESOLVED & COMPLETED';
+                }
+                clearInterval(pollInterval);
+              }
+
+              updateMap(updated);
+            }
+          }, 6000);
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', init);
+    })();
+  </script>
+</body>
+</html>

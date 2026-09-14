@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emergency SOS | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+  <style>
+    /* SOS button */
+    .sos-button {
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ef4444, #b91c1c);
+      border: 6px solid rgba(255,255,255,.25);
+      box-shadow: 0 0 0 12px rgba(239,68,68,.15), 0 8px 32px rgba(239,68,68,.4);
+      color: #fff;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: .1em;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .sos-button:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 0 18px rgba(239,68,68,.2), 0 12px 40px rgba(239,68,68,.5);
+    }
+    .sos-button:active { transform: scale(.97); }
+
+    /* Duration pill row */
+    .dur-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .dur-pill {
+      padding: 6px 16px; border-radius: 999px;
+      border: 1.5px solid #e2e8f0; background: #f8fafc;
+      font-size: 13px; font-weight: 700; color: #1e3a5f;
+      cursor: pointer; transition: all .15s;
+    }
+    .dur-pill.active, .dur-pill:hover { background: #fef2f2; border-color: #ef4444; color: #ef4444; }
+
+    /* Contact chip */
+    .contact-chip {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      background: #f8fafc; border-radius: 10px;
+      margin-bottom: 8px;
+    }
+    .contact-chip .icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #1e3a5f; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+    }
+    .contact-chip.service .icon { background: #ef4444; }
+
+    /* Live tracking map */
+    #sosTrackingMap { width: 100%; height: 240px; border-radius: 12px; background: #e2e8f0; }
+
+    /* Safety check status */
+    #safetyCheckStatus {
+      margin-top: 12px; padding: 10px 14px;
+      background: #f0fdf4; border-radius: 8px;
+      font-size: 13px; color: #166534;
+      display: none;
+    }
+  </style>
+</head>
+<body class="app-shell sos-shell">
+  <header class="topbar">
+    <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
+    <nav class="nav">
+      <a href="dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a>
+      <a href="safe-navigation.html"><i class="fas fa-route"></i> Safe Navigation</a>
+      <a href="crime-heatmap.html"><i class="fas fa-map-marked-alt"></i> Crime Heatmap</a>
+      <a href="incident-management.html"><i class="fas fa-clipboard-list"></i> CivicSense</a>
+      <a href="emergency-sos.html" class="sos active"><i class="fas fa-circle-exclamation"></i> SOS</a>
+      <a href="emergency-contacts.html"><i class="fas fa-address-book"></i> Contacts</a>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="notifications.html"><i class="fas fa-bell"></i> Alerts</a>
+    </nav>
+    <div class="user-chip"><span class="avatar">AS</span> Alert Mode</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Emergency</div>
+        <nav>
+          <a href="emergency-sos.html" class="active"><i class="fas fa-bolt"></i> SOS Center</a>
+          <a href="emergency-contacts.html"><i class="fas fa-phone"></i> Emergency Contacts</a>
+          <a href="notifications.html"><i class="fas fa-bell"></i> Alerts</a>
+          <a href="settings.html"><i class="fas fa-gear"></i> Safety Settings</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Quick Help</div>
+        <nav>
+          <a href="help.html"><i class="fas fa-circle-question"></i> Safety Guide</a>
+          <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1>Emergency SOS</h1>
+          <p>Immediate help when every second matters</p>
+        </div>
+        <span class="badge critical">LIVE ALERT</span>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <!-- SOS Button -->
+        <section class="card" style="text-align:center;">
+          <div class="section-head" style="justify-content:center;margin-bottom:24px;">
+            <h3>Send Emergency Alert</h3>
+          </div>
+          <button class="sos-button" onclick="window.emergencySOS.triggerSOS()">SOS</button>
+          <div style="margin-top:20px;color:var(--muted);font-size:14px;font-weight:600;">
+            Tap to set safety timer &amp; start emergency flow
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+            <a href="tel:100" class="btn btn-danger" style="font-size:13px;padding:8px 16px;">
+              <i class="fas fa-phone"></i> Police 100
+            </a>
+            <a href="tel:108" class="btn" style="font-size:13px;padding:8px 16px;background:#3b82f6;color:#fff;">
+              <i class="fas fa-ambulance"></i> Ambulance 108
+            </a>
+          </div>
+        </section>
+
+        <!-- Safety Check Schedule -->
+        <section class="card">
+          <div class="section-head"><h3>Safety Check Schedule</h3></div>
+          <div style="padding:16px;">
+            <div class="form-group" style="margin-bottom:16px;">
+              <label style="display:block;margin-bottom:8px;font-weight:600;font-size:14px;">Event Start Time</label>
+              <input type="datetime-local" id="eventStartTime"
+                style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label style="display:block;margin-bottom:8px;font-weight:600;font-size:14px;">Expected Exit Time</label>
+              <input type="datetime-local" id="eventExitTime"
+                style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label style="display:block;margin-bottom:8px;font-weight:600;font-size:14px;">Safety Check Interval</label>
+              <select id="safetyCheckInterval"
+                style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;">
+                <option value="10">Every 10 minutes</option>
+                <option value="15" selected>Every 15 minutes</option>
+                <option value="30">Every 30 minutes</option>
+                <option value="60">Every 1 hour</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" style="width:100%;"
+              onclick="window.emergencySOS.startSafetyCheckSchedule()">
+              <i class="fas fa-clock"></i> Start Safety Checks
+            </button>
+            <button class="btn btn-danger" style="width:100%;margin-top:8px;"
+              onclick="window.emergencySOS.stopSafetyCheckSchedule()">
+              <i class="fas fa-stop"></i> Stop Safety Checks
+            </button>
+            <div id="safetyCheckStatus">
+              <i class="fas fa-check-circle"></i> Safety checks active
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="grid-3">
+        <!-- Emergency Contacts (live-rendered) -->
+        <section class="card">
+          <div class="section-head">
+            <h3>Emergency Contacts</h3>
+            <a href="emergency-contacts.html" style="font-size:13px;color:#4fc3f7;font-weight:700;">
+              Manage <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+          <div id="sosContactsList">
+            <div style="padding:20px;text-align:center;color:#94a3b8;font-size:14px;">
+              <i class="fas fa-spinner fa-spin"></i> Loading contacts…
+            </div>
+          </div>
+          <!-- National emergency services always shown -->
+          <div style="margin-top:8px;border-top:1px solid #f1f5f9;padding-top:10px;">
+            <div class="contact-chip service">
+              <div class="icon"><i class="fas fa-user-shield"></i></div>
+              <div>
+                <div style="font-weight:700;font-size:14px;">Police Emergency</div>
+                <div style="font-size:12px;color:#64748b;">+91 100</div>
+              </div>
+              <a href="tel:100" style="margin-left:auto;padding:6px 12px;background:#fef2f2;
+                 border-radius:8px;color:#ef4444;font-weight:700;font-size:13px;text-decoration:none;">
+                Call
+              </a>
+            </div>
+            <div class="contact-chip service">
+              <div class="icon"><i class="fas fa-ambulance"></i></div>
+              <div>
+                <div style="font-weight:700;font-size:14px;">Ambulance</div>
+                <div style="font-size:12px;color:#64748b;">+91 108</div>
+              </div>
+              <a href="tel:108" style="margin-left:auto;padding:6px 12px;background:#fef2f2;
+                 border-radius:8px;color:#ef4444;font-weight:700;font-size:13px;text-decoration:none;">
+                Call
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Live Tracking Map -->
+        <section class="card">
+          <div class="section-head">
+            <h3>Live Tracking</h3>
+            <span class="badge info" id="trackingStatus">Idle</span>
+          </div>
+          <div id="sosTrackingMap"></div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn" style="flex:1;font-size:13px;" onclick="initSOSMap()">
+              <i class="fas fa-location-dot"></i> Show My Location
+            </button>
+          </div>
+        </section>
+
+        <!-- Emergency Instructions -->
+        <section class="card">
+          <div class="section-head"><h3>Emergency Instructions</h3></div>
+          <ul style="padding-left:18px;color:var(--muted);line-height:2.1;margin:0;font-size:14px;">
+            <li>Stay calm — move to a visible, public area.</li>
+            <li>Keep your phone charged and location sharing on.</li>
+            <li>Call emergency services if you're in immediate danger.</li>
+            <li>Alert nearby trusted contacts via the SOS button.</li>
+            <li>Do not confront the threat directly.</li>
+          </ul>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • Emergency Response Center</footer>
+
+  <script src="js/google-maps-loader.js"></script>
+  <script src="js/securestep-ui.js"></script>
+  <script src="js/emergency-contacts.js"></script>
+  <script src="js/emergency-sos.js"></script>
+
+  <script>
+    // Render saved contacts in the SOS contacts panel
+    async function renderSOSContacts() {
+      const list = document.getElementById('sosContactsList');
+      if (!list) return;
+      if (!window.emergencyContacts._loaded) {
+        await window.emergencyContacts.loadContacts();
+      }
+      const contacts = window.emergencyContacts.getAllContacts();
+      if (contacts.length === 0) {
+        list.innerHTML = `
+          <div style="padding:16px;text-align:center;color:#94a3b8;font-size:14px;">
+            No contacts saved.
+            <a href="emergency-contacts.html" style="color:#4fc3f7;font-weight:700;">Add contacts →</a>
+          </div>`;
+        return;
+      }
+      list.innerHTML = contacts.map(c => `
+        <div class="contact-chip">
+          <div class="icon"><i class="fas fa-user"></i></div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:14px;">${c.name}</div>
+            <div style="font-size:12px;color:#64748b;">${c.phone}${c.relationship ? ' · ' + c.relationship : ''}</div>
+          </div>
+          ${c.priority === 'priority' ? '<span class="badge safe" style="font-size:11px;">Priority</span>' : ''}
+          <a href="tel:${c.phone}"
+             style="padding:6px 12px;background:#f0fdf4;border-radius:8px;
+                    color:#10b981;font-weight:700;font-size:13px;text-decoration:none;">
+            Call
+          </a>
+        </div>`).join('');
+    }
+
+    // Show current location on the inline tracking map
+    let sosMap = null;
+    let sosMarker = null;
+    function initSOSMap() {
+      window.loadGoogleMapsApi().then(() => {
+        const mapDiv = document.getElementById('sosTrackingMap');
+        if (!mapDiv) return;
+        navigator.geolocation.getCurrentPosition(pos => {
+          const center = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          if (!sosMap) {
+            sosMap = new google.maps.Map(mapDiv, {
+              center, zoom: 15,
+              mapTypeControl: false, streetViewControl: false,
+              styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
+            });
+          } else { sosMap.setCenter(center); }
+          if (sosMarker) sosMarker.setMap(null);
+          sosMarker = new google.maps.Marker({
+            position: center, map: sosMap, title: 'You',
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 10, fillColor: '#ef4444', fillOpacity: 1,
+              strokeColor: '#fff', strokeWeight: 2
+            }
+          });
+          document.getElementById('trackingStatus').textContent = 'Live';
+          document.getElementById('trackingStatus').className   = 'badge critical';
+        }, () => {
+          mapDiv.innerHTML = '<div style="padding:20px;text-align:center;color:#64748b;font-size:14px;"><i class="fas fa-location-slash"></i> Location unavailable</div>';
+        }, { enableHighAccuracy: true });
+      }).catch(() => {});
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderSOSContacts();
+      window.addEventListener('emergencyContactsUpdated', renderSOSContacts);
+    });
+  </script>
+</body>
+</html>

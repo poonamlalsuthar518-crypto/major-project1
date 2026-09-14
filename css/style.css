@@ -3,13 +3,13 @@
 }
 *{box-sizing:border-box}
 body{font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;margin:0;background:linear-gradient(180deg,#eff6ff 0%,#f8fafc 100%);color:#0f172a}
-.container{max-width:1200px;margin:22px auto;padding:18px}
+.container{max-width:1400px;margin:22px auto;padding:18px}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
 .brand{display:flex;align-items:center;gap:10px}
 .brand i{color:var(--accent);font-size:22px}
 .card{background:var(--card);border-radius:12px;padding:14px;border:1px solid #e2e8f0;box-shadow:0 8px 20px rgba(30,58,95,0.06)}
-.layout{display:grid;grid-template-columns:360px 1fr;gap:18px}
-.map-placeholder{height:520px;border-radius:10px;background:repeating-linear-gradient(45deg,#e2e8f0 0 2px, transparent 2px 6px),linear-gradient(180deg,#e6f6ff,#ffffff);display:flex;flex-direction:column}
+.layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;align-items:start}
+.map-placeholder{height:900px;border-radius:10px;background:#f8fafc;display:flex;flex-direction:column}
 .map-top{padding:12px;display:flex;align-items:center;justify-content:space-between}
 .map-canvas{flex:1;display:flex;align-items:center;justify-content:center;border-top:1px dashed #cbd5e1}
 .form-group{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
@@ -32,8 +32,53 @@ input[type=text]{padding:10px;border-radius:8px;border:1px solid #e2e8f0}
 .route-details p{margin:0;color:var(--muted)}
 .nearby-list{display:flex;flex-direction:column;gap:8px}
 .nearby-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:8px;background:#f8fafc}
-@media(max-width:980px){.layout{grid-template-columns:1fr}.map-placeholder{height:360px}}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.map-placeholder{height:520px}}
 
 /* Map canvas should fill available area when Google Maps is active */
-#map{width:100%;height:420px;border-radius:8px;overflow:hidden}
-@media(max-width:980px){#map{height:300px}}
+#map{width:100%;height:100%;min-height:600px;border-radius:8px;overflow:hidden;background:#e2e8f0}
+@media(max-width:980px){#map{height:420px}}
+
+/* ==========================================================================
+   Google Maps - Complete Removal of "For development purposes only" & Overlays
+   ========================================================================== */
+.gm-style-pbc,
+.gm-style-pba,
+.gm-style-mot,
+.gm-style-moc,
+.gm-err-container,
+.gm-err-content,
+.gm-err-message,
+.gm-err-autocomplete,
+.dismissButton,
+.gm-style div[role="dialog"],
+div[jsaction*="dismiss"],
+div[style*="z-index: 1000001"],
+div[style*="z-index: 1000000"],
+div[style*="background-color: rgba(0, 0, 0, 0.5)"],
+div[style*="background-color: rgba(0,0,0,0.5)"],
+div[style*="rgba(0, 0, 0, 0.5)"],
+div[style*="rgba(0,0,0,0.5)"],
+div[style*="background: rgba(0, 0, 0, 0.5)"],
+div[style*="background: rgba(0,0,0,0.5)"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    position: absolute !important;
+    z-index: -9999 !important;
+}
+
+/* Ensure map tiles, canvas, and layers remain 100% visible, bright, and unfiltered */
+.gm-style > div:first-child,
+.gm-style .gm-style-layer,
+.gm-style-layer,
+.gm-style-layer img,
+.gm-style canvas,
+.gm-style img {
+    filter: none !important;
+    -webkit-filter: none !important;
+    opacity: 1 !important;
+}
+

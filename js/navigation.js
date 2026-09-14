@@ -44,16 +44,43 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 if(dstInput.dataset && dstInput.dataset.lat && dstInput.dataset.lng){ dstCoord = {lat:parseFloat(dstInput.dataset.lat), lng:parseFloat(dstInput.dataset.lng)}; }
                 else{ dstCoord = await window.Routing.getCoordinates(dstText); }
 
+                // Show nearby central precinct locations for source and destination
+                if(window.dashboardMap){
+                    await window.dashboardMap.showNearbyPrecincts(srcCoord, dstCoord);
+                }
+
                 const osrmRoutes = await window.Routing.findRoutes(srcCoord, dstCoord);
 
-                // For each route compute safety score using demo data
-                const enhanced = osrmRoutes.map(r=>{
-                    const demoSafety = getCrimeRiskForRoute(r); // demo values
-                    const community = getCommunityRiskForRoute(r);
-                    const scoreObj = calculateSafetyScore(r, demoSafety);
-                    const classification = classifyRoute(scoreObj.score);
-                    return Object.assign({}, r, { safetyScore: scoreObj.score, safetyBreakdown: scoreObj.breakdown, communityRisk: community, classification: classification.label });
-                });
+                // For each route compute safety score using the new SafetyScoreService
+                const enhanced = await Promise.all(osrmRoutes.map(async (r) => {
+                    let safetyResult;
+                    if (window.SafetyScoreService) {
+                        safetyResult = await window.SafetyScoreService.calculateSafetyScore(r, r.coords);
+                    } else {
+                        // Fallback to old method if service not available
+                        const analysis = analyzeRouteSafety(r, r.coords);
+                        const scoreObj = calculateSafetyScore(r, analysis);
+                        const classification = classifyRoute(scoreObj.score);
+                        const recommendations = generateSafetyRecommendations(analysis, scoreObj.score);
+                        safetyResult = {
+                            score: scoreObj.score,
+                            riskLevel: classification,
+                            factors: scoreObj.analysis,
+                            explanation: recommendations.join(' '),
+                            breakdown: scoreObj.breakdown
+                        };
+                    }
+                    
+                    return Object.assign({}, r, { 
+                        safetyScore: safetyResult.score, 
+                        safetyBreakdown: safetyResult.breakdown,
+                        routeAnalysis: safetyResult.factors,
+                        safetyRecommendations: [safetyResult.explanation],
+                        classification: safetyResult.riskLevel.label,
+                        classificationLevel: safetyResult.riskLevel.level,
+                        classificationColor: safetyResult.riskLevel.color
+                    });
+                }));
 
                 // Draw routes on map
                 window.SecureStepMaps.drawRoutes(enhanced);
@@ -104,23 +131,50 @@ document.addEventListener('DOMContentLoaded', ()=>{
         window._lastRoutes = routes;
         const container = document.getElementById('routesList');
         container.innerHTML = '';
+        
+        if (routes.length === 0) {
+            container.innerHTML = '<div style="color:var(--muted)">No routes found. Please try different locations.</div>';
+            return;
+        }
+
+        // Sort routes by safety score (highest first)
+        const sortedRoutes = [...routes].sort((a,b) => b.safetyScore - a.safetyScore);
+        
+        // Assign labels based on sorted order and total count
+        sortedRoutes.forEach((r, idx) => {
+            if (idx === 0) {
+                r.displayLabel = 'SAFEST';
+                r.displayColor = 'safe';
+            } else if (idx === 1) {
+                r.displayLabel = 'ALTERNATIVE';
+                r.displayColor = 'moderate';
+            } else {
+                r.displayLabel = 'OPTION';
+                r.displayColor = 'moderate';
+            }
+        });
+        
+        // Render in original order but with assigned labels
         routes.forEach(r=>{
             const div = document.createElement('div');
             div.className = 'route-item card';
-            const colorClass = r.safetyScore >=80 ? 'safe' : r.safetyScore >=60 ? 'moderate' : 'unsafe';
+            const colorClass = r.displayColor;
             div.style.borderLeft = `6px solid ${colorClass==='safe'? '#10b981' : colorClass==='moderate'? '#f59e0b' : '#ef4444'}`;
             div.innerHTML = `
                 <div style="display:flex;justify-content:space-between;align-items:center">
-                    <div style="font-weight:800">Route ${r.index+1} — ${r.classification}</div>
+                    <div style="font-weight:800">${r.displayLabel} ROUTE — ${r.classification}</div>
                     <div style="display:flex;gap:8px;align-items:center">
-                        <div class="badge ${colorClass}">${r.safetyScore}</div>
+                        <div class="badge ${colorClass}">${r.safetyScore}/100</div>
                         <button class="btn-ghost select-route" data-route="${r.id}">Preview</button>
                     </div>
                 </div>
                 <div style="display:flex;gap:12px;margin-top:8px;color:var(--muted)">
                     <div><i class="fas fa-route"></i> ${r.distance_km} km</div>
                     <div><i class="far fa-clock"></i> ${r.duration_min} min</div>
-                    <div><i class="fas fa-exclamation-triangle"></i> Risk: ${r.classification}</div>
+                    <div><i class="fas fa-shield-alt"></i> ${r.displayLabel}</div>
+                </div>
+                <div style="margin-top:8px;font-size:12px;color:var(--muted)">
+                    <i class="fas fa-check-circle"></i> Real route from Google Maps
                 </div>
                 <div style="margin-top:8px;display:flex;justify-content:flex-end">
                     <button class="btn" style="padding:8px 10px" data-route="${r.id}" class="use-route" data-route-2="${r.id}">Use This Route</button>
@@ -140,11 +194,20 @@ document.addEventListener('DOMContentLoaded', ()=>{
         if(window.SecureStepMaps && window.SecureStepMaps.selectRoute){
             window.SecureStepMaps.selectRoute(id);
         }
+        
+        // Display police stations along the selected route
+        if(window.dashboardMap && info.coords){
+            window.dashboardMap.displayPoliceStationsAlongRoute(info.coords, id);
+        }
+        
         // Update details panel
         if(info){
             document.getElementById('routeDistance').textContent = info.distance_km + ' km';
             document.getElementById('routeTime').textContent = info.duration_min + ' min';
-            document.getElementById('routeRisk').textContent = info.classification;
+            const safetyScoreEl = document.getElementById('routeSafetyScore');
+            if (safetyScoreEl) {
+                safetyScoreEl.textContent = info.safetyScore + '/100';
+            }
             const explanation = generateExplanation(info);
             document.getElementById('routeExplanation').textContent = explanation;
             const badge = document.getElementById('overallSafetyBadge');
@@ -154,12 +217,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
 
     function generateExplanation(info){
-        // Simple dynamic explanation based on breakdown when available
+        // Enhanced explanation based on comprehensive route analysis
+        if(info.safetyRecommendations && info.safetyRecommendations.length > 0){
+            return info.safetyRecommendations.join(' ');
+        }
         if(info.safetyBreakdown){
             const b = info.safetyBreakdown;
-            if(b.crimePenalty + b.highRiskZonePenalty > 20) return 'This route passes near areas with reported incidents; score lowered due to crime-related penalties.';
+            if(b.lightingPenalty > 10) return 'This route has limited streetlight coverage. Consider alternative during nighttime.';
+            if(b.policeBonus < 5) return 'Police stations are not nearby on this route. Ensure phone is charged for emergencies.';
             if(b.distancePenalty > 5) return 'This route is longer but passes through safer main roads.';
-            return 'Lower crime risk detected along this route. Fewer CivicSense reports found near this route.';
+            return 'This route has good safety infrastructure coverage.';
         }
         return 'Recommended because this route has a higher safety score.';
     }

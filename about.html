@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
+    <nav class="nav">
+      <a href="dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a>
+      <a href="safe-navigation.html"><i class="fas fa-route"></i> Safe Navigation</a>
+      <a href="crime-heatmap.html"><i class="fas fa-map-marked-alt"></i> Heatmap</a>
+      <a href="about.html" class="active"><i class="fas fa-info-circle"></i> About</a>
+      <a href="help.html"><i class="fas fa-circle-question"></i> Help</a>
+    </nav>
+    <div class="user-chip"><span class="avatar">SS</span> Team</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Project</div>
+        <nav>
+          <a href="about.html" class="active"><i class="fas fa-building-columns"></i> Overview</a>
+          <a href="help.html"><i class="fas fa-book"></i> Guides</a>
+          <a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1>About SecureStep</h1>
+          <p>Smart personal safety and navigation for modern cities</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <section class="card">
+          <div class="section-head"><h3>Project Overview</h3></div>
+          <p style="color:var(--muted); line-height:1.8;">SecureStep is a safety-first urban mobility platform designed to help students, commuters, and professionals navigate cities with confidence. It combines route safety intelligence, community reporting, emergency response support, and real-time visualization.</p>
+        </section>
+        <section class="card">
+          <div class="section-head"><h3>Objectives</h3></div>
+          <ul style="color:var(--muted); line-height:1.9; margin:0; padding-left:18px;">
+            <li>Improve situational awareness during travel.</li>
+            <li>Provide safer route recommendations.</li>
+            <li>Encourage local reporting and prevention.</li>
+            <li>Support emergency communication and response.</li>
+          </ul>
+        </section>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <section class="card">
+          <div class="section-head"><h3>Features</h3></div>
+          <ul style="color:var(--muted); line-height:1.9; margin:0; padding-left:18px;">
+            <li>Smart route navigation with safety scoring</li>
+            <li>Crime heatmap and hotspot detection</li>
+            <li>Civic reporting and anonymous incident submissions</li>
+            <li>Emergency SOS and contact management</li>
+          </ul>
+        </section>
+        <section class="card">
+          <div class="section-head"><h3>Technology Stack</h3></div>
+          <div class="meta-row">
+            <span>HTML5</span>
+            <span>CSS3</span>
+            <span>JavaScript</span>
+            <span>Leaflet</span>
+            <span>Google Maps Placeholder</span>
+          </div>
+        </section>
+      </div>
+
+      <div class="grid-3">
+        <section class="card">
+          <div class="section-head"><h3>Team Members</h3></div>
+          <div class="list">
+            <div class="report-item"><strong>Project Lead</strong><div style="color:var(--muted);margin-top:6px;">Alice Sharma</div></div>
+            <div class="report-item"><strong>Frontend Developer</strong><div style="color:var(--muted);margin-top:6px;">Rohan Mehta</div></div>
+            <div class="report-item"><strong>Research & Analysis</strong><div style="color:var(--muted);margin-top:6px;">Nisha Rao</div></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head"><h3>Guide Information</h3></div>
+          <div style="color:var(--muted); line-height:1.9;">
+            <p><strong>Guide:</strong> Prof. Ananya Kumar</p>
+            <p><strong>Department:</strong> Computer Science</p>
+            <p><strong>College:</strong> SecureStep Institute of Technology</p>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head"><h3>Architecture</h3></div>
+          <div class="map-box" style="min-height:220px;"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • About the project</footer>
+  <script src="js/securestep-ui.js"></script>
+</body>
+</html>

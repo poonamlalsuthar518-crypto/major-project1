@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emergency Contacts | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
+    <nav class="nav">
+      <a href="dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a>
+      <a href="safe-navigation.html"><i class="fas fa-route"></i> Safe Navigation</a>
+      <a href="crime-heatmap.html"><i class="fas fa-map-marked-alt"></i> Crime Heatmap</a>
+      <a href="incident-management.html"><i class="fas fa-clipboard-list"></i> CivicSense</a>
+      <a href="emergency-sos.html" class="sos"><i class="fas fa-circle-exclamation"></i> SOS</a>
+      <a href="emergency-contacts.html" class="active"><i class="fas fa-address-book"></i> Contacts</a>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="notifications.html"><i class="fas fa-bell"></i> Alerts</a>
+    </nav>
+    <div class="user-chip"><span class="avatar">AS</span> User</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Manage</div>
+        <nav>
+          <a href="emergency-contacts.html" class="active"><i class="fas fa-address-card"></i> All Contacts</a>
+          <a href="emergency-sos.html"><i class="fas fa-exclamation"></i> Safety Center</a>
+          <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+          <a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1>Emergency Contacts</h1>
+          <p>Manage trusted people and emergency services</p>
+        </div>
+        <button class="btn btn-primary" onclick="showAddContactModal()"><i class="fas fa-plus"></i> Add Contact</button>
+      </div>
+
+      <section class="card" style="margin-bottom:20px;">
+        <div class="section-head">
+          <h3>Find Contact</h3>
+          <input id="contactSearch" type="text" placeholder="Search contact name" style="max-width:300px;" oninput="filterContacts()" />
+        </div>
+      </section>
+
+      <section class="grid-3" id="contactsGrid">
+        <!-- Contacts will be populated by JavaScript -->
+      </section>
+
+      <!-- Debug info -->
+      <div id="contactDebug" style="margin-top: 20px; padding: 10px; background: #f0fdf4; border-radius: 8px; font-size: 12px; color: #166534;">
+        <strong>Debug:</strong> <span id="contactCount">Loading...</span> contacts loaded
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Contact Modal -->
+  <div id="contactModal" class="modal">
+    <div class="modal-content">
+      <h2 id="modalTitle" style="margin-bottom: 20px;">Add Emergency Contact</h2>
+      <form id="contactForm" onsubmit="saveContact(event)">
+        <input type="hidden" id="contactId">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" id="contactName" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number *</label>
+          <input type="tel" id="contactPhone" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="contactEmail">
+        </div>
+        <div class="form-group">
+          <label>Relationship *</label>
+          <select id="contactRelationship" required>
+            <option value="">Select relationship</option>
+            <option value="Family">Family</option>
+            <option value="Parent">Parent</option>
+            <option value="Spouse">Spouse / Partner</option>
+            <option value="Sibling">Sibling</option>
+            <option value="Friend">Friend</option>
+            <option value="Colleague">Colleague</option>
+            <option value="Neighbor">Neighbor</option>
+            <option value="Doctor">Doctor / Caregiver</option>
+            <option value="Emergency Service">Emergency Service</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Priority Level</label>
+          <select id="contactPriority">
+            <option value="priority">Priority (First to notify)</option>
+            <option value="trusted">Trusted</option>
+            <option value="standard">Standard</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn" onclick="hideContactModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Contact</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • Trusted emergency network</footer>
+  <script src="js/securestep-ui.js"></script>
+  <script src="js/emergency-contacts.js"></script>
+</body>
+</html>

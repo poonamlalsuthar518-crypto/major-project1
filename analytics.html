@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports & Analytics | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
+    <nav class="nav">
+      <a href="admin-dashboard.html"><i class="fas fa-gauge-high"></i> Admin</a>
+      <a href="incident-management.html"><i class="fas fa-folder-open"></i> Incidents</a>
+      <a href="analytics.html" class="active"><i class="fas fa-chart-line"></i> Analytics</a>
+      <a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
+    </nav>
+    <div class="user-chip"><span class="avatar">AD</span> Analyst</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Reports</div>
+        <nav>
+          <a href="analytics.html" class="active"><i class="fas fa-chart-bar"></i> Overview</a>
+          <a href="admin-dashboard.html"><i class="fas fa-house"></i> Dashboard</a>
+          <a href="incident-management.html"><i class="fas fa-shield-halved"></i> Incidents</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1>Reports & Analytics</h1>
+          <p>Crime trends, safety insights, and activity overview</p>
+        </div>
+        <button class="btn btn-primary"><i class="fas fa-download"></i> Download Report</button>
+      </div>
+
+      <div class="stats-grid" style="margin-bottom:20px;">
+        <div class="stat-card"><div class="stat-label">Crime Incidents</div><div class="stat-value">1,284</div><div class="stat-trend">+5.2% vs last month</div></div>
+        <div class="stat-card"><div class="stat-label">Safe Routes</div><div class="stat-value">87%</div><div class="stat-trend">Improved reliability</div></div>
+        <div class="stat-card"><div class="stat-label">SOS Requests</div><div class="stat-value">326</div><div class="stat-trend">+18 emergencies</div></div>
+        <div class="stat-card"><div class="stat-label">User Activity</div><div class="stat-value">92k</div><div class="stat-trend">+12.3% engagement</div></div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <section class="card"><div class="section-head"><h3>Monthly Reports</h3></div><div class="map-box" style="min-height:220px;"></div></section>
+        <section class="card"><div class="section-head"><h3>Most Dangerous Areas</h3></div><div class="map-box" style="min-height:220px;"></div></section>
+      </div>
+
+      <div class="grid-2">
+        <section class="card"><div class="section-head"><h3>Most Common Crime Types</h3></div><div class="map-box" style="min-height:220px;"></div></section>
+        <section class="card"><div class="section-head"><h3>User Activity</h3></div><div class="map-box" style="min-height:220px;"></div></section>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • Safety analytics</footer>
+  <script src="js/securestep-ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Help Center | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
+    <nav class="nav">
+      <a href="dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a>
+      <a href="safe-navigation.html"><i class="fas fa-route"></i> Safe Navigation</a>
+      <a href="crime-heatmap.html"><i class="fas fa-map-marked-alt"></i> Heatmap</a>
+      <a href="help.html" class="active"><i class="fas fa-circle-question"></i> Help</a>
+    </nav>
+    <div class="user-chip"><span class="avatar">SS</span> Support</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Support</div>
+        <nav>
+          <a href="help.html" class="active"><i class="fas fa-question"></i> FAQs</a>
+          <a href="about.html"><i class="fas fa-book"></i> User Guide</a>
+          <a href="emergency-sos.html"><i class="fas fa-bolt"></i> Emergency Guide</a>
+          <a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1>Help Center</h1>
+          <p>Guides, troubleshooting, and support</p>
+        </div>
+      </div>
+
+      <section class="card" style="margin-bottom:18px;">
+        <div class="section-head">
+          <h3>Search Help</h3>
+          <input type="text" placeholder="Search FAQs or guides" style="max-width:320px;" />
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head"><h3>Frequently Asked Questions</h3></div>
+        <div class="faq-list">
+          <details class="faq-item" open>
+            <summary>How do I use the safe navigation feature?</summary>
+            <div>Enter your source and destination, then choose the safest route from the list of generated recommendations.</div>
+          </details>
+          <details class="faq-item">
+            <summary>Can I report an incident anonymously?</summary>
+            <div>Yes, you can enable the anonymous checkbox while filing a CivicSense report.</div>
+          </details>
+          <details class="faq-item">
+            <summary>What should I do in an emergency?</summary>
+            <div>Press the SOS button, call emergency services, and share your live location using the emergency actions.</div>
+          </details>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • Help center</footer>
+  <script src="js/securestep-ui.js"></script>
+</body>
+</html>

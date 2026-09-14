@@ -1,0 +1,2202 @@
+[
+  {
+    "id": 1,
+    "code": "1644315",
+    "name": "Cubbon Police Station",
+    "lat": 12.9716,
+    "lng": 77.6066,
+    "address": "Cubbon Park # 7 cubbon park police station kasturba road bangalore 560001",
+    "phone": "080-22942675",
+    "jurisdiction": "Central Division (Bangalore City)",
+    "hours": "24/7",
+    "officers": 30,
+    "rating": "4.0",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 2,
+    "code": "1644316",
+    "name": "V.V.Tower Police Station",
+    "lat": 12.980494989973208,
+    "lng": 77.59264147440334,
+    "address": "V.V.Tower Ambedkar beedi",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-01Ph no. 080-22943443 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 31,
+    "rating": "4.1",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 3,
+    "code": "1644390",
+    "name": "Vidhanasoudha Police Station",
+    "lat": 12.979982240016119,
+    "lng": 77.5887200150068,
+    "address": "Vidhanasoudha Vidhana Soudha West Gate Bangalore-560001",
+    "phone": "080-22942590 080-22259668",
+    "jurisdiction": "Central Division (Bangalore City)",
+    "hours": "24/7",
+    "officers": 32,
+    "rating": "4.2",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 4,
+    "code": "1644332",
+    "name": "Highgrounds Police Station",
+    "lat": 12.98554493976467,
+    "lng": 77.58377840840113,
+    "address": "Highgrounds Palace rd",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (Central Division)",
+    "hours": "24/7",
+    "officers": 33,
+    "rating": "4.3",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 5,
+    "code": "1644370",
+    "name": "Seshadripuram Police Station",
+    "lat": 12.9906411690036,
+    "lng": 77.5805203405733,
+    "address": "Seshadripuram Seshadripuram ps",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (Central Division)",
+    "hours": "24/7",
+    "officers": 34,
+    "rating": "4.4",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 6,
+    "code": "1644374",
+    "name": "Sadashivanagar Police Station",
+    "lat": 13.00867599995355,
+    "lng": 77.58199327063566,
+    "address": "Sadashivanagar Sadashivanaga",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalorePh no. 080-22942589 080-23600358 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 35,
+    "rating": "4.5",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 7,
+    "code": "1644389",
+    "name": "Vyalikaval Police Station",
+    "lat": 13.002224236970484,
+    "lng": 77.57337773947623,
+    "address": "Vyalikaval 2nd cross",
+    "phone": "080-22942222",
+    "jurisdiction": "vyalikaval (bangalore-03Ph no. 080-22942588 080-23443484)",
+    "hours": "24/7",
+    "officers": 36,
+    "rating": "4.6",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 8,
+    "code": "1644371",
+    "name": "S.J.Park Police Station",
+    "lat": 12.962440608480057,
+    "lng": 77.58054892614402,
+    "address": "S.J.Park Kumbaragundi road",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (Central Division)",
+    "hours": "24/7",
+    "officers": 37,
+    "rating": "4.7",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 9,
+    "code": "1644372",
+    "name": "Ashoknagar Police Station",
+    "lat": 12.969426854163999,
+    "lng": 77.60848770791748,
+    "address": "Ashoknagar Ashoknagar ps",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-25Ph no. 080-22942580 080-25576623 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 38,
+    "rating": "4.8",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 10,
+    "code": "1644377",
+    "name": "S.R.Nagar Police Station",
+    "lat": 12.960007568853102,
+    "lng": 77.59238984132662,
+    "address": "S.R.Nagar Mission Road",
+    "phone": "080-22942222",
+    "jurisdiction": "S R Nagar (Bangalore-27Ph no. 080-22942582 080-22238568)",
+    "hours": "24/7",
+    "officers": 39,
+    "rating": "4.9",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 11,
+    "code": "1644385",
+    "name": "Ulsoorgate Police Station",
+    "lat": 12.969100575680315,
+    "lng": 77.58608062417427,
+    "address": "Ulsoorgate Cubbon pet Main Road",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalore-02Ph no. 080-22942660 080-22942579 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 40,
+    "rating": "4.0",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 12,
+    "code": "1644388",
+    "name": "Viveknagar Police Station",
+    "lat": 12.946776429315262,
+    "lng": 77.61999520588499,
+    "address": "Viveknagar Viveka Nagar Post",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalore-47Ph no. 080-22942584 080-25717100 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 41,
+    "rating": "4.1",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 13,
+    "code": "1644393",
+    "name": "Wilsongarden Police Station",
+    "lat": 12.944998025506457,
+    "lng": 77.59672063341648,
+    "address": "Wilsongarden No-Nil",
+    "phone": "080-22942222",
+    "jurisdiction": "H.Siddaiah Road (Wilsongarden)",
+    "hours": "24/7",
+    "officers": 42,
+    "rating": "4.2",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 14,
+    "code": "1644330",
+    "name": "Hal Police Station",
+    "lat": 12.95541107973944,
+    "lng": 77.67009162993962,
+    "address": "Hal White Field Main Road bangalore-37",
+    "phone": "080-22942542 080-25235432",
+    "jurisdiction": "East Division (Bangalore City)",
+    "hours": "24/7",
+    "officers": 43,
+    "rating": "4.3",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 15,
+    "code": "1644308",
+    "name": "Bowring Police Station",
+    "lat": 12.985173311277071,
+    "lng": 77.60340454147955,
+    "address": "Bowring hospital Bowring p.s",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore.Ph no. 080-22942551 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 44,
+    "rating": "4.4",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 16,
+    "code": "1644313",
+    "name": "Bharathinagar Police Station",
+    "lat": 12.98462565097508,
+    "lng": 77.61075339071981,
+    "address": "Bharathinagar Bharathi Nagar P.S",
+    "phone": "080-22942222",
+    "jurisdiction": "St.John Church Road (Bharathi Nagar)",
+    "hours": "24/7",
+    "officers": 45,
+    "rating": "4.5",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 17,
+    "code": "1644314",
+    "name": "Commercial Police Station",
+    "lat": 12.979588843275987,
+    "lng": 77.60944835801467,
+    "address": "Commercial Street Com.street p.s commercial street",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (East Division)",
+    "hours": "24/7",
+    "officers": 46,
+    "rating": "4.6",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 18,
+    "code": "1644318",
+    "name": "D.J.Halli Police Station",
+    "lat": 12.954918116708045,
+    "lng": 77.67036663022412,
+    "address": "D.J.Halli D.j halli main road",
+    "phone": "080-22942222",
+    "jurisdiction": "d.j halli (bangalore-560045Ph no. 080-22942550 080-25466413)",
+    "hours": "24/7",
+    "officers": 47,
+    "rating": "4.7",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 19,
+    "code": "1644325",
+    "name": "Frazer Police Station",
+    "lat": 12.99941275185681,
+    "lng": 77.61291572238254,
+    "address": "Frazer town Frazertown p.s",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore.Ph no. 080-22942548 080-25487365 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 48,
+    "rating": "4.8",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 20,
+    "code": "1644304",
+    "name": "Banasawadi Police Station",
+    "lat": 13.012052488719625,
+    "lng": 77.64655070944856,
+    "address": "Banasawadi Near KEB Office",
+    "phone": "080-22942222",
+    "jurisdiction": "2nd Block (HRBR Layout)",
+    "hours": "24/7",
+    "officers": 49,
+    "rating": "4.9",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 21,
+    "code": "1644336",
+    "name": "Hennur Police Station",
+    "lat": 13.026523936751813,
+    "lng": 77.63610850289977,
+    "address": "Hennur Hennur main road",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (East Division)",
+    "hours": "24/7",
+    "officers": 50,
+    "rating": "4.0",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 22,
+    "code": "1644346",
+    "name": "Kadugondanahalli Police Station",
+    "lat": 12.954367948911383,
+    "lng": 77.6704929358151,
+    "address": "Kadugondanahalli K.g halli p.s",
+    "phone": "080-22942222",
+    "jurisdiction": "kadugondanahalli (bangalore-45Ph no. 080-22942556 080-25474595)",
+    "hours": "24/7",
+    "officers": 51,
+    "rating": "4.1",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 23,
+    "code": "1644349",
+    "name": "K.R.Puram Police Station",
+    "lat": 13.010499823720215,
+    "lng": 77.69577344650556,
+    "address": "K.R.Puram K.r pura p.s",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-36Ph no. 080-22942553 080-25610322 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 52,
+    "rating": "4.2",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 24,
+    "code": "1644353",
+    "name": "Mahadevapura Police Station",
+    "lat": 12.99161497495621,
+    "lng": 77.6892033075451,
+    "address": "Mahadevapura Mahadevapura P.S",
+    "phone": "080-22942222",
+    "jurisdiction": "Whitefield Main Road (Bangalore. Ph no. 080-22942546 080-28510782)",
+    "hours": "24/7",
+    "officers": 53,
+    "rating": "4.3",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 25,
+    "code": "1644367",
+    "name": "Ramamurthynagar Police Station",
+    "lat": 13.017516442293115,
+    "lng": 77.66824407262074,
+    "address": "Ramamurthynagar R.m nagar p.s",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-16Ph no. 080-22942554 080-25650222 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 54,
+    "rating": "4.4",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 26,
+    "code": "1644307",
+    "name": "Byappanahalli Police Station",
+    "lat": 12.953804402400728,
+    "lng": 77.67046048528161,
+    "address": "Byappanahalli Byappanahalli p.s",
+    "phone": "080-22942222",
+    "jurisdiction": "near ngef factory (bangalore-38Ph no. 080-22942545)",
+    "hours": "24/7",
+    "officers": 30,
+    "rating": "4.5",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 27,
+    "code": "1644326",
+    "name": "Airport Police Station",
+    "lat": 12.958727590772568,
+    "lng": 77.66303328586471,
+    "address": "Airport #D-32",
+    "phone": "080-22942222",
+    "jurisdiction": "airport main road. Bangalore-17Ph no. 080-22942544 080-25232153 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 31,
+    "rating": "4.6",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 28,
+    "code": "1644328",
+    "name": "Jeevanabimanagar Police Station",
+    "lat": 12.965168302353696,
+    "lng": 77.6529149610179,
+    "address": "Jeevanabimanagar J.B NAGAR P.S",
+    "phone": "080-22942222",
+    "jurisdiction": "BANGALORE-75 (Ph no. 080-22942543 080-25264352)",
+    "hours": "24/7",
+    "officers": 32,
+    "rating": "4.7",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 29,
+    "code": "1644337",
+    "name": "Indiranagar Police Station",
+    "lat": 12.97656695690417,
+    "lng": 77.64000002937003,
+    "address": "Indiranagar Indira nagar p.s",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-38Ph no. 080-22942658 080-22942541 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 33,
+    "rating": "4.8",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 30,
+    "code": "1644380",
+    "name": "Shivajinagar Police Station",
+    "lat": 12.984672368968033,
+    "lng": 77.60297186361454,
+    "address": "Shivajinagar Shivaji nagar p.s",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-51Ph no. 080-22942597 080-25368597 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 34,
+    "rating": "4.9",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 31,
+    "code": "1644384",
+    "name": "Ulsoor Police Station",
+    "lat": 12.969501807049069,
+    "lng": 77.58865064397763,
+    "address": "Ulsoor Ulsoor",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (East Division)",
+    "hours": "24/7",
+    "officers": 35,
+    "rating": "4.0",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 32,
+    "code": "1644312",
+    "name": "Chickpet Police Station",
+    "lat": 12.971668393168827,
+    "lng": 77.57357677561531,
+    "address": "Chickpet Chickpet",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (West Division)",
+    "hours": "24/7",
+    "officers": 36,
+    "rating": "4.1",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 33,
+    "code": "1644347",
+    "name": "Kalasipalyam Police Station",
+    "lat": 12.959963490677351,
+    "lng": 77.57551971132106,
+    "address": "Kalasipalyam No-1",
+    "phone": "080-22942222",
+    "jurisdiction": "Kamakshipalya (Magadi main Road)",
+    "hours": "24/7",
+    "officers": 37,
+    "rating": "4.2",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 34,
+    "code": "1644356",
+    "name": "Market Police Station",
+    "lat": 12.964414230091533,
+    "lng": 77.57764209630774,
+    "address": "Market City market",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (West Division)",
+    "hours": "24/7",
+    "officers": 38,
+    "rating": "4.3",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 35,
+    "code": "1644386",
+    "name": "Upparpet Police Station",
+    "lat": 12.975840458351687,
+    "lng": 77.57568430839363,
+    "address": "Upparpet",
+    "phone": "080-22942503 080-22873367",
+    "jurisdiction": "West Division (Bangalore City)",
+    "hours": "24/7",
+    "officers": 39,
+    "rating": "4.4",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 36,
+    "code": "1644306",
+    "name": "Byatarayanapura Police Station",
+    "lat": 12.956375410453969,
+    "lng": 77.53996789533662,
+    "address": "Byatarayanapura Byatarayanapura",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalore-26Ph no. 080-22942507 080-26749038 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 40,
+    "rating": "4.5",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 37,
+    "code": "1644309",
+    "name": "Chandra Police Station",
+    "lat": 12.956682421902297,
+    "lng": 77.52414138033427,
+    "address": "Chandra layout Chandralayout",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (West Division)",
+    "hours": "24/7",
+    "officers": 41,
+    "rating": "4.6",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 38,
+    "code": "1644329",
+    "name": "Jnanabharathi Police Station",
+    "lat": 12.944766480851479,
+    "lng": 77.5037974524358,
+    "address": "Jnanabharathi University campus",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-56Ph no. 080-22942513 080-23213586 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 42,
+    "rating": "4.7",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 39,
+    "code": "1644339",
+    "name": "J.J.Nagar Police Station",
+    "lat": 12.962072329510496,
+    "lng": 77.56029973365393,
+    "address": "J.J.Nagar J.j. nagar",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (West Division)",
+    "hours": "24/7",
+    "officers": 43,
+    "rating": "4.8",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 40,
+    "code": "1644348",
+    "name": "Cottonpet Police Station",
+    "lat": 12.97135693144553,
+    "lng": 77.56775716380903,
+    "address": "Cottonpet No-140",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-53Ph no. 080-22942508 080-26700675 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 44,
+    "rating": "4.9",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 41,
+    "code": "1644351",
+    "name": "Kengeri Police Station",
+    "lat": 12.907890378757795,
+    "lng": 77.48389517403916,
+    "address": "Kengeri Kengeri",
+    "phone": "080-22942222",
+    "jurisdiction": "BangalorePh no. 080-22942510 080-28484210 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 45,
+    "rating": "4.0",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 42,
+    "code": "1644302",
+    "name": "Basaveshwaranagar Police Station",
+    "lat": 12.984556822752968,
+    "lng": 77.53897335207469,
+    "address": "Basaveshwaranagar Khb road",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-79Ph no. 080-22942516 080-23483819 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 46,
+    "rating": "4.1",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 43,
+    "code": "1644333",
+    "name": "Vijayanagar Police Station",
+    "lat": 12.971834711400607,
+    "lng": 77.53477179316316,
+    "address": "Vijayanagar Vijayanagar",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (West Division)",
+    "hours": "24/7",
+    "officers": 47,
+    "rating": "4.2",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 44,
+    "code": "1644342",
+    "name": "Kempapura Police Station",
+    "lat": 12.966190530342722,
+    "lng": 77.54830560618657,
+    "address": "Kempapura Agrahara No-14",
+    "phone": "080-22942222",
+    "jurisdiction": "K.P. Agrahara Bangalore-23Ph no. 080-22942518 080-23352910 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 48,
+    "rating": "4.3",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 45,
+    "code": "1644345",
+    "name": "Kamakshipalya Police Station",
+    "lat": 12.982446897691952,
+    "lng": 77.51950070508808,
+    "address": "Kamakshipalya No-1",
+    "phone": "080-22942222",
+    "jurisdiction": "Kamakshipalya (Magadi main Road)",
+    "hours": "24/7",
+    "officers": 49,
+    "rating": "4.4",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 46,
+    "code": "1644354",
+    "name": "Magadi Police Station",
+    "lat": 12.97380195703993,
+    "lng": 77.55271154475868,
+    "address": "Magadi road Magadi road",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (West Division)",
+    "hours": "24/7",
+    "officers": 50,
+    "rating": "4.5",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 47,
+    "code": "1644334",
+    "name": "Hebbal Police Station",
+    "lat": 13.035570430372434,
+    "lng": 77.60048678075944,
+    "address": "Hebbal Hebbala p.s.",
+    "phone": "080-22942222",
+    "jurisdiction": "bellary road (bangalore-24Ph no. 080-22942535 080-23330907)",
+    "hours": "24/7",
+    "officers": 51,
+    "rating": "4.6",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 48,
+    "code": "1644358",
+    "name": "J.C.Nagar Police Station",
+    "lat": 13.003465564733986,
+    "lng": 77.59286953386382,
+    "address": "J.C.Nagar J.c.nagar p.s.",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-06Ph no. 080-22942534 080-23330049 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 52,
+    "rating": "4.7",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 49,
+    "code": "1644368",
+    "name": "R.T.Nagar Police Station",
+    "lat": 13.022007646725523,
+    "lng": 77.59386549882345,
+    "address": "R.T.Nagar R.T.Nagar P.S. C.A No.8",
+    "phone": "080-22942222",
+    "jurisdiction": "1st Bolck R.T.Nagar (b'lore-32Ph no. 080-22942538 080-23330460)",
+    "hours": "24/7",
+    "officers": 53,
+    "rating": "4.8",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 50,
+    "code": "1644394",
+    "name": "Yelahanka Police Station",
+    "lat": 13.099606254283612,
+    "lng": 77.57055678373648,
+    "address": "Yelahanka newtown Yelahanka New Town P.S.",
+    "phone": "080-22942222",
+    "jurisdiction": "Mother Dairy Road (HIG)",
+    "hours": "24/7",
+    "officers": 54,
+    "rating": "4.9",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 51,
+    "code": "1644395",
+    "name": "Sanjaynagar Police Station",
+    "lat": 13.037724436729182,
+    "lng": 77.57764350253944,
+    "address": "Sanjaynagar Sanjayanagar main road",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-94Ph no. 080-22942533 080-23411908 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 30,
+    "rating": "4.0",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 52,
+    "code": "1644359",
+    "name": "Mahalakshmi Police Station",
+    "lat": 12.9559840233654,
+    "lng": 77.66940402468533,
+    "address": "Mahalakshmi layout Mahalakshmipura PS",
+    "phone": "080-22942222",
+    "jurisdiction": "2nd Main (12th Cross)",
+    "hours": "24/7",
+    "officers": 31,
+    "rating": "4.1",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 53,
+    "code": "1644357",
+    "name": "Malleshwaram Police Station",
+    "lat": 12.999527956911974,
+    "lng": 77.56908439381351,
+    "address": "Malleshwaram Malleswaram P.S. No.47",
+    "phone": "080-22942222",
+    "jurisdiction": "M.K.K. Road (Malleswaram)",
+    "hours": "24/7",
+    "officers": 32,
+    "rating": "4.2",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 54,
+    "code": "1644361",
+    "name": "Nandini Police Station",
+    "lat": 13.016861406225377,
+    "lng": 77.53565326095307,
+    "address": "Nandini layout Nandini Layout P.S. No.6",
+    "phone": "080-22942222",
+    "jurisdiction": "Nandini lay out (near nandilay out bus stop b'lore-96Ph no. 080-22942539 080-23491716)",
+    "hours": "24/7",
+    "officers": 33,
+    "rating": "4.3",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 55,
+    "code": "1644366",
+    "name": "Rajagopalanagar Police Station",
+    "lat": 13.01024022401145,
+    "lng": 77.52005337196405,
+    "address": "Rajagopalanagar Rajagopalanagar P.S No.137 Rajagopalanagar Main Road",
+    "phone": "080-22942222",
+    "jurisdiction": "b'lore-58Ph no. 080-22942525 080-28395644 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 34,
+    "rating": "4.4",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 56,
+    "code": "1644369",
+    "name": "Rajajinagar Police Station",
+    "lat": 12.992960367718307,
+    "lng": 77.5561665014187,
+    "address": "Rajajinagar Rajajinagar P.S.   No.  12th Main",
+    "phone": "080-22942222",
+    "jurisdiction": "Rajajinagar (Near R.T.O office)",
+    "hours": "24/7",
+    "officers": 35,
+    "rating": "4.5",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 57,
+    "code": "1644373",
+    "name": "Srirampura Police Station",
+    "lat": 12.995966380640146,
+    "lng": 77.56013995300881,
+    "address": "Srirampura Srirampura P.S. No.47",
+    "phone": "080-22942222",
+    "jurisdiction": "Srirampura (Bhasyanagar)",
+    "hours": "24/7",
+    "officers": 36,
+    "rating": "4.6",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 58,
+    "code": "1644376",
+    "name": "Soladevanahalli Police Station",
+    "lat": 12.952947087607821,
+    "lng": 77.6669410867447,
+    "address": "Soladevanahalli Soladevanahalli P.S. Soladevanahlli",
+    "phone": "080-22942222",
+    "jurisdiction": "Chikkabanavara Post (b'lore-90Ph no. 080-22942529 080-28394805)",
+    "hours": "24/7",
+    "officers": 37,
+    "rating": "4.7",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 59,
+    "code": "1644324",
+    "name": "Gangammanagudi Police Station",
+    "lat": 13.05285636432674,
+    "lng": 77.54393950066853,
+    "address": "Gangammanagudi Gangammagudi P.S. No.T-76/1 &2 S.M.road",
+    "phone": "080-22942222",
+    "jurisdiction": "East (b'lore-14Ph no. 080-22942530 080-28396734)",
+    "hours": "24/7",
+    "officers": 38,
+    "rating": "4.8",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 60,
+    "code": "1644340",
+    "name": "Jalahalli Police Station",
+    "lat": 12.955220380016003,
+    "lng": 77.67022012343247,
+    "address": "Jalahalli Jalahalli P.S. H.M.T Main",
+    "phone": "080-22942222",
+    "jurisdiction": "Infront of H.M.T Hospital (b'lore-13Ph no. 080-22942527 080-28381624)",
+    "hours": "24/7",
+    "officers": 39,
+    "rating": "4.9",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 61,
+    "code": "1644365",
+    "name": "Peenya Police Station",
+    "lat": 12.95984429495415,
+    "lng": 77.5784196601125,
+    "address": "Peenya Peenya 1st Cross",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalore-58Ph no. 080-22942532 080-28395919 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 40,
+    "rating": "4.0",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 62,
+    "code": "1644391",
+    "name": "Vidyaranyapura Police Station",
+    "lat": 12.949290160358796,
+    "lng": 77.56763203650284,
+    "address": "Vidyaranyapura Vidyaranyapura P.S. No.280",
+    "phone": "080-22942222",
+    "jurisdiction": "6th block (6th Cross)",
+    "hours": "24/7",
+    "officers": 41,
+    "rating": "4.1",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 63,
+    "code": "1644397",
+    "name": "Yeshwanthpura Police Station",
+    "lat": 12.937372644703567,
+    "lng": 77.55815156862893,
+    "address": "Yeshwanthpura Gangammagudi P.S. No.T-76/1 &2 S.M.road",
+    "phone": "080-22942222",
+    "jurisdiction": "East (b'lore-14Ph no. 080-22942526 080-23346472)",
+    "hours": "24/7",
+    "officers": 42,
+    "rating": "4.2",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 64,
+    "code": "1644398",
+    "name": "R.M.C Police Station",
+    "lat": 12.92421703921761,
+    "lng": 77.55010443811463,
+    "address": "R.M.C Yard R.M.C.Yard P.S. APMC YARD Building",
+    "phone": "080-22942222",
+    "jurisdiction": "b'lore-22Ph no. 080-22942531 080-23376904 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 43,
+    "rating": "4.3",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 65,
+    "code": "1644303",
+    "name": "Banashankari Police Station",
+    "lat": 12.927367175490868,
+    "lng": 77.54643913910142,
+    "address": "Banashankari 27th Cross",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalore-70Ph no. 080-22942564 080-26710245 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 44,
+    "rating": "4.4",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 66,
+    "code": "1644323",
+    "name": "Girinagar Police Station",
+    "lat": 12.9554196601125,
+    "lng": 77.58284429495416,
+    "address": "Girinagar # 99/1",
+    "phone": "080-22942222",
+    "jurisdiction": "6th main (bsk 3rd stage)",
+    "hours": "24/7",
+    "officers": 45,
+    "rating": "4.5",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 67,
+    "code": "1644343",
+    "name": "Kumaraswamy Police Station",
+    "lat": 12.942048522607429,
+    "lng": 77.57584606217573,
+    "address": "Kumaraswamy Layout K.S.Lay Out Police Station",
+    "phone": "080-22942222",
+    "jurisdiction": "K.S.Lay out (Bengaluru-78Ph no. 080-22942567 080-26660154)",
+    "hours": "24/7",
+    "officers": 46,
+    "rating": "4.6",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 68,
+    "code": "1644362",
+    "name": "Women Police Station",
+    "lat": 12.927784665997807,
+    "lng": 77.57051231629491,
+    "address": "Women Police Station",
+    "phone": "080-22943250",
+    "jurisdiction": "South Division (Bangalore City)",
+    "hours": "24/7",
+    "officers": 47,
+    "rating": "4.7",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 69,
+    "code": "1644382",
+    "name": "Subramanyapura Police Station",
+    "lat": 12.912786241589709,
+    "lng": 77.56692434604827,
+    "address": "Subramanyapura Subramanya Pura Main road",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalore-61Ph no. 080-22942565 080-26662089 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 48,
+    "rating": "4.8",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 70,
+    "code": "1644310",
+    "name": "Chamarajpet Police Station",
+    "lat": 12.89721788112894,
+    "lng": 77.56515003578522,
+    "address": "Chamarajpet # 260",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore -18Ph no. 080-22942575 080-26704478 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 49,
+    "rating": "4.9",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 71,
+    "code": "1644311",
+    "name": "Central Police Station",
+    "lat": 12.952578869674097,
+    "lng": 77.5884196601125,
+    "address": "Central Central police station",
+    "phone": "080-22942222",
+    "jurisdiction": "bangalore-18.Ph no. 080-22942670 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 50,
+    "rating": "4.0",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 72,
+    "code": "1644327",
+    "name": "Kempegowdanagar Police Station",
+    "lat": 12.937699589360498,
+    "lng": 77.58589585394922,
+    "address": "Kempegowdanagar K.g.nagar main road bangalore-19",
+    "phone": "080-22942578 080-26611176",
+    "jurisdiction": "South Division (Bangalore City)",
+    "hours": "24/7",
+    "officers": 51,
+    "rating": "4.1",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 73,
+    "code": "1644331",
+    "name": "Hanumanthanagar Police Station",
+    "lat": 12.922485637463566,
+    "lng": 77.58523093427071,
+    "address": "Hanumanthanagar Hanumantha nagar",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (South Division)",
+    "hours": "24/7",
+    "officers": 52,
+    "rating": "4.2",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 74,
+    "code": "1644379",
+    "name": "Shankarapuram Police Station",
+    "lat": 12.90711254441456,
+    "lng": 77.58645333981832,
+    "address": "Shankarapuram Shankarpura shankarmutt road",
+    "phone": "080-22942222",
+    "jurisdiction": "Bangalolre City (South Division)",
+    "hours": "24/7",
+    "officers": 53,
+    "rating": "4.3",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 75,
+    "code": "1644387",
+    "name": "Victoria Police Station",
+    "lat": 12.891757861725738,
+    "lng": 77.58957675843766,
+    "address": "Victoria Hospital Vixtoria hospital police station k.r.road bangalore-02",
+    "phone": "080-22942560",
+    "jurisdiction": "South Division (Bangalore City)",
+    "hours": "24/7",
+    "officers": 54,
+    "rating": "4.4",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 76,
+    "code": "1644301",
+    "name": "Audugodi Police Station",
+    "lat": 12.951600000000001,
+    "lng": 77.5946,
+    "address": "Audugodi Adugodi poilice station hosur lashkar road bangalore-30",
+    "phone": "080-22942573 080-25710880",
+    "jurisdiction": "South Division (Bangalore City)",
+    "hours": "24/7",
+    "officers": 30,
+    "rating": "4.5",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 77,
+    "code": "1644305",
+    "name": "Basavanagudi Police Station",
+    "lat": 12.936669064505011,
+    "lng": 77.59679766818353,
+    "address": "Basavanagudi K.R.ROAD",
+    "phone": "080-22942222",
+    "jurisdiction": "BANGALORE-560004.Ph no. 080-22942561 080-26676036 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 31,
+    "rating": "4.6",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 78,
+    "code": "1644341",
+    "name": "Jayanagar Police Station",
+    "lat": 12.97284699204237,
+    "lng": 77.53132161830443,
+    "address": "Jayanagar No 7677",
+    "phone": "080-22942222",
+    "jurisdiction": "30th Cross Tilak Nagar BangalorePh no. 080-22942562 080-26548833 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 32,
+    "rating": "4.7",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 79,
+    "code": "1644344",
+    "name": "J.P.Nagar Police Station",
+    "lat": 12.907751328702636,
+    "lng": 77.60677978544807,
+    "address": "J.P.Nagar Ca Site No.36",
+    "phone": "080-22942222",
+    "jurisdiction": "7th Cross (2nd Phase)",
+    "hours": "24/7",
+    "officers": 33,
+    "rating": "4.8",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 80,
+    "code": "1644360",
+    "name": "New Police Station",
+    "lat": 12.89411334710971,
+    "lng": 77.61449519097319,
+    "address": "New Tharagupet",
+    "phone": "080-22942559 080-26704264",
+    "jurisdiction": "South Division (Bangalore City)",
+    "hours": "24/7",
+    "officers": 34,
+    "rating": "4.9",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 81,
+    "code": "1644375",
+    "name": "Siddapura Police Station",
+    "lat": 12.952578869674097,
+    "lng": 77.60078033988749,
+    "address": "Siddapura Siddapura Police station. 1st block",
+    "phone": "080-22942222",
+    "jurisdiction": "B'lore-29Ph no. 080-22942572 080-26636777 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 35,
+    "rating": "4.0",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 82,
+    "code": "1644350",
+    "name": "Koramangala Police Station",
+    "lat": 12.936906424493433,
+    "lng": 77.62345687227618,
+    "address": "Koramangala No.8/A",
+    "phone": "080-22942222",
+    "jurisdiction": "6th Block (Koramangala)",
+    "hours": "24/7",
+    "officers": 36,
+    "rating": "4.1",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 83,
+    "code": "1644355",
+    "name": "Madivala Police Station",
+    "lat": 12.9263586473767,
+    "lng": 77.61588896457825,
+    "address": "Madivala No.20/A",
+    "phone": "080-22942222",
+    "jurisdiction": "Hosur Main Road (Opposite Total Complex)",
+    "hours": "24/7",
+    "officers": 37,
+    "rating": "4.2",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 84,
+    "code": "1644383",
+    "name": "Thyagarajanagar Police Station",
+    "lat": 12.91464006579715,
+    "lng": 77.6259139888166,
+    "address": "Thyagarajanagar 9th main",
+    "phone": "080-22942222",
+    "jurisdiction": "bsk 2nd stage (bangalore-70Ph no. 080-22942566 080-26341976)",
+    "hours": "24/7",
+    "officers": 38,
+    "rating": "4.3",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 85,
+    "code": "1644352",
+    "name": "Mico Police Station",
+    "lat": 12.904053765959839,
+    "lng": 77.63746614359832,
+    "address": "Mico Layout Shanthinikethan School Building",
+    "phone": "080-22942222",
+    "jurisdiction": "3rd Cross (Btm Second Stage)",
+    "hours": "24/7",
+    "officers": 39,
+    "rating": "4.4",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 86,
+    "code": "1644378",
+    "name": "Thilaknagar Police Station",
+    "lat": 12.9554196601125,
+    "lng": 77.60635570504584,
+    "address": "Thilaknagar No 7677",
+    "phone": "080-22942222",
+    "jurisdiction": "30th Cross Tilak Nagar BangalorePh no. 080-22942571 080-26341976 (Bangalolre City)",
+    "hours": "24/7",
+    "officers": 40,
+    "rating": "4.5",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 87,
+    "code": "",
+    "name": "Anekal Police Station",
+    "lat": 12.944632036502847,
+    "lng": 77.61690983964121,
+    "address": "Anekal  (080)78-29335",
+    "phone": "",
+    "jurisdiction": "Bangalore (Anekal)",
+    "hours": "24/7",
+    "officers": 41,
+    "rating": "4.6",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 88,
+    "code": "",
+    "name": "Bannerghatta Police Station",
+    "lat": 12.93515156862893,
+    "lng": 77.62882735529644,
+    "address": "Bannerghatta  (080)78-28595",
+    "phone": "",
+    "jurisdiction": "Bangalore (Anekal)",
+    "hours": "24/7",
+    "officers": 42,
+    "rating": "4.7",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 89,
+    "code": "",
+    "name": "Attibele Police Station",
+    "lat": 12.927104438114636,
+    "lng": 77.64198296078239,
+    "address": "Attibele  (080)78-21360",
+    "phone": "",
+    "jurisdiction": "Bangalore (Attibele)",
+    "hours": "24/7",
+    "officers": 43,
+    "rating": "4.8",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 90,
+    "code": "",
+    "name": "Hebbagodi Police Station",
+    "lat": 12.920606080820106,
+    "lng": 77.65624105942206,
+    "address": "Hebbagodi  (080)78-32922",
+    "phone": "",
+    "jurisdiction": "Bangalore (Attibele)",
+    "hours": "24/7",
+    "officers": 44,
+    "rating": "4.9",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 91,
+    "code": "",
+    "name": "Sarjapura Police Station",
+    "lat": 12.95984429495415,
+    "lng": 77.6107803398875,
+    "address": "Sarjapura  (080)78-23032",
+    "phone": "",
+    "jurisdiction": "Bangalore (Attibele)",
+    "hours": "24/7",
+    "officers": 45,
+    "rating": "4.0",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 92,
+    "code": "",
+    "name": "Hosakote Police Station",
+    "lat": 12.952846062175736,
+    "lng": 77.62415147739257,
+    "address": "Hosakote  (080)79-31570",
+    "phone": "",
+    "jurisdiction": "Bangalore (Hoskote)",
+    "hours": "24/7",
+    "officers": 46,
+    "rating": "4.1",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 93,
+    "code": "",
+    "name": "Avalahally Police Station",
+    "lat": 12.953743895480999,
+    "lng": 77.6704472977861,
+    "address": "Avalahally  (080 )28472500",
+    "phone": "",
+    "jurisdiction": "Bangalore (Hoskote)",
+    "hours": "24/7",
+    "officers": 47,
+    "rating": "4.2",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 94,
+    "code": "",
+    "name": "Anugondanahalli Police Station",
+    "lat": 12.956110156221717,
+    "lng": 77.66909270836727,
+    "address": "Anugondanahalli  (080)7945777",
+    "phone": "",
+    "jurisdiction": "Bangalore (Tirumasettihalli)",
+    "hours": "24/7",
+    "officers": 48,
+    "rating": "4.3",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 95,
+    "code": "",
+    "name": "Tirumasettihalli Police Station",
+    "lat": 12.954926342730747,
+    "lng": 77.66663655527651,
+    "address": "Tirumasettihalli (080)28452268",
+    "phone": "",
+    "jurisdiction": "Bangalore (Tirumasettihalli)",
+    "hours": "24/7",
+    "officers": 49,
+    "rating": "4.4",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 96,
+    "code": "",
+    "name": "Nandagudi Police Station",
+    "lat": 12.965419660112502,
+    "lng": 77.6136211303259,
+    "address": "Nandagudi  (080)79-61250",
+    "phone": "",
+    "jurisdiction": "Bangalore (Nandagudi)",
+    "hours": "24/7",
+    "officers": 50,
+    "rating": "4.5",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 97,
+    "code": "",
+    "name": "Sulibele Police Station",
+    "lat": 12.962895853949231,
+    "lng": 77.6285004106395,
+    "address": "Sulibele  (080)-27952415",
+    "phone": "",
+    "jurisdiction": "Bangalore (Nandagudi)",
+    "hours": "24/7",
+    "officers": 51,
+    "rating": "4.6",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 98,
+    "code": "",
+    "name": "Vishwanathapura Police Station",
+    "lat": 12.962230934270714,
+    "lng": 77.64371436253643,
+    "address": "Vishwanathapura (080)28467377",
+    "phone": "",
+    "jurisdiction": "Doddaballapura (Vijayapura)",
+    "hours": "24/7",
+    "officers": 52,
+    "rating": "4.7",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 99,
+    "code": "",
+    "name": "Channarayapatna Police Station",
+    "lat": 12.96345333981832,
+    "lng": 77.65908745558544,
+    "address": "Channarayapatna  (080)76-82236",
+    "phone": "",
+    "jurisdiction": "Doddaballapura (Vijayapura)",
+    "hours": "24/7",
+    "officers": 53,
+    "rating": "4.8",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 100,
+    "code": "",
+    "name": "Vijayapura Police Station",
+    "lat": 12.966576758437656,
+    "lng": 77.67444213827426,
+    "address": "Vijayapura (080)76-68444",
+    "phone": "",
+    "jurisdiction": "Doddaballapura (Vijayapura)",
+    "hours": "24/7",
+    "officers": 54,
+    "rating": "4.9",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 101,
+    "code": "",
+    "name": "Doddaballapura Police Station",
+    "lat": 12.9716,
+    "lng": 77.6146,
+    "address": "Doddaballapura Town  (080)76-22015",
+    "phone": "",
+    "jurisdiction": "Doddaballapura (Doddaballapura)",
+    "hours": "24/7",
+    "officers": 30,
+    "rating": "4.0",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 102,
+    "code": "",
+    "name": "Doddaballapura Police Station",
+    "lat": 12.973797668183526,
+    "lng": 77.62953093549498,
+    "address": "Doddaballapura Rural (080)76-22025",
+    "phone": "",
+    "jurisdiction": "Doddaballapura (Doddaballapura)",
+    "hours": "24/7",
+    "officers": 31,
+    "rating": "4.1",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  },
+  {
+    "id": 103,
+    "code": "",
+    "name": "Doddabelavangala Police Station",
+    "lat": 12.977866661678215,
+    "lng": 77.64420573506573,
+    "address": "Doddabelavangala  (080)76-55241",
+    "phone": "",
+    "jurisdiction": "Doddaballapura (Doddaballapura)",
+    "hours": "24/7",
+    "officers": 32,
+    "rating": "4.2",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.0"
+  },
+  {
+    "id": 104,
+    "code": "",
+    "name": "Hosahalli Police Station",
+    "lat": 12.953134308450688,
+    "lng": 77.66680757525374,
+    "address": "Hosahalli  (080)76-56008",
+    "phone": "",
+    "jurisdiction": "Doddaballapura (Doddaballapura)",
+    "hours": "24/7",
+    "officers": 33,
+    "rating": "4.3",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "4.5"
+  },
+  {
+    "id": 105,
+    "code": "",
+    "name": "Rajanukunte Police Station",
+    "lat": 12.99149519097319,
+    "lng": 77.67208665289029,
+    "address": "Rajanukunte  (080)28468936",
+    "phone": "",
+    "jurisdiction": "Doddaballapura (Doddaballapura)",
+    "hours": "24/7",
+    "officers": 34,
+    "rating": "4.4",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.0"
+  },
+  {
+    "id": 106,
+    "code": "",
+    "name": "Dobbespet Police Station",
+    "lat": 12.977780339887499,
+    "lng": 77.6136211303259,
+    "address": "Dobbespet  (080)77-34231",
+    "phone": "",
+    "jurisdiction": "Nelamangala (Nelamangala)",
+    "hours": "24/7",
+    "officers": 35,
+    "rating": "4.5",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "1.5"
+  },
+  {
+    "id": 107,
+    "code": "",
+    "name": "Nelamangala Police Station",
+    "lat": 12.984484359343964,
+    "lng": 77.62714217700609,
+    "address": "Nelamangala  (080)77-22133",
+    "phone": "",
+    "jurisdiction": "Nelamangala (Nelamangala)",
+    "hours": "24/7",
+    "officers": 36,
+    "rating": "4.6",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 108,
+    "code": "",
+    "name": "Nelamangala Police Station",
+    "lat": 12.992888964578254,
+    "lng": 77.6398413526233,
+    "address": "Nelamangala Rural GO received",
+    "phone": "",
+    "jurisdiction": "Nelamangala (Nelamangala)",
+    "hours": "24/7",
+    "officers": 37,
+    "rating": "4.7",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "2.5"
+  },
+  {
+    "id": 109,
+    "code": "",
+    "name": "Thyamagondlu Police Station",
+    "lat": 13.002913988816612,
+    "lng": 77.65155993420285,
+    "address": "Thyamagondlu (080)77-32033",
+    "phone": "",
+    "jurisdiction": "Nelamangala (Nelamangala)",
+    "hours": "24/7",
+    "officers": 38,
+    "rating": "4.8",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.0"
+  },
+  {
+    "id": 110,
+    "code": "",
+    "name": "Madhanayakanahally Police Station",
+    "lat": 12.954473504297603,
+    "lng": 77.6704812105893,
+    "address": "Madhanayakanahally  GO received",
+    "phone": "",
+    "jurisdiction": "Nelamangala (Nelamangala)",
+    "hours": "24/7",
+    "officers": 39,
+    "rating": "4.9",
+    "services": [
+      "24/7 Emergency Patrol",
+      "Women Help Desk",
+      "SOS Dispatch",
+      "Crime Reporting"
+    ],
+    "distance": "3.5"
+  }
+]

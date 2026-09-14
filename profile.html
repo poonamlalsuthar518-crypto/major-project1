@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Safety Profile | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+  <style>
+    .safety-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .stat-card h3 {
+      font-size: 32px;
+      margin: 8px 0;
+    }
+    .stat-card p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .safety-preferences {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    .preference-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .preference-item:last-child {
+      border-bottom: none;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 26px;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    input:checked + .toggle-slider {
+      background-color: #10b981;
+    }
+    input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+    .recent-activity {
+      margin-top: 24px;
+    }
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .activity-icon.sos { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    .activity-icon.report { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .activity-icon.location { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+
+    /* === Home Safety Zone Map === */
+    .map-section {
+      margin-top: 24px;
+    }
+    .map-section .profile-card {
+      padding: 0;
+      overflow: hidden;
+    }
+    .map-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px 12px;
+    }
+    .map-section-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e3a5f;
+    }
+    .map-section-header .map-legend {
+      display: flex;
+      gap: 14px;
+      font-size: 12px;
+      color: #64748b;
+      align-items: center;
+    }
+    .map-legend-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+    #profileMap {
+      width: 100%;
+      height: 380px;
+      display: block;
+    }
+    .map-controls-bar {
+      display: flex;
+      gap: 10px;
+      padding: 12px 20px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+    }
+    .map-ctrl-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e3a5f;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .map-ctrl-btn:hover {
+      background: #eff6ff;
+      border-color: #4fc3f7;
+      color: #0284c7;
+    }
+    .map-ctrl-btn i { font-size: 13px; }
+  </style>
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
+    <nav class="nav">
+      <a href="dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a>
+      <a href="safe-navigation.html"><i class="fas fa-route"></i> Safe Navigation</a>
+      <a href="crime-heatmap.html"><i class="fas fa-map-marked-alt"></i> Crime Heatmap</a>
+      <a href="incident-management.html"><i class="fas fa-clipboard-list"></i> CivicSense</a>
+      <a href="emergency-sos.html" class="sos"><i class="fas fa-circle-exclamation"></i> SOS</a>
+      <a href="emergency-contacts.html"><i class="fas fa-address-book"></i> Contacts</a>
+      <a href="profile.html" class="active"><i class="fas fa-user"></i> Profile</a>
+      <a href="notifications.html"><i class="fas fa-bell"></i> Alerts</a>
+    </nav>
+    <div class="user-chip"><span class="avatar">AS</span> Alice S.</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Account</div>
+        <nav>
+          <a href="profile.html" class="active"><i class="fas fa-user"></i> My Profile</a>
+          <a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
+          <a href="emergency-contacts.html"><i class="fas fa-address-book"></i> Emergency Contacts</a>
+          <a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Support</div>
+        <nav>
+          <a href="help.html"><i class="fas fa-circle-question"></i> Help Center</a>
+          <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
+          <a href="index.html" class="logout"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1>User Safety Profile</h1>
+          <p>Manage your personal safety settings and view your activity</p>
+        </div>
+        <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+      </div>
+
+      <!-- Safety Statistics -->
+      <div class="safety-stats">
+        <div class="stat-card">
+          <i class="fas fa-route" style="font-size: 24px; margin-bottom: 8px;"></i>
+          <h3 id="statRoutes">0</h3>
+          <p>Safe Routes Planned</p>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-exclamation-triangle" style="font-size: 24px; margin-bottom: 8px;"></i>
+          <h3 id="statReports">0</h3>
+          <p>Incidents Reported</p>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-bell" style="font-size: 24px; margin-bottom: 8px;"></i>
+          <h3 id="statSOS">0</h3>
+          <p>SOS Alerts Sent</p>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-map-marker-alt" style="font-size: 24px; margin-bottom: 8px;"></i>
+          <h3 id="statShared">0</h3>
+          <p>Location Shares</p>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <section class="profile-card">
+          <div class="avatar-large">AS</div>
+          <div class="field" style="margin-bottom:12px;">
+            <label>Full Name</label>
+            <input type="text" id="profileName" value="Alice Sharma" />
+          </div>
+          <div class="field" style="margin-bottom:12px;">
+            <label>Email</label>
+            <input type="email" id="profileEmail" value="alice.sharma@email.com" />
+          </div>
+          <div class="field" style="margin-bottom:12px;">
+            <label>Phone</label>
+            <input type="tel" id="profilePhone" value="+91 98765 43210" />
+          </div>
+          <div class="field" style="margin-bottom:12px;">
+            <label>Emergency Contacts</label>
+            <input type="text" id="profileContacts" value="Aisha Sharma, Rohan Mehta" />
+          </div>
+        </section>
+
+        <section class="profile-card">
+          <div class="section-head"><h3>Safety Preferences</h3></div>
+          <div class="safety-preferences">
+            <div class="preference-item">
+              <div>
+                <strong>High Risk Route Warnings</strong>
+                <p style="font-size: 13px; color: #64748b;">Get alerts for routes with safety score below 60</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="prefHighRisk" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="preference-item">
+              <div>
+                <strong>Live Location Sharing</strong>
+                <p style="font-size: 13px; color: #64748b;">Automatically share location during navigation</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="prefLocationShare">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="preference-item">
+              <div>
+                <strong>Community Alerts</strong>
+                <p style="font-size: 13px; color: #64748b;">Receive notifications about nearby incidents</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="prefCommunity" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="preference-item">
+              <div>
+                <strong>Night Mode Alerts</strong>
+                <p style="font-size: 13px; color: #64748b;">Enhanced safety alerts after sunset</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="prefNightMode" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Recent Activity -->
+      <section class="profile-card recent-activity">
+        <div class="section-head"><h3>Recent Safety Activity</h3></div>
+        <div id="activityList">
+          <div class="activity-item">
+            <div class="activity-icon location"><i class="fas fa-map-marker-alt"></i></div>
+            <div>
+              <strong>Location Shared</strong>
+              <p style="font-size: 13px; color: #64748b;">Shared live location with 2 contacts</p>
+              <p style="font-size: 12px; color: #94a3b8;">2 hours ago</p>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon report"><i class="fas fa-clipboard-list"></i></div>
+            <div>
+              <strong>Incident Reported</strong>
+              <p style="font-size: 13px; color: #64748b;">Reported poor street lighting on Main Street</p>
+              <p style="font-size: 12px; color: #94a3b8;">Yesterday</p>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon sos"><i class="fas fa-exclamation-triangle"></i></div>
+            <div>
+              <strong>SOS Alert Sent</strong>
+              <p style="font-size: 13px; color: #64748b;">Emergency alert sent to 3 contacts</p>
+              <p style="font-size: 12px; color: #94a3b8;">3 days ago</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Home Safety Zone Map -->
+      <section class="map-section">
+        <div class="profile-card">
+          <div class="map-section-header">
+            <h3><i class="fas fa-map" style="color:#4fc3f7;margin-right:8px;"></i>Home Safety Zone</h3>
+            <div class="map-legend">
+              <span><span class="map-legend-dot" style="background:#4fc3f7;"></span>You</span>
+              <span><span class="map-legend-dot" style="background:#1e3a5f;"></span>Police</span>
+              <span><span class="map-legend-dot" style="background:#ef4444;"></span>Hospital</span>
+            </div>
+          </div>
+          <div id="profileMap"></div>
+          <div class="map-controls-bar">
+            <button class="map-ctrl-btn" id="profileCenterBtn">
+              <i class="fas fa-crosshairs"></i> Center on Me
+            </button>
+            <button class="map-ctrl-btn" id="profilePoliceBtn">
+              <i class="fas fa-shield-alt" style="color:#1e3a5f;"></i> Toggle Police
+            </button>
+            <button class="map-ctrl-btn" id="profileHospitalBtn">
+              <i class="fas fa-hospital" style="color:#ef4444;"></i> Toggle Hospitals
+            </button>
+            <button class="map-ctrl-btn" id="profileRefreshBtn">
+              <i class="fas fa-rotate-right"></i> Refresh
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • Personal safety profile</footer>
+  
+  <script src="js/google-maps-loader.js"></script>
+  <script src="js/safety-score.js"></script>
+  <script src="js/emergency-sos.js"></script>
+  <script src="js/location-sharing.js"></script>
+  <script src="js/civicsense-reporting.js"></script>
+  <script src="js/dashboard-map.js"></script>
+  <script src="js/securestep-ui.js"></script>
+  
+  <script>
+    // Load user safety statistics
+    function loadSafetyStats() {
+      // Get statistics from various modules
+      let routesPlanned = 0;
+      let incidentsReported = 0;
+      let sosAlerts = 0;
+      let locationShares = 0;
+
+      // Try to get data from CivicSense
+      if (window.civicSense) {
+        const reports = window.civicSense.getRecentReports(100);
+        incidentsReported = reports.length;
+      }
+
+      // Try to get data from location sharing
+      if (window.locationSharing) {
+        locationShares = Math.floor(Math.random() * 10) + 1; // Demo data
+      }
+
+      // Demo data for other stats
+      routesPlanned = Math.floor(Math.random() * 20) + 5;
+      sosAlerts = Math.floor(Math.random() * 3);
+
+      // Update UI
+      document.getElementById('statRoutes').textContent = routesPlanned;
+      document.getElementById('statReports').textContent = incidentsReported;
+      document.getElementById('statSOS').textContent = sosAlerts;
+      document.getElementById('statShared').textContent = locationShares;
+    }
+
+    // Save profile preferences
+    function saveProfile() {
+      const preferences = {
+        name: document.getElementById('profileName').value,
+        email: document.getElementById('profileEmail').value,
+        phone: document.getElementById('profilePhone').value,
+        contacts: document.getElementById('profileContacts').value,
+        highRiskWarnings: document.getElementById('prefHighRisk').checked,
+        locationSharing: document.getElementById('prefLocationShare').checked,
+        communityAlerts: document.getElementById('prefCommunity').checked,
+        nightModeAlerts: document.getElementById('prefNightMode').checked
+      };
+
+      localStorage.setItem('safetyPreferences', JSON.stringify(preferences));
+      
+      // Show success message
+      const btn = document.querySelector('.btn-primary');
+      const originalText = btn.textContent;
+      btn.textContent = 'Saved!';
+      btn.style.background = '#10b981';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+      }, 2000);
+    }
+
+    // Load saved preferences
+    function loadPreferences() {
+      const saved = localStorage.getItem('safetyPreferences');
+      if (saved) {
+        const prefs = JSON.parse(saved);
+        document.getElementById('profileName').value = prefs.name || 'Alice Sharma';
+        document.getElementById('profileEmail').value = prefs.email || 'alice.sharma@email.com';
+        document.getElementById('profilePhone').value = prefs.phone || '+91 98765 43210';
+        document.getElementById('profileContacts').value = prefs.contacts || 'Aisha Sharma, Rohan Mehta';
+        document.getElementById('prefHighRisk').checked = prefs.highRiskWarnings !== false;
+        document.getElementById('prefLocationShare').checked = prefs.locationSharing || false;
+        document.getElementById('prefCommunity').checked = prefs.communityAlerts !== false;
+        document.getElementById('prefNightMode').checked = prefs.nightModeAlerts !== false;
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSafetyStats();
+      loadPreferences();
+
+      // Update stats periodically
+      setInterval(loadSafetyStats, 30000);
+
+      // Initialize Home Safety Zone map using DashboardMap class
+      const profileMap = new DashboardMap('profileMap');
+      window.loadGoogleMapsApi().then(() => {
+        profileMap.initialize();
+      }).catch(e => console.warn('Profile map load error:', e));
+
+      // Wire map control buttons
+      document.getElementById('profileCenterBtn').addEventListener('click', () => profileMap.centerOnUser());
+      document.getElementById('profilePoliceBtn').addEventListener('click', () => profileMap.toggleLayer('police'));
+      document.getElementById('profileHospitalBtn').addEventListener('click', () => profileMap.toggleLayer('hospital'));
+      document.getElementById('profileRefreshBtn').addEventListener('click', () => profileMap.refreshNearbyServices());
+    });
+  </script>
+</body>
+</html>

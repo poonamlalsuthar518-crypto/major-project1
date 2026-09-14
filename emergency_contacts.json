@@ -1,0 +1,32 @@
+[
+  {
+    "id": 2,
+    "user_id": "test_user_1788684347928",
+    "name": "Dr. Robert Smith",
+    "relationship": "Doctor",
+    "phone": "9123456789",
+    "email": "robert@hospital.org",
+    "is_primary": 0,
+    "created_at": "2026-09-06T08:45:48.331Z"
+  },
+  {
+    "id": 3,
+    "user_id": "poonamlalsuthar518@gmail.com",
+    "name": "Poonam Lal",
+    "relationship": "Family",
+    "phone": "7483176991",
+    "email": "poonamlalsuthar518@gmail.com",
+    "is_primary": 0,
+    "created_at": "2026-09-06T08:48:08.065Z"
+  },
+  {
+    "id": 4,
+    "user_id": 2,
+    "name": "Poonam Lal",
+    "relationship": "Family",
+    "phone": "1234567891",
+    "email": "poonamlalsuthar518@gmail.com",
+    "is_primary": 0,
+    "created_at": "2026-09-06T11:47:30.584Z"
+  }
+]

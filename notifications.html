@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
+    <nav class="nav">
+      <a href="dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a>
+      <a href="safe-navigation.html"><i class="fas fa-route"></i> Safe Navigation</a>
+      <a href="crime-heatmap.html"><i class="fas fa-map-marked-alt"></i> Crime Heatmap</a>
+      <a href="incident-management.html"><i class="fas fa-clipboard-list"></i> CivicSense</a>
+      <a href="emergency-sos.html" class="sos"><i class="fas fa-circle-exclamation"></i> SOS</a>
+      <a href="emergency-contacts.html"><i class="fas fa-address-book"></i> Contacts</a>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="notifications.html" class="active"><i class="fas fa-bell"></i> Alerts</a>
+    </nav>
+    <div class="user-chip"><span class="avatar">AS</span> Alerts</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Center</div>
+        <nav>
+          <a href="notifications.html" class="active"><i class="fas fa-bell"></i> Recent Notifications</a>
+          <a href="emergency-sos.html"><i class="fas fa-bolt"></i> Emergency Alerts</a>
+          <a href="incident-management.html"><i class="fas fa-file-circle-exclamation"></i> Incident Updates</a>
+          <a href="help.html"><i class="fas fa-lightbulb"></i> Safety Tips</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1>Notifications</h1>
+          <p>Alerts, updates, and safety reminders</p>
+        </div>
+        <button class="btn btn-outline">Mark All Read</button>
+      </div>
+
+      <section class="card">
+        <div class="section-head">
+          <h3>Recent Notifications</h3>
+          <span class="badge info">4 New</span>
+        </div>
+        <div class="notification-list">
+          <div class="notification-item">
+            <div class="notify-head">
+              <strong>Emergency alert in your area</strong>
+              <span class="status urgent">Critical</span>
+            </div>
+            <p style="margin:0; color:var(--muted);">Police and community responders are monitoring a nearby incident.</p>
+            <div class="meta-row" style="margin-top:10px;">
+              <span>12 mins ago</span>
+              <button class="btn btn-outline" type="button" data-action="mark-read">Mark Read</button>
+              <button class="btn btn-outline" type="button" data-action="delete">Delete</button>
+            </div>
+          </div>
+
+          <div class="notification-item">
+            <div class="notify-head">
+              <strong>Route safety update</strong>
+              <span class="status pending">Info</span>
+            </div>
+            <p style="margin:0; color:var(--muted);">The safest route to your destination has been recalculated due to crowd activity.</p>
+            <div class="meta-row" style="margin-top:10px;">
+              <span>1 hour ago</span>
+              <button class="btn btn-outline" type="button" data-action="mark-read">Mark Read</button>
+              <button class="btn btn-outline" type="button" data-action="delete">Delete</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • Safety notifications</footer>
+  <script src="js/securestep-ui.js"></script>
+</body>
+</html>

@@ -476,7 +476,19 @@
     </div>
 
     <script>
-        // Local storage demo fallback storage
+        // Session & Local Storage Management
+        function setSessionUser(user) {
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+        }
+
+        function getSessionUser() {
+            try {
+                return JSON.parse(sessionStorage.getItem('currentUser'));
+            } catch (e) {
+                return null;
+            }
+        }
+
         function getLocalUsers() {
             try {
                 return JSON.parse(localStorage.getItem('secureStepUsers') || '[]');
@@ -489,20 +501,73 @@
             localStorage.setItem('secureStepUsers', JSON.stringify(users));
         }
 
-        function handleLocalRegister(fullName, email, phone, password) {
-            const users = getLocalUsers();
-            if (users.some(u => u.email === email)) {
-                return { success: false, message: 'An account with this email already exists' };
+        function showForm(formType) {
+            document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            
+            if (formType === 'login') {
+                document.getElementById('loginForm').classList.add('active');
+                document.querySelector('[onclick="showForm(\'login\')"]').classList.add('active');
+                document.querySelector('.form-header h2').textContent = 'Welcome Back';
+                document.querySelector('.form-header p').textContent = 'Access your SecureStep account';
+            } else {
+                document.getElementById('registerForm').classList.add('active');
+                document.querySelector('[onclick="showForm(\'register\')"]').classList.add('active');
+                document.querySelector('.form-header h2').textContent = 'Create Account';
+                document.querySelector('.form-header p').textContent = 'Join SecureStep for safer navigation';
             }
-            const user = { fullName, email, phone, password };
-            users.push(user);
-            saveLocalUsers(users);
-            return { success: true, message: 'Account created successfully', user: { fullName, email } };
+            document.getElementById('successMessage').classList.remove('show');
+        }
+
+        function showError(message) {
+            const msgEl = document.getElementById('successMessage');
+            msgEl.textContent = message;
+            msgEl.classList.add('show', 'error');
+            setTimeout(() => msgEl.classList.remove('show', 'error'), 4000);
+        }
+
+        // Check if already logged in
+        window.addEventListener('load', () => {
+            const user = getSessionUser();
+            if (user) {
+                window.location.href = 'dashboard.html';
+            }
+            
+            // Load users from users.json into localStorage
+            loadUsersFromJson();
+        });
+
+        // Load users from users.json file
+        async function loadUsersFromJson() {
+            try {
+                console.log('Attempting to load users from users.json...');
+                const response = await fetch('users.json');
+                if (response.ok) {
+                    const users = await response.json();
+                    localStorage.setItem('secureStepUsers', JSON.stringify(users));
+                    console.log('Users loaded from users.json:', users.length);
+                    console.log('Users:', users);
+                } else {
+                    console.error('Failed to fetch users.json:', response.status);
+                }
+            } catch (e) {
+                console.warn('Could not load users from users.json:', e);
+            }
+            
+            // Verify localStorage
+            const storedUsers = localStorage.getItem('secureStepUsers');
+            console.log('Users in localStorage:', storedUsers ? JSON.parse(storedUsers).length : 0);
         }
 
         function handleLocalLogin(email, password) {
             const users = getLocalUsers();
-            const user = users.find(u => u.email === email && u.password === password);
+            console.log('Attempting login with:', email, password);
+            console.log('Available users:', users);
+            
+            // Case-insensitive email matching
+            const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+            console.log('Found user:', user);
+            
             if (user) {
                 return {
                     success: true,
@@ -512,7 +577,7 @@
             }
 
             // Default demo credentials fallback for quick testing
-            if (email === 'alex@example.com' && password === 'password123') {
+            if (email.toLowerCase() === 'alex@example.com' && password === 'password123') {
                 return {
                     success: true,
                     message: 'Login successful (Demo Account)',
@@ -521,6 +586,21 @@
             }
 
             return { success: false, message: 'Invalid email or password' };
+        }
+
+        function handleLocalRegister(fullName, email, phone, password) {
+            const users = getLocalUsers();
+            if (users.some(u => u.email === email)) {
+                return { success: false, message: 'An account with this email already exists' };
+            }
+            const user = { fullName, email, phone, password };
+            users.push(user);
+            saveLocalUsers(users);
+            return {
+                success: true,
+                message: 'Account created successfully',
+                user: { fullName: user.fullName, email: user.email }
+            };
         }
 
         async function submitForm(url, payload) {
@@ -540,34 +620,6 @@
                 console.warn('Network request failed or server not running. Falling back to local mode.', e);
             }
             return { networkSuccess: false };
-        }
-
-        function showForm(formType) {
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const toggleBtns = document.querySelectorAll('.toggle-btn');
-            const formHeader = document.querySelector('.form-header h2');
-            const formHeaderP = document.querySelector('.form-header p');
-            const successMessage = document.getElementById('successMessage');
-
-            successMessage.classList.remove('show');
-            successMessage.classList.remove('error');
-
-            if (formType === 'login') {
-                loginForm.classList.add('active');
-                registerForm.classList.remove('active');
-                toggleBtns[0].classList.add('active');
-                toggleBtns[1].classList.remove('active');
-                formHeader.textContent = 'Welcome Back';
-                formHeaderP.textContent = 'Access your SecureStep account';
-            } else {
-                loginForm.classList.remove('active');
-                registerForm.classList.add('active');
-                toggleBtns[0].classList.remove('active');
-                toggleBtns[1].classList.add('active');
-                formHeader.textContent = 'Create Account';
-                formHeaderP.textContent = 'Join SecureStep today';
-            }
         }
 
         function showMessage(message, isError = false) {
@@ -597,6 +649,7 @@
             if (!user || !user.fullName || !user.email) return;
             localStorage.setItem('secureStepUserName', user.fullName);
             localStorage.setItem('secureStepUserEmail', user.email);
+            localStorage.setItem('secureStepUser', JSON.stringify(user));
         }
 
         async function handleLogin(event) {
@@ -625,7 +678,10 @@
                 return;
             }
 
-            const { networkSuccess, response, result } = await submitForm('login.php', { email, password });
+            // Ensure users are loaded from users.json
+            await loadUsersFromJson();
+
+            const { networkSuccess, response, result } = await submitForm('/api/login', { email, password });
 
             if (networkSuccess && result) {
                 if (!response.ok || !result.success) {
@@ -635,6 +691,7 @@
                     return;
                 }
                 setLoggedInUser(result.user);
+                setSessionUser(result.user);
                 showMessage('Login successful! Redirecting...', false);
                 setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
                 return;
@@ -650,6 +707,7 @@
             }
 
             setLoggedInUser(localRes.user);
+            setSessionUser(localRes.user);
             showMessage(localRes.message + '! Redirecting...', false);
             setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
         }
@@ -702,12 +760,11 @@
                 return;
             }
 
-            const { networkSuccess, response, result } = await submitForm('register.php', {
+            const { networkSuccess, response, result } = await submitForm('/api/register', {
                 fullName,
                 email,
                 phone,
-                password,
-                confirmPassword
+                password
             });
 
             if (networkSuccess && result) {
@@ -717,6 +774,7 @@
                     return;
                 }
                 setLoggedInUser(result.user);
+                setSessionUser(result.user);
                 showMessage('Account created successfully! Redirecting to dashboard...', false);
                 document.getElementById('registerForm').reset();
                 setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
@@ -732,6 +790,7 @@
             }
 
             setLoggedInUser(localRes.user);
+            setSessionUser(localRes.user);
             showMessage('Account created successfully! Redirecting to dashboard...', false);
             document.getElementById('registerForm').reset();
             setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
