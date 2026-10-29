@@ -152,8 +152,8 @@ function getDefaultAnalysisData(){
 
 function classifyRoute(score){
     if(score >= 80) return { label: 'LOW RISK', level: 'safe', color: '#10b981' };
-    if(score >= 60) return { label: 'MODERATE', level: 'moderate', color: '#f59e0b' };
-    if(score >= 40) return { label: 'CAUTION', level: 'caution', color: '#f59e0b' };
+    if(score >= 60) return { label: 'MODERATE', level: 'moderate', color: '#eab308' };
+    if(score >= 40) return { label: 'CAUTION', level: 'caution', color: '#eab308' };
     return { label: 'HIGH RISK', level: 'unsafe', color: '#ef4444' };
 }
 

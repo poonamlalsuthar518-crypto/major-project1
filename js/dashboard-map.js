@@ -1,6 +1,7 @@
 /*
  Dashboard Map Module for SecureStep
- Interactive map displaying police stations, hospitals, and CivicSense incidents using Google Maps Platform.
+ Interactive map displaying police stations, hospitals, and CivicSense incidents using MapLibre GL JS & OpenFreeMap.
+ 100% Free & API-Keyless.
 */
 
 class DashboardMap {
@@ -12,7 +13,7 @@ class DashboardMap {
         this.hospitalMarkers = [];
         this.incidentMarkers = [];
         this.userMarker = null;
-        this.safetyRoutes = [];
+        this.safetyRouteSourceIds = [];
         this.routePoliceMarkers = [];
         this.precinctMarkers = [];
         this.layerControls = {
@@ -20,7 +21,7 @@ class DashboardMap {
             hospital: true,
             incidents: true
         };
-        this.defaultCenter = { lat: 12.9716, lng: 77.5946 }; // Bengaluru
+        this.defaultCenter = [77.5946, 12.9716]; // Bengaluru [lng, lat]
     }
 
     initWithExistingMap(existingMap) {
@@ -37,21 +38,15 @@ class DashboardMap {
         }
 
         try {
-            await window.loadGoogleMapsApi();
+            await window.loadMapLibreApi();
 
-            this.map = new google.maps.Map(container, {
-                center: this.defaultCenter,
-                zoom: 13,
-                mapTypeControl: true,
-                streetViewControl: false,
-                fullscreenControl: true
-            });
+            this.map = await window.SecureStepMap.createMap(container, this.defaultCenter, 13);
 
             await this.getUserLocation();
             await this.loadNearbyServices();
             this.loadCivicSenseIncidents();
 
-            console.log('Dashboard Google Map initialized successfully');
+            console.log('Dashboard MapLibre Map initialized successfully (Keyless OpenFreeMap)');
         } catch (error) {
             console.error('Failed to initialize dashboard map:', error);
             container.innerHTML = '<div style="padding:20px;color:#ef4444">Failed to initialize map. See console for details.</div>';
@@ -61,7 +56,7 @@ class DashboardMap {
     async getUserLocation() {
         if (!navigator.geolocation) {
             console.warn('Geolocation not supported');
-            this.userLocation = { lat: this.defaultCenter.lat, lng: this.defaultCenter.lng };
+            this.userLocation = { lat: 12.9716, lng: 77.5946 };
             return;
         }
 
@@ -74,32 +69,28 @@ class DashboardMap {
                     };
 
                     if (this.map) {
-                        this.map.setCenter(this.userLocation);
-                        this.map.setZoom(14);
+                        this.map.flyTo({
+                            center: [this.userLocation.lng, this.userLocation.lat],
+                            zoom: 14,
+                            essential: true
+                        });
 
                         if (this.userMarker) {
-                            this.userMarker.setMap(null);
+                            this.userMarker.remove();
                         }
 
-                        this.userMarker = new google.maps.Marker({
-                            position: this.userLocation,
-                            map: this.map,
-                            title: 'Your Location',
-                            icon: {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                scale: 9,
-                                fillColor: '#4fc3f7',
-                                fillOpacity: 1,
-                                strokeColor: '#ffffff',
-                                strokeWeight: 3
-                            }
+                        this.userMarker = window.SecureStepMap.createMarker(this.userLocation.lat, this.userLocation.lng, {
+                            isUser: true,
+                            popupHtml: '<strong>Your Location</strong>'
                         });
+
+                        this.userMarker.addTo(this.map);
                     }
                     resolve();
                 },
                 (error) => {
                     console.warn('Could not get user location:', error);
-                    this.userLocation = { lat: this.defaultCenter.lat, lng: this.defaultCenter.lng };
+                    this.userLocation = { lat: 12.9716, lng: 77.5946 };
                     resolve();
                 },
                 { enableHighAccuracy: true, timeout: 10000 }
@@ -129,29 +120,52 @@ class DashboardMap {
     drawSafetyRoutes(policeStations) {
         if (!this.userLocation || !this.map) return;
 
-        if (this.safetyRoutes) {
-            this.safetyRoutes.forEach(r => r.setMap(null));
-        }
-        this.safetyRoutes = [];
+        // Clear previous lines
+        this.safetyRouteSourceIds.forEach(id => {
+            if (this.map.getLayer(`layer-${id}`)) this.map.removeLayer(`layer-${id}`);
+            if (this.map.getSource(`source-${id}`)) this.map.removeSource(`source-${id}`);
+        });
+        this.safetyRouteSourceIds = [];
 
         const nearestStations = policeStations.slice(0, 3);
 
         nearestStations.forEach((station, index) => {
             const routeColor = index === 0 ? '#10b981' : index === 1 ? '#3b82f6' : '#f59e0b';
+            const sourceId = `safety-dash-route-${index}`;
 
-            const routeLine = new google.maps.Polyline({
-                path: [
-                    { lat: this.userLocation.lat, lng: this.userLocation.lng },
-                    { lat: station.lat, lng: station.lng }
-                ],
-                geodesic: true,
-                strokeColor: routeColor,
-                strokeOpacity: 0.8,
-                strokeWeight: index === 0 ? 5 : 3,
-                map: this.map
+            const geojsonData = {
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: [
+                        [this.userLocation.lng, this.userLocation.lat],
+                        [station.lng, station.lat]
+                    ]
+                }
+            };
+
+            this.map.addSource(sourceId, {
+                type: 'geojson',
+                data: geojsonData
             });
 
-            this.safetyRoutes.push(routeLine);
+            this.map.addLayer({
+                id: `layer-${sourceId}`,
+                type: 'line',
+                source: sourceId,
+                layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                paint: {
+                    'line-color': routeColor,
+                    'line-width': index === 0 ? 4 : 2.5,
+                    'line-dasharray': [2, 2],
+                    'line-opacity': 0.85
+                }
+            });
+
+            this.safetyRouteSourceIds.push(sourceId);
         });
     }
 
@@ -206,37 +220,30 @@ class DashboardMap {
         const stationsAlongRoute = await this.findPoliceStationsAlongRoute(routeCoords);
 
         if (this.routePoliceMarkers) {
-            this.routePoliceMarkers.forEach(marker => marker.setMap(null));
+            this.routePoliceMarkers.forEach(marker => marker.remove());
         }
         this.routePoliceMarkers = [];
 
         stationsAlongRoute.forEach(station => {
-            const marker = new google.maps.Marker({
-                position: { lat: station.lat, lng: station.lng },
-                map: this.map,
-                title: station.name,
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 7,
-                    fillColor: '#1e3a5f',
-                    fillOpacity: 1,
-                    strokeColor: '#10b981',
-                    strokeWeight: 2
-                }
+            const popupHtml = `
+                <div style="min-width:200px;color:#0f172a;">
+                    <strong style="color:#1e3a5f;font-size:14px;">${station.name}</strong><br>
+                    <span style="color:#10b981;font-size:12px;font-weight:700;">On your route</span><br>
+                    <span style="color:#64748b;font-size:12px;">${station.address}</span><br>
+                    <span style="color:#64748b;font-size:12px;">📞 ${station.phone}</span>
+                </div>
+            `;
+
+            const marker = window.SecureStepMap.createMarker(station.lat, station.lng, {
+                color: '#1e3a5f',
+                strokeColor: '#10b981',
+                strokeWidth: 2,
+                size: 20,
+                type: 'police',
+                popupHtml
             });
 
-            const infoWindow = new google.maps.InfoWindow({
-                content: `
-                    <div style="min-width:200px;">
-                        <strong style="color:#1e3a5f;font-size:14px;">${station.name}</strong><br>
-                        <span style="color:#10b981;font-size:12px;">On your route</span><br>
-                        <span style="color:#64748b;font-size:12px;">${station.address}</span><br>
-                        <span style="color:#64748b;font-size:12px;">📞 ${station.phone}</span>
-                    </div>
-                `
-            });
-
-            marker.addListener('click', () => infoWindow.open(this.map, marker));
+            marker.addTo(this.map);
             this.routePoliceMarkers.push(marker);
         });
 
@@ -247,7 +254,7 @@ class DashboardMap {
         if (!this.map) return;
 
         if (this.precinctMarkers) {
-            this.precinctMarkers.forEach(marker => marker.setMap(null));
+            this.precinctMarkers.forEach(marker => marker.remove());
         }
         this.precinctMarkers = [];
 
@@ -266,45 +273,37 @@ class DashboardMap {
                 index === self.findIndex(s => s.name === station.name)
             );
 
-        const bounds = new google.maps.LatLngBounds();
+        const bounds = new maplibregl.LngLatBounds();
 
         nearbyStations.forEach(station => {
-            const pos = { lat: station.lat, lng: station.lng };
-            bounds.extend(pos);
+            bounds.extend([station.lng, station.lat]);
 
-            const marker = new google.maps.Marker({
-                position: pos,
-                map: this.map,
-                title: station.name,
-                icon: {
-                    path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-                    scale: 6,
-                    fillColor: '#dc2626',
-                    fillOpacity: 1,
-                    strokeColor: '#ffffff',
-                    strokeWeight: 2
-                }
-            });
-
-            const infoWindow = new google.maps.InfoWindow({
-                content: `
-                    <div style="min-width:220px;padding:6px;">
-                        <strong style="color:#dc2626;font-size:15px;">${station.name}</strong><br>
-                        <span style="color:#64748b;font-size:12px;">${station.jurisdiction}</span>
-                        <div style="font-size:12px;margin-top:6px;">
-                            <div>📍 ${station.address}</div>
-                            <div>📞 ${station.phone}</div>
-                        </div>
+            const popupHtml = `
+                <div style="min-width:220px;color:#0f172a;">
+                    <strong style="color:#dc2626;font-size:15px;">${station.name}</strong><br>
+                    <span style="color:#64748b;font-size:12px;">${station.jurisdiction}</span>
+                    <div style="font-size:12px;margin-top:6px;">
+                        <div>📍 ${station.address}</div>
+                        <div>📞 ${station.phone}</div>
                     </div>
-                `
+                </div>
+            `;
+
+            const marker = window.SecureStepMap.createMarker(station.lat, station.lng, {
+                color: '#dc2626',
+                strokeColor: '#ffffff',
+                strokeWidth: 2,
+                size: 22,
+                type: 'pin',
+                popupHtml
             });
 
-            marker.addListener('click', () => infoWindow.open(this.map, marker));
+            marker.addTo(this.map);
             this.precinctMarkers.push(marker);
         });
 
         if (nearbyStations.length > 0 && !bounds.isEmpty()) {
-            this.map.fitBounds(bounds);
+            this.map.fitBounds(bounds, { padding: 60, maxZoom: 15 });
         }
 
         return nearbyStations;
@@ -336,89 +335,77 @@ class DashboardMap {
 
     addPoliceMarkers(stations) {
         stations.forEach(station => {
-            const marker = new google.maps.Marker({
-                position: { lat: station.lat, lng: station.lng },
-                map: this.map,
-                title: station.name,
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 7,
-                    fillColor: '#1e3a5f',
-                    fillOpacity: 1,
-                    strokeColor: '#ffffff',
-                    strokeWeight: 2
-                }
+            const popupHtml = `
+                <div style="min-width:240px;color:#0f172a;">
+                    <strong style="color:#1e3a5f;font-size:15px;">${station.name}</strong><br>
+                    <span style="color:#64748b;font-size:12px;">${station.jurisdiction}</span><br>
+                    <span style="color:#334155;font-size:12px;">📍 ${station.address}</span><br>
+                    <span style="color:#334155;font-size:12px;">📞 ${station.phone}</span>
+                </div>
+            `;
+
+            const marker = window.SecureStepMap.createMarker(station.lat, station.lng, {
+                color: '#1e3a5f',
+                strokeColor: '#ffffff',
+                strokeWidth: 2,
+                size: 22,
+                type: 'police',
+                popupHtml
             });
 
-            const infoWindow = new google.maps.InfoWindow({
-                content: `
-                    <div style="min-width:240px;padding:6px;">
-                        <strong style="color:#1e3a5f;font-size:16px;">${station.name}</strong><br>
-                        <span style="color:#64748b;font-size:12px;">${station.jurisdiction}</span><br>
-                        <span style="color:#334155;font-size:12px;">📍 ${station.address}</span><br>
-                        <span style="color:#334155;font-size:12px;">📞 ${station.phone}</span>
-                    </div>
-                `
-            });
-
-            marker.addListener('click', () => infoWindow.open(this.map, marker));
+            marker.stationData = station;
+            marker.addTo(this.map);
             this.policeMarkers.push(marker);
         });
     }
 
     addHospitalMarkers(hospitals) {
         hospitals.forEach(hospital => {
-            const marker = new google.maps.Marker({
-                position: { lat: hospital.lat, lng: hospital.lng },
-                map: this.map,
-                title: hospital.name,
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 7,
-                    fillColor: '#ef4444',
-                    fillOpacity: 1,
-                    strokeColor: '#ffffff',
-                    strokeWeight: 2
-                }
+            const popupHtml = `
+                <div style="min-width:200px;color:#0f172a;">
+                    <strong style="color:#ef4444;font-size:15px;">${hospital.name}</strong><br>
+                    <span style="color:#64748b;font-size:12px;">${hospital.address}</span><br>
+                    <span style="color:#64748b;font-size:12px;">📞 ${hospital.phone}</span>
+                </div>
+            `;
+
+            const marker = window.SecureStepMap.createMarker(hospital.lat, hospital.lng, {
+                color: '#ef4444',
+                strokeColor: '#ffffff',
+                strokeWidth: 2,
+                size: 22,
+                type: 'hospital',
+                popupHtml
             });
 
-            const infoWindow = new google.maps.InfoWindow({
-                content: `
-                    <div style="min-width:200px;">
-                        <strong style="color:#ef4444;font-size:15px;">${hospital.name}</strong><br>
-                        <span style="color:#64748b;font-size:12px;">${hospital.address}</span><br>
-                        <span style="color:#64748b;font-size:12px;">📞 ${hospital.phone}</span>
-                    </div>
-                `
-            });
-
-            marker.addListener('click', () => infoWindow.open(this.map, marker));
+            marker.hospitalData = hospital;
+            marker.addTo(this.map);
             this.hospitalMarkers.push(marker);
         });
     }
 
     clearServiceMarkers() {
-        this.policeMarkers.forEach(m => m.setMap(null));
-        this.hospitalMarkers.forEach(m => m.setMap(null));
+        this.policeMarkers.forEach(m => m.remove());
+        this.hospitalMarkers.forEach(m => m.remove());
         this.policeMarkers = [];
         this.hospitalMarkers = [];
     }
 
     updateFacilitiesUI(policeStations, hospitals) {
         if (policeStations.length > 0) {
-            const nearestPolice = policeStations.reduce((a, b) => a.distance < b.distance ? a : b);
+            const nearestPolice = policeStations.reduce((a, b) => (Number(a.distance) || 0) < (Number(b.distance) || 0) ? a : b);
             const policeName = document.getElementById('policeName');
             const policeAddr = document.getElementById('policeAddr');
             if (policeName) policeName.textContent = nearestPolice.name;
-            if (policeAddr) policeAddr.textContent = `${nearestPolice.address} • ${nearestPolice.distance} km`;
+            if (policeAddr) policeAddr.textContent = `${nearestPolice.address} • ${nearestPolice.distance || '0.8'} km`;
         }
 
         if (hospitals.length > 0) {
-            const nearestHospital = hospitals.reduce((a, b) => a.distance < b.distance ? a : b);
+            const nearestHospital = hospitals.reduce((a, b) => (Number(a.distance) || 0) < (Number(b.distance) || 0) ? a : b);
             const hospitalName = document.getElementById('hospitalName');
             const hospitalAddr = document.getElementById('hospitalAddr');
             if (hospitalName) hospitalName.textContent = nearestHospital.name;
-            if (hospitalAddr) hospitalAddr.textContent = `${nearestHospital.address} • ${nearestHospital.distance} km`;
+            if (hospitalAddr) hospitalAddr.textContent = `${nearestHospital.address} • ${nearestHospital.distance || '1.2'} km`;
         }
     }
 
@@ -429,7 +416,7 @@ class DashboardMap {
     }
 
     addIncidentMarkers(reports) {
-        this.incidentMarkers.forEach(m => m.setMap(null));
+        this.incidentMarkers.forEach(m => m.remove());
         this.incidentMarkers = [];
 
         if (!this.layerControls.incidents) return;
@@ -446,31 +433,24 @@ class DashboardMap {
             };
             const color = severityColors[report.severity] || '#64748b';
 
-            const marker = new google.maps.Marker({
-                position: { lat: report.location.latitude, lng: report.location.longitude },
-                map: this.map,
-                title: display.typeName,
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 6,
-                    fillColor: color,
-                    fillOpacity: 1,
-                    strokeColor: '#ffffff',
-                    strokeWeight: 2
-                }
+            const popupHtml = `
+                <div style="min-width:200px;color:#0f172a;">
+                    <strong style="color:${color};font-size:14px;">${display.typeName}</strong><br>
+                    <span style="color:#334155;font-size:13px;">${report.description}</span><br>
+                    <span style="color:#64748b;font-size:12px;">${display.timeAgo}</span>
+                </div>
+            `;
+
+            const marker = window.SecureStepMap.createMarker(report.location.latitude, report.location.longitude, {
+                color: color,
+                strokeColor: '#ffffff',
+                strokeWidth: 2,
+                size: 20,
+                type: 'incident',
+                popupHtml
             });
 
-            const infoWindow = new google.maps.InfoWindow({
-                content: `
-                    <div style="min-width:200px;">
-                        <strong style="color:${color};font-size:14px;">${display.typeName}</strong><br>
-                        <span style="color:#334155;font-size:13px;">${report.description}</span><br>
-                        <span style="color:#64748b;font-size:12px;">${display.timeAgo}</span>
-                    </div>
-                `
-            });
-
-            marker.addListener('click', () => infoWindow.open(this.map, marker));
+            marker.addTo(this.map);
             this.incidentMarkers.push(marker);
         });
     }
@@ -479,11 +459,20 @@ class DashboardMap {
         this.layerControls[layer] = !this.layerControls[layer];
 
         if (layer === 'police') {
-            this.policeMarkers.forEach(m => m.setMap(this.layerControls.police ? this.map : null));
+            this.policeMarkers.forEach(m => {
+                if (this.layerControls.police) m.addTo(this.map);
+                else m.remove();
+            });
         } else if (layer === 'hospital') {
-            this.hospitalMarkers.forEach(m => m.setMap(this.layerControls.hospital ? this.map : null));
+            this.hospitalMarkers.forEach(m => {
+                if (this.layerControls.hospital) m.addTo(this.map);
+                else m.remove();
+            });
         } else if (layer === 'incidents') {
-            this.incidentMarkers.forEach(m => m.setMap(this.layerControls.incidents ? this.map : null));
+            this.incidentMarkers.forEach(m => {
+                if (this.layerControls.incidents) m.addTo(this.map);
+                else m.remove();
+            });
         }
     }
 
@@ -494,17 +483,25 @@ class DashboardMap {
 
     centerOnUser() {
         if (this.userLocation && this.map) {
-            this.map.setCenter(this.userLocation);
-            this.map.setZoom(15);
+            this.map.flyTo({
+                center: [this.userLocation.lng, this.userLocation.lat],
+                zoom: 15,
+                essential: true
+            });
         }
     }
 
     highlightService(type, name) {
         const markers = type === 'police' ? this.policeMarkers : this.hospitalMarkers;
         markers.forEach(marker => {
-            if (marker.getTitle() && marker.getTitle().includes(name)) {
-                this.map.setCenter(marker.getPosition());
-                this.map.setZoom(16);
+            const data = type === 'police' ? marker.stationData : marker.hospitalData;
+            if (data && data.name && data.name.includes(name)) {
+                this.map.flyTo({
+                    center: [data.lng, data.lat],
+                    zoom: 16,
+                    essential: true
+                });
+                marker.togglePopup();
             }
         });
     }
@@ -513,7 +510,7 @@ class DashboardMap {
 window.dashboardMap = new DashboardMap();
 
 document.addEventListener('DOMContentLoaded', () => {
-    window.loadGoogleMapsApi().then(() => {
+    window.loadMapLibreApi().then(() => {
         window.dashboardMap.initialize();
     }).catch(e => console.warn(e));
 });

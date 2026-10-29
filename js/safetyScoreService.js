@@ -21,8 +21,8 @@ const SafetyScoreService = {
         },
         riskLevels: {
             lowRisk: { min: 80, label: 'LOW RISK', color: '#10b981' },
-            moderate: { min: 60, label: 'MODERATE', color: '#f59e0b' },
-            caution: { min: 40, label: 'CAUTION', color: '#f59e0b' },
+            moderate: { min: 60, label: 'MODERATE', color: '#eab308' },
+            caution: { min: 40, label: 'CAUTION', color: '#eab308' },
             highRisk: { min: 0, label: 'HIGH RISK', color: '#ef4444' }
         }
     },
@@ -191,7 +191,7 @@ const SafetyScoreService = {
         if (window.GeoUtils) {
             return window.GeoUtils.calculateRouteCoverage(
                 routeCoords,
-                streetlights.map(s => ({ lat: s.lat, lng: s.lng, id: s.id })),
+                streetlights.map((s, idx) => ({ lat: s.lat, lng: s.lng, id: s.id || `sl_${idx}` })),
                 this.config.thresholds.streetlightProximityMeters
             );
         }

@@ -11,6 +11,7 @@ const PORT = Number(process.env.PORT || 8000);
 const DATABASE_FILE = path.join(__dirname, 'users.json');
 const CONTACTS_FILE = path.join(__dirname, 'emergency_contacts.json');
 const SOS_ALERTS_FILE = path.join(__dirname, 'sos_alerts.json');
+const SOS_NOTIFICATIONS_FILE = path.join(__dirname, 'sos_notifications.json');
 let dbConnection = null;
 
 app.use(express.json({ limit: '1mb' }));
@@ -94,6 +95,247 @@ function saveSosAlertsJson(alerts) {
     return false;
   }
 }
+
+function getSosNotificationsJson() {
+  try {
+    if (fs.existsSync(SOS_NOTIFICATIONS_FILE)) {
+      const data = fs.readFileSync(SOS_NOTIFICATIONS_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+    return [];
+  } catch (error) {
+    console.error('Error reading sos_notifications.json:', error);
+    return [];
+  }
+}
+
+function saveSosNotificationsJson(notifications) {
+  try {
+    fs.writeFileSync(SOS_NOTIFICATIONS_FILE, JSON.stringify(notifications, null, 2));
+    return true;
+  } catch (error) {
+    console.error('Error saving sos_notifications.json:', error);
+    return false;
+  }
+}
+
+function formatPhoneForWhatsApp(phone) {
+  if (!phone) return '';
+  let cleaned = String(phone).replace(/[^\d+]/g, '');
+  if (cleaned.startsWith('+')) cleaned = cleaned.substring(1);
+  if (cleaned.length === 10) {
+    cleaned = '91' + cleaned;
+  } else if (cleaned.length === 11 && cleaned.startsWith('0')) {
+    cleaned = '91' + cleaned.substring(1);
+  }
+  return cleaned;
+}
+
+function formatPhoneForSms(phone) {
+  if (!phone) return '';
+  let cleaned = String(phone).replace(/[^\d+]/g, '');
+  if (cleaned.startsWith('+')) {
+    return cleaned;
+  }
+  if (cleaned.length === 10) {
+    return '+91' + cleaned;
+  }
+  if (cleaned.length === 11 && cleaned.startsWith('0')) {
+    return '+91' + cleaned.substring(1);
+  }
+  return '+' + cleaned;
+}
+
+async function sendTwilioMessage({ to, body, isWhatsApp = false }) {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const fromSms = process.env.TWILIO_PHONE_NUMBER;
+  const fromWa = process.env.TWILIO_WHATSAPP_NUMBER;
+
+  if (!accountSid || !authToken) {
+    return { success: false, reason: 'Automatic messaging is not configured' };
+  }
+
+  const from = isWhatsApp
+    ? (fromWa && (fromWa.startsWith('whatsapp:') ? fromWa : `whatsapp:${fromWa}`))
+    : fromSms;
+  const targetTo = isWhatsApp
+    ? (to.startsWith('whatsapp:') ? to : `whatsapp:${to.startsWith('+') ? to : '+' + to}`)
+    : (to.startsWith('+') ? to : `+${to}`);
+
+  if (!from) {
+    return { success: false, reason: isWhatsApp ? 'WhatsApp sender number not configured' : 'SMS sender number not configured' };
+  }
+
+  try {
+    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+    const params = new URLSearchParams();
+    params.append('To', targetTo);
+    params.append('From', from);
+    params.append('Body', body);
+
+    const authHeader = 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64');
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: params.toString()
+    });
+
+    const data = await response.json();
+    const isSuccess = response.ok && !data.error_code && !data.code && (data.sid || ['queued', 'sending', 'sent', 'delivered'].includes(data.status));
+    return {
+      success: isSuccess,
+      sid: data.sid || null,
+      status: data.status || (isSuccess ? 'queued' : 'failed'),
+      error: data.message || data.error_message || null
+    };
+  } catch (err) {
+    console.error('Twilio dispatch error:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+async function processEmergencyNotifications({ sosId, userId, userName, latitude, longitude, triggerReason, shareUrl, customMessage }) {
+  let contacts = [];
+  if (dbConnection) {
+    try {
+      const [rows] = await dbConnection.execute(
+        'SELECT id, name, relationship, phone, email, is_primary FROM emergency_contacts WHERE user_id = ? ORDER BY is_primary DESC, created_at DESC',
+        [userId]
+      );
+      contacts = rows;
+    } catch (e) {
+      console.warn('DB contacts query notice:', e.message);
+    }
+  }
+  if (!contacts.length) {
+    const all = getContactsJson();
+    contacts = all.filter(c => String(c.user_id) === String(userId));
+  }
+
+  const name = userName || 'SecureStep User';
+  const reasonText = triggerReason === 'timeout'
+    ? 'Safety Check Timed Out (User Did Not Respond)'
+    : (triggerReason === 'user_reported_danger' ? 'User Reported NOT SAFE' : 'Emergency SOS Triggered');
+
+  const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+  const now = new Date();
+  const timestampStr = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+  const emergencyMessage = customMessage || 
+`🚨 EMERGENCY SOS ALERT — SecureStep
+User: ${name}
+Status: ${reasonText}
+Live Location Link: ${shareUrl || mapsUrl}
+Google Maps: ${mapsUrl}
+Coordinates: ${Number(latitude).toFixed(6)}, ${Number(longitude).toFixed(6)}
+Timestamp: ${timestampStr}
+
+Please check on them or contact emergency services immediately!`;
+
+  const isTwilioConfigured = Boolean(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN);
+  const isSmsConfigured = Boolean(isTwilioConfigured && process.env.TWILIO_PHONE_NUMBER);
+  const isWhatsAppConfigured = Boolean(isTwilioConfigured && process.env.TWILIO_WHATSAPP_NUMBER);
+  const automaticMessagingConfigured = isSmsConfigured || isWhatsAppConfigured;
+
+  const notificationResults = [];
+  const notificationsJson = getSosNotificationsJson();
+  let totalCarrierSmsSent = 0;
+  let totalCarrierWaSent = 0;
+
+  for (const c of contacts) {
+    const waPhone = formatPhoneForWhatsApp(c.phone);
+    const smsPhone = formatPhoneForSms(c.phone);
+
+    let waSent = false;
+    let smsSent = false;
+    let waResponse = null;
+    let smsResponse = null;
+
+    if (isSmsConfigured && smsPhone) {
+      smsResponse = await sendTwilioMessage({ to: smsPhone, body: emergencyMessage, isWhatsApp: false });
+      smsSent = Boolean(smsResponse && smsResponse.success);
+      if (smsSent) totalCarrierSmsSent++;
+    }
+
+    if (isWhatsAppConfigured && waPhone) {
+      waResponse = await sendTwilioMessage({ to: waPhone, body: emergencyMessage, isWhatsApp: true });
+      waSent = Boolean(waResponse && waResponse.success);
+      if (waSent) totalCarrierWaSent++;
+    }
+
+    const timestamp = new Date().toISOString();
+    const channels = [
+      { type: 'sms', sent: smsSent, configured: isSmsConfigured },
+      { type: 'whatsapp', sent: waSent, configured: isWhatsAppConfigured }
+    ];
+
+    for (const ch of channels) {
+      const dbStatus = ch.sent ? 'sent' : 'failed';
+      const jsonStatus = ch.sent ? 'carrier_sent' : (ch.configured ? 'failed' : 'not_configured');
+
+      if (dbConnection) {
+        try {
+          await dbConnection.execute(
+            'INSERT INTO sos_notifications (sos_id, emergency_contact_id, notification_type, status, message, sent_at) VALUES (?, ?, ?, ?, ?, NOW())',
+            [sosId, c.id || null, ch.type, dbStatus, emergencyMessage]
+          );
+        } catch (dbErr) { /* ignore or fallback */ }
+      }
+      notificationsJson.push({
+        id: (notificationsJson.length ? Math.max(...notificationsJson.map(n => Number(n.id || 0))) + 1 : 1),
+        sos_id: sosId,
+        user_id: userId,
+        contact_id: c.id,
+        contact_name: c.name,
+        contact_phone: c.phone,
+        notification_type: ch.type,
+        status: jsonStatus,
+        message: emergencyMessage,
+        sent_at: timestamp
+      });
+    }
+
+    notificationResults.push({
+      contactId: c.id,
+      name: c.name,
+      phone: c.phone,
+      waPhone: waPhone,
+      smsPhone: smsPhone,
+      carrierSmsSent: smsSent,
+      carrierWaSent: waSent,
+      smsStatus: smsSent ? 'sent' : (isSmsConfigured ? 'failed' : 'not_configured'),
+      waStatus: waSent ? 'sent' : (isWhatsAppConfigured ? 'failed' : 'not_configured')
+    });
+
+    console.log(`[EMERGENCY NOTIFICATION] Processed for ${c.name} (${c.phone}). SMS Sent: ${smsSent}, WhatsApp Sent: ${waSent}. Status: ${reasonText}`);
+  }
+
+  saveSosNotificationsJson(notificationsJson);
+
+  const successfullyNotifiedContactsCount = notificationResults.filter(r => r.carrierSmsSent || r.carrierWaSent).length;
+
+  return {
+    success: true,
+    automaticMessagingConfigured,
+    message: automaticMessagingConfigured
+      ? (successfullyNotifiedContactsCount > 0
+          ? `Emergency alert successfully dispatched to ${successfullyNotifiedContactsCount} contacts.`
+          : 'Automatic messaging attempted but provider could not deliver to the specified numbers.')
+      : 'Automatic messaging is not configured',
+    emergencyMessage,
+    contactsNotified: successfullyNotifiedContactsCount,
+    carrierSmsSent: totalCarrierSmsSent,
+    carrierWaSent: totalCarrierWaSent,
+    smsConfigured: isSmsConfigured,
+    whatsappConfigured: isWhatsAppConfigured,
+    totalContacts: contacts.length,
+    contacts: notificationResults
+  };
+}
+
 
 async function ensureMySqlConnection() {
   if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_NAME) {
@@ -283,7 +525,8 @@ async function getUsersList() {
 
 app.get('/api/config', (req, res) => {
   res.json({
-    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || ''
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
+    hereApiKey: process.env.HERE_API_KEY || ''
   });
 });
 
@@ -657,12 +900,12 @@ app.post('/api/sos/start', async (req, res) => {
     const token = crypto.randomBytes(16).toString('hex');
     const name = userName ? String(userName).trim() : 'SecureStep User';
 
+    let sosId;
     if (dbConnection) {
       try {
         await dbConnection.execute('ALTER TABLE sos_alerts ADD COLUMN IF NOT EXISTS token VARCHAR(64)');
       } catch (e) { /* column may already exist or ALTER not permitted */ }
 
-      let sosId;
       try {
         const [result] = await dbConnection.execute(
           'INSERT INTO sos_alerts (user_id, latitude, longitude, status, token) VALUES (?, ?, ?, ?, ?)',
@@ -678,15 +921,6 @@ app.post('/api/sos/start', async (req, res) => {
         sosId = result.insertId;
       }
       sosTokensMap.set(String(sosId), { token, userName: name });
-
-      res.json({
-        success: true,
-        sosId,
-        token,
-        userName: name,
-        shareUrl: `/emergency-live.html?sosId=${sosId}&token=${token}`,
-        googleMapsUrl: `https://www.google.com/maps?q=${latitude},${longitude}`
-      });
     } else {
       const alerts = getSosAlertsJson();
       const newId = alerts.length ? Math.max(...alerts.map(a => Number(a.id || 0))) + 1 : 1;
@@ -711,20 +945,72 @@ app.post('/api/sos/start', async (req, res) => {
       };
       alerts.push(newAlert);
       saveSosAlertsJson(alerts);
-      res.json({
-        success: true,
-        sosId: newId,
-        token: token,
-        userName: name,
-        shareUrl: `/emergency-live.html?sosId=${newId}&token=${token}`,
-        googleMapsUrl: `https://www.google.com/maps?q=${latitude},${longitude}`
-      });
+      sosId = newId;
     }
+
+    const shareUrl = `/emergency-live.html?sosId=${sosId}&token=${token}`;
+    const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+    // Automatically trigger notification dispatch to emergency contacts via WhatsApp & SMS
+    let notificationResult = null;
+    try {
+      notificationResult = await processEmergencyNotifications({
+        sosId,
+        userId,
+        userName: name,
+        latitude,
+        longitude,
+        triggerReason: req.body.triggerReason || 'manual',
+        shareUrl,
+        customMessage: req.body.message || null
+      });
+    } catch (notifErr) {
+      console.warn('Auto notification dispatch notice:', notifErr.message);
+    }
+
+    res.json({
+      success: true,
+      sosId,
+      token,
+      userName: name,
+      shareUrl,
+      googleMapsUrl,
+      notifications: notificationResult
+    });
+
   } catch (error) {
     console.error('SOS start error:', error);
     res.status(500).json({ success: false, message: 'Failed to start SOS' });
   }
 });
+
+// Dedicated emergency notification dispatch endpoint
+app.post('/api/sos/notify-contacts', async (req, res) => {
+  try {
+    const { sosId, userId, userName, latitude, longitude, triggerReason, shareUrl, message } = req.body;
+
+    if (!userId || latitude === undefined || longitude === undefined) {
+      return res.status(400).json({ success: false, message: 'User ID, latitude, and longitude are required' });
+    }
+
+    const result = await processEmergencyNotifications({
+      sosId: sosId || 0,
+      userId,
+      userName,
+      latitude,
+      longitude,
+      triggerReason: triggerReason || 'manual',
+      shareUrl,
+      customMessage: message
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Emergency notification error:', error);
+    res.status(500).json({ success: false, message: 'Failed to notify emergency contacts' });
+  }
+});
+
 
 app.post('/api/sos/location', async (req, res) => {
   try {
@@ -1232,7 +1518,7 @@ app.use((req, res) => {
 
 async function startServer() {
   const mysqlReady = await ensureMySqlConnection();
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log('\n========================================');
     console.log('SecureStep project is running.');
     console.log(`Main App: http://localhost:${PORT}`);
@@ -1240,6 +1526,21 @@ async function startServer() {
     console.log(`Users API: http://localhost:${PORT}/api/users`);
     console.log(`Database mode: ${mysqlReady ? 'MySQL' : 'JSON fallback'}`);
     console.log('========================================\n');
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`\nPort ${PORT} is already in use. Killing old process and retrying...\n`);
+      const { execSync } = require('child_process');
+      try {
+        // Kill the process using the port (Windows)
+        execSync(`for /f "tokens=5" %a in ('netstat -aon ^| findstr :${PORT}') do taskkill /F /PID %a`, { shell: 'cmd.exe', stdio: 'ignore' });
+      } catch (_) {}
+      setTimeout(() => startServer(), 1000);
+    } else {
+      console.error('Server error:', err);
+      process.exit(1);
+    }
   });
 }
 

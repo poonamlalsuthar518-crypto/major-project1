@@ -52,31 +52,54 @@ class EmergencySOS {
     // ── Load user's saved emergency contacts ─────────────────────────────────
     async initializeContacts() {
         if (window.emergencyContacts) {
-            if (!window.emergencyContacts._loaded) {
-                await window.emergencyContacts.loadContacts();
+            try {
+                if (!window.emergencyContacts._loaded) {
+                    await window.emergencyContacts.loadContacts();
+                }
+                const c = window.emergencyContacts.getAllContacts();
+                if (Array.isArray(c) && c.length > 0) {
+                    this.contacts = c;
+                    return this.contacts;
+                }
+            } catch (err) {
+                console.warn('Emergency contacts helper load notice:', err);
             }
+        }
+
+        const userId = this.getCurrentUserId();
+        try {
+            const res = await fetch(`/api/emergency-contacts/${userId}`);
+            const data = await res.json();
+            if (data.success && Array.isArray(data.contacts) && data.contacts.length > 0) {
+                this.contacts = data.contacts.map(c => ({
+                    id: c.id,
+                    name: c.name,
+                    phone: c.phone,
+                    email: c.email || '',
+                    relationship: c.relationship || 'Other',
+                    priority: c.is_primary ? 'priority' : 'standard'
+                }));
+                return this.contacts;
+            }
+        } catch (e) {
+            console.warn('Emergency contacts API fetch failed, falling back to storage:', e);
+        }
+
+        try {
+            const stored = localStorage.getItem(`secureStepContacts_${userId}`) || localStorage.getItem('secureStepContacts_default_user') || localStorage.getItem('secureStepContacts_guest');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    this.contacts = parsed;
+                    return this.contacts;
+                }
+            }
+        } catch { }
+
+        if (window.emergencyContacts && Array.isArray(window.emergencyContacts.getAllContacts())) {
             this.contacts = window.emergencyContacts.getAllContacts();
         } else {
-            const userId = this.getCurrentUserId();
-            try {
-                const res = await fetch(`/api/emergency-contacts/${userId}`);
-                const data = await res.json();
-                if (data.success && Array.isArray(data.contacts)) {
-                    this.contacts = data.contacts.map(c => ({
-                        id: c.id,
-                        name: c.name,
-                        phone: c.phone,
-                        email: c.email || '',
-                        relationship: c.relationship || 'Other',
-                        priority: c.is_primary ? 'priority' : 'standard'
-                    }));
-                }
-            } catch (e) {
-                console.warn('Emergency contacts API fetch failed, falling back to storage:', e);
-                try {
-                    this.contacts = JSON.parse(localStorage.getItem(`secureStepContacts_${userId}`) || '[]');
-                } catch { this.contacts = []; }
-            }
+            this.contacts = [];
         }
         return this.contacts;
     }
@@ -289,35 +312,40 @@ class EmergencySOS {
         overlay.id = 'sos-safe-check';
         overlay.style.cssText = `
             position: fixed; inset: 0; z-index: 10001;
-            background: rgba(15, 23, 42, 0.92);
+            background: rgba(15, 23, 42, 0.94);
             display: flex; align-items: center; justify-content: center;
-            padding: 16px; backdrop-filter: blur(6px);`;
+            padding: 16px; backdrop-filter: blur(8px);`;
 
         let countdown = 60; // 60-second timeout
 
         const renderContent = () => `
-          <div style="background: #ffffff; border-radius: 24px; padding: 36px 28px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.4); animation: pulseSafeModal 0.25s ease-out;">
-            <div style="width: 76px; height: 76px; border-radius: 50%; background: #fef2f2; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 8px rgba(239,68,68,0.12);">
-              <i class="fas fa-circle-question" style="font-size: 38px; color: #ef4444;"></i>
+          <div style="background: #ffffff; border-radius: 24px; padding: 36px 28px; max-width: 460px; width: 100%; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.45); animation: pulseSafeModal 0.25s ease-out; border: 2px solid #ef4444;">
+            <div style="width: 76px; height: 76px; border-radius: 50%; background: #fef2f2; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 8px rgba(239,68,68,0.15);">
+              <i class="fas fa-triangle-exclamation" style="font-size: 38px; color: #ef4444;"></i>
             </div>
             <h2 style="font-size: 26px; font-weight: 900; color: #0f172a; margin: 0 0 8px;">Are you safe?</h2>
-            <p style="font-size: 15px; color: #64748b; margin: 0 0 24px; line-height: 1.5;">
+            <p style="font-size: 14px; color: #64748b; margin: 0 0 16px; line-height: 1.5;">
               Your safety event timer ended. Please confirm your safety status immediately.
             </p>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px;">
+            <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; padding: 10px 14px; margin-bottom: 20px; font-size: 13px; color: #9f1239; line-height: 1.4; text-align: left;">
+              <i class="fas fa-shield-halved" style="color: #e11d48; margin-right: 4px;"></i>
+              <strong>Notice:</strong> If you tap <strong>NOT SAFE</strong> or do not respond, emergency mode will activate with <strong>live GPS tracking</strong> and instant <strong>WhatsApp sharing options</strong>.
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
               <button id="sosYesBtn"
-                style="padding: 18px 14px; border: none; border-radius: 14px; background: #10b981; color: #ffffff; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 18px rgba(16,185,129,0.35); transition: transform 0.15s;">
-                <i class="fas fa-check"></i> YES
+                style="padding: 16px 12px; border: none; border-radius: 14px; background: #10b981; color: #ffffff; font-size: 16px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 18px rgba(16,185,129,0.35); transition: transform 0.15s;">
+                <i class="fas fa-check"></i> I Am Safe (YES)
               </button>
               <button id="sosNoBtn"
-                style="padding: 18px 14px; border: none; border-radius: 14px; background: #ef4444; color: #ffffff; font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 18px rgba(239,68,68,0.35); transition: transform 0.15s;">
-                <i class="fas fa-triangle-exclamation"></i> NO
+                style="padding: 16px 12px; border: none; border-radius: 14px; background: #ef4444; color: #ffffff; font-size: 16px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 18px rgba(239,68,68,0.35); transition: transform 0.15s;">
+                <i class="fas fa-triangle-exclamation"></i> I'm NOT SAFE (NO)
               </button>
             </div>
 
-            <div id="sosAutoTimeoutText" style="font-size: 13px; color: #94a3b8; font-weight: 600;">
-              Emergency mode will activate in <strong style="color: #ef4444; font-size: 15px;">${countdown}s</strong> if no response
+            <div id="sosAutoTimeoutText" style="font-size: 13px; color: #64748b; font-weight: 600;">
+              Emergency mode &amp; WhatsApp share in <strong style="color: #ef4444; font-size: 16px;">${countdown}s</strong> if no response
             </div>
           </div>
           <style>
@@ -331,7 +359,7 @@ class EmergencySOS {
             countdown--;
             const timeoutEl = document.getElementById('sosAutoTimeoutText');
             if (timeoutEl) {
-                timeoutEl.innerHTML = `Emergency mode will activate in <strong style="color: #ef4444; font-size: 15px;">${countdown}s</strong> if no response`;
+                timeoutEl.innerHTML = `Emergency mode &amp; WhatsApp share in <strong style="color: #ef4444; font-size: 16px;">${countdown}s</strong> if no response`;
             }
             if (countdown <= 0) {
                 clearInterval(timeoutInterval);
@@ -369,12 +397,97 @@ class EmergencySOS {
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
-    //  STEP 4: EMERGENCY MODE WITH LIVE LOCATION TRACKING
+    //  STEP 4: EMERGENCY MODE WITH LIVE LOCATION TRACKING & SMS/WHATSAPP DISPATCH
     // ═══════════════════════════════════════════════════════════════════════════
+    _formatPhoneForWhatsApp(phone) {
+        if (!phone) return '';
+        let cleaned = String(phone).replace(/[^\d]/g, '');
+        if (cleaned.length === 10) {
+            cleaned = '91' + cleaned;
+        } else if (cleaned.length === 11 && cleaned.startsWith('0')) {
+            cleaned = '91' + cleaned.substring(1);
+        } else if (cleaned.length === 12 && cleaned.startsWith('91')) {
+            cleaned = cleaned;
+        }
+        return cleaned;
+    }
+
+    _formatPhoneForSms(phone) {
+        if (!phone) return '';
+        let cleaned = String(phone).replace(/[^\d+]/g, '');
+        if (!cleaned.startsWith('+') && cleaned.length === 10) {
+            cleaned = '+91' + cleaned;
+        }
+        return cleaned;
+    }
+
+    _playEmergencyAlarm() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const now = ctx.currentTime;
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            gain.gain.setValueAtTime(0.3, now);
+
+            for (let i = 0; i < 6; i++) {
+                osc.frequency.setValueAtTime(880, now + (i * 0.5));
+                osc.frequency.setValueAtTime(587.33, now + (i * 0.5) + 0.25);
+            }
+
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 3.0);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 3.0);
+        } catch (e) {
+            console.warn('Audio siren alert notice:', e);
+        }
+
+        if (navigator.vibrate) {
+            try { navigator.vibrate([400, 200, 400, 200, 800]); } catch (e) {}
+        }
+    }
+
+    async _dispatchEmergencyNotifications(loc, triggerReason) {
+        const userName = this.getCurrentUserName();
+        const shareLink = this.shareUrl
+            ? `${window.location.origin}${this.shareUrl}`
+            : `${window.location.origin}/emergency-live.html?sosId=${this.sosId}&token=${this.sosToken}`;
+        const mapsUrl = this.googleMapsLink(loc.latitude, loc.longitude);
+
+        const reasonLabel = triggerReason === 'timeout'
+            ? 'Safety Check Timed Out (User Did Not Respond)'
+            : (triggerReason === 'user_reported_danger' ? 'User Confirmed NOT SAFE' : 'Emergency SOS Alert');
+
+        const timestamp = new Date().toLocaleString('en-IN', {
+            dateStyle: 'medium',
+            timeStyle: 'medium'
+        });
+
+        this.lastAlertMessage = 
+`🚨 EMERGENCY SOS ALERT — SecureStep
+${userName} is in an emergency and needs immediate help!
+
+Status: ${reasonLabel}
+⏰ Timestamp: ${timestamp}
+📍 Live Tracking: ${shareLink}
+🗺️ Google Maps: ${mapsUrl}
+📌 Coordinates: ${Number(loc.latitude).toFixed(6)}, ${Number(loc.longitude).toFixed(6)}
+
+Please check on them or send emergency assistance immediately!`;
+
+        // Play audible alarm to alert the user locally
+        this._playEmergencyAlarm();
+    }
+
     async _triggerEmergencyMode(triggerReason = 'manual') {
         this.isActive = true;
 
-        const spinner = this._showSpinner('Acquiring GPS coordinates and preparing emergency mode…');
+        const spinner = this._showSpinner('Acquiring GPS coordinates & preparing emergency mode…');
 
         await this.initializeContacts();
 
@@ -397,7 +510,8 @@ class EmergencySOS {
                     userId: userId,
                     userName: userName,
                     latitude: loc.latitude,
-                    longitude: loc.longitude
+                    longitude: loc.longitude,
+                    triggerReason: triggerReason
                 })
             });
             const data = await res.json();
@@ -405,10 +519,14 @@ class EmergencySOS {
                 this.sosId = data.sosId;
                 this.sosToken = data.token;
                 this.shareUrl = data.shareUrl;
+                this.dispatchedNotifications = data.notifications || {};
             }
         } catch (err) {
             console.warn('Backend SOS creation notice (local tracking active):', err);
         }
+
+        // Build the alert message and play alarm (notifications already dispatched by /api/sos/start)
+        await this._dispatchEmergencyNotifications(loc, triggerReason);
 
         this._startLocationTracking();
         this._showEmergencyScreen(loc, triggerReason);
@@ -470,10 +588,17 @@ class EmergencySOS {
         if (mapsBtn) mapsBtn.href = mapsLink;
         if (timeEl) timeEl.textContent = `Updated: ${new Date().toLocaleTimeString()}`;
 
-        if (this.activeSosMap && window.google && window.google.maps) {
-            const pos = { lat: Number(loc.latitude), lng: Number(loc.longitude) };
-            this.activeSosMap.panTo(pos);
-            if (this.activeSosMarker) this.activeSosMarker.setPosition(pos);
+        if (this.activeSosMap) {
+            const lat = Number(loc.latitude);
+            const lng = Number(loc.longitude);
+            if (typeof this.activeSosMap.flyTo === 'function') {
+                this.activeSosMap.flyTo({ center: [lng, lat], zoom: 15 });
+            } else if (typeof this.activeSosMap.setCenter === 'function') {
+                this.activeSosMap.setCenter([lng, lat]);
+            }
+            if (this.activeSosMarker && typeof this.activeSosMarker.setLngLat === 'function') {
+                this.activeSosMarker.setLngLat([lng, lat]);
+            }
         }
     }
 
@@ -509,33 +634,154 @@ class EmergencySOS {
 
         const mapsLink = this.googleMapsLink(loc.latitude, loc.longitude);
         const coords   = `${loc.latitude.toFixed(6)}, ${loc.longitude.toFixed(6)}`;
-        const userContacts = this.contacts;
+        const userContacts = this.contacts || [];
         const userName = this.getCurrentUserName();
-        const shareLink = this.shareUrl ? `${window.location.origin}${this.shareUrl}` : `${window.location.origin}/emergency-live.html?sosId=${this.sosId}&token=${this.sosToken}`;
+        const shareLink = this.shareUrl
+            ? `${window.location.origin}${this.shareUrl}`
+            : `${window.location.origin}/emergency-live.html?sosId=${this.sosId}&token=${this.sosToken}`;
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const reasonLabel = reason === 'timeout'
+            ? 'Safety Check Timed Out (User Did Not Respond)'
+            : (reason === 'user_reported_danger' ? 'User Confirmed NOT SAFE' : 'Emergency SOS Alert');
+        const timestamp = new Date().toLocaleString('en-IN', {
+            dateStyle: 'medium',
+            timeStyle: 'medium'
+        });
+
+        const emergencyAlertMessage = this.lastAlertMessage || 
+`🚨 EMERGENCY SOS ALERT — SecureStep
+${userName} is in an emergency and needs immediate help!
+
+Status: ${reasonLabel}
+⏰ Timestamp: ${timestamp}
+📍 Live Tracking: ${shareLink}
+🗺️ Google Maps: ${mapsLink}
+📌 Location: ${coords}
+
+Please check on them or send emergency assistance immediately!`;
+
+        const validContacts = userContacts.filter(c => c && c.phone && String(c.phone).trim().length > 0);
+
+        let whatsappShareSectionHTML = '';
+        if (validContacts.length === 0) {
+            const genericWaUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(emergencyAlertMessage)}`;
+            whatsappShareSectionHTML = `
+              <div style="background: rgba(0, 0, 0, 0.38); border: 2px solid #25D366; border-radius: 18px; padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.35);">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                  <div style="display: inline-flex; align-items: center; gap: 8px;">
+                    <span style="background: #25D366; color: #ffffff; font-size: 11px; font-weight: 900; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.04em; display: inline-flex; align-items: center; gap: 6px;">
+                      <i class="fab fa-whatsapp" style="font-size: 15px;"></i> SHARE VIA WHATSAPP
+                    </span>
+                    <span style="font-size: 13px; font-weight: 700; color: #86efac;">Ready to send</span>
+                  </div>
+                  <span style="font-size: 11px; background: rgba(255,255,255,0.18); padding: 3px 8px; border-radius: 999px; font-weight: 600;">
+                    <i class="fas fa-satellite-dish"></i> Live GPS Active
+                  </span>
+                </div>
+                <p style="font-size: 13px; color: #e2e8f0; margin: 0 0 14px; line-height: 1.4;">
+                  Tap below to open WhatsApp with your live GPS location and emergency alert pre-filled:
+                </p>
+                <a href="${genericWaUrl}" target="_blank" rel="noopener" class="sos-whatsapp-btn"
+                   style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; background: #25D366; color: #ffffff; border-radius: 12px; font-size: 16px; font-weight: 900; text-decoration: none; box-shadow: 0 4px 14px rgba(37,211,102,0.4); box-sizing: border-box;">
+                  <i class="fab fa-whatsapp" style="font-size: 24px;"></i> Share via WhatsApp
+                </a>
+                <div style="font-size: 12px; color: #fde68a; margin-top: 10px; text-align: center;">
+                  ⚠️ No personal emergency contacts saved yet.
+                  <a href="emergency-contacts.html" style="color: #ffffff; font-weight: 700; text-decoration: underline; margin-left: 4px;">Add your trusted contacts &rarr;</a>
+                </div>
+              </div>`;
+        } else {
+            // Contacts are available: render individual buttons for each contact
+            const contactButtonsHTML = validContacts.map(c => {
+                const cWaPhone = this._formatPhoneForWhatsApp(c.phone);
+                const cWaUrl = `https://wa.me/${cWaPhone}?text=${encodeURIComponent(emergencyAlertMessage)}`;
+                const isPrimary = c.priority === 'priority';
+                return `
+                  <a href="${cWaUrl}" target="_blank" rel="noopener" class="sos-whatsapp-btn"
+                     style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; background: #25D366; color: #ffffff; border-radius: 12px; font-size: 15px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 14px rgba(37,211,102,0.35); box-sizing: border-box; transition: transform 0.15s, filter 0.15s;">
+                    <span style="display: inline-flex; align-items: center; gap: 10px;">
+                      <i class="fab fa-whatsapp" style="font-size: 22px;"></i>
+                      <span>WhatsApp &rarr; <strong>${c.name}</strong></span>
+                    </span>
+                    <span style="font-size: 12px; font-weight: 600; opacity: 0.95; background: rgba(0,0,0,0.22); padding: 4px 10px; border-radius: 8px;">
+                      ${c.phone}${c.relationship ? ' · ' + c.relationship : ''}${isPrimary ? ' ⭐ Priority' : ''}
+                    </span>
+                  </a>`;
+            }).join('');
+
+            const chooseAnyChatUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(emergencyAlertMessage)}`;
+
+            whatsappShareSectionHTML = `
+              <div style="background: rgba(0, 0, 0, 0.38); border: 2px solid #25D366; border-radius: 18px; padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.35);">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                  <div style="display: inline-flex; align-items: center; gap: 8px;">
+                    <span style="background: #25D366; color: #ffffff; font-size: 11px; font-weight: 900; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.04em; display: inline-flex; align-items: center; gap: 6px;">
+                      <i class="fab fa-whatsapp" style="font-size: 15px;"></i> SHARE VIA WHATSAPP
+                    </span>
+                    <span style="font-size: 13px; font-weight: 700; color: #86efac;">Tap contact to send SOS</span>
+                  </div>
+                  <span style="font-size: 11px; background: rgba(255,255,255,0.18); padding: 3px 8px; border-radius: 999px; font-weight: 600;">
+                    <i class="fas fa-satellite-dish"></i> Live GPS Active
+                  </span>
+                </div>
+
+                <p style="font-size: 13px; color: #f1f5f9; margin: 0 0 12px; line-height: 1.4;">
+                  Tap a contact below to open WhatsApp with your live tracking location and SOS alert pre-filled. Press <strong>Send</strong> inside WhatsApp:
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  ${contactButtonsHTML}
+                </div>
+
+                <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.15); display: flex; justify-content: flex-end;">
+                  <a href="${chooseAnyChatUrl}" target="_blank" rel="noopener"
+                     style="font-size: 12px; color: #a7f3d0; text-decoration: underline; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+                    <i class="fab fa-whatsapp"></i> Share via WhatsApp to another contact or group &rarr;
+                  </a>
+                </div>
+              </div>`;
+        }
+
 
         const contactsHTML = userContacts.length > 0
-            ? userContacts.map(c => `
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: rgba(255, 255, 255, 0.12); border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.1);">
-                  <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+            ? userContacts.map(c => {
+                const cWaPhone = this._formatPhoneForWhatsApp(c.phone);
+                const cSmsPhone = this._formatPhoneForSms(c.phone);
+                const cWaUrl = `https://wa.me/${cWaPhone}?text=${encodeURIComponent(emergencyAlertMessage)}`;
+                const cSmsUrl = isIOS
+                    ? `sms:${cSmsPhone}&body=${encodeURIComponent(emergencyAlertMessage)}`
+                    : `sms:${cSmsPhone}?body=${encodeURIComponent(emergencyAlertMessage)}`;
+
+                return `
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; background: rgba(255, 255, 255, 0.12); border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.12); flex-wrap: wrap;">
+                  <div style="display: flex; align-items: center; gap: 12px; min-width: 170px;">
                     <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                       <i class="fas ${c.relationship === 'Emergency Service' ? 'fa-user-shield' : 'fa-user'}" style="font-size: 16px;"></i>
                     </div>
                     <div style="min-width: 0;">
-                      <div style="font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${c.name}</div>
+                      <div style="font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${c.name} ${c.priority === 'priority' ? '<span style="font-size: 10px; background: #ef4444; color: #fff; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">Primary</span>' : ''}
+                      </div>
                       <div style="font-size: 12px; opacity: 0.85;">${c.phone} ${c.relationship ? '· ' + c.relationship : ''}</div>
                     </div>
                   </div>
-                  <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                  <div style="display: flex; gap: 6px; flex-shrink: 0; margin-left: auto;">
                     <a href="tel:${c.phone}"
-                       style="padding: 6px 12px; background: #ffffff; border-radius: 8px; color: #b91c1c; font-size: 13px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                       style="padding: 7px 11px; background: #ffffff; border-radius: 8px; color: #b91c1c; font-size: 12px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
                       <i class="fas fa-phone"></i> Call
                     </a>
-                    <a href="sms:${c.phone}?body=EMERGENCY! I need immediate help. Live tracking: ${encodeURIComponent(shareLink)}"
-                       style="padding: 6px 10px; background: rgba(255,255,255,0.2); border-radius: 8px; color: #ffffff; font-size: 13px; font-weight: 700; text-decoration: none;">
-                      SMS
+                    <a href="${cSmsUrl}"
+                       style="padding: 7px 11px; background: #0284c7; border-radius: 8px; color: #ffffff; font-size: 12px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                      <i class="fas fa-comment-sms"></i> SMS
+                    </a>
+                    <a href="${cWaUrl}" target="_blank" rel="noopener"
+                       style="padding: 7px 11px; background: #25D366; border-radius: 8px; color: #ffffff; font-size: 12px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(37,211,102,0.3);">
+                      <i class="fab fa-whatsapp" style="font-size: 15px;"></i> WhatsApp
                     </a>
                   </div>
-                </div>`).join('')
+                </div>`;
+            }).join('')
             : `<div style="padding: 16px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; font-size: 14px; text-align: center; opacity: 0.9;">
                  No personal emergency contacts saved yet.
                  <div style="margin-top: 6px;">
@@ -552,15 +798,18 @@ class EmergencySOS {
         overlay.innerHTML = `
           <div style="max-width: 600px; margin: 0 auto; padding-bottom: 30px;">
             <!-- Header with pulse -->
-            <div style="text-align: center; margin-bottom: 20px;">
+            <div style="text-align: center; margin-bottom: 18px;">
               <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 12px rgba(255,255,255,0.1); animation: sosPulse 1.4s infinite;">
                 <i class="fas fa-triangle-exclamation" style="font-size: 38px; color: #ffffff;"></i>
               </div>
               <h1 style="font-size: 26px; font-weight: 900; margin: 0 0 6px; letter-spacing: 0.02em;">EMERGENCY ACTIVE</h1>
-              <div style="font-size: 14px; opacity: 0.9; font-weight: 600;">
-                User: <strong>${userName}</strong> · <span id="sosLiveTime">Started: ${new Date().toLocaleTimeString()}</span>
+              <div style="font-size: 14px; opacity: 0.95; font-weight: 600;">
+                User: <strong>${userName}</strong> · <span id="sosLiveTime">Updated: ${new Date().toLocaleTimeString()}</span>
               </div>
             </div>
+
+            <!-- PROMINENT WHATSAPP EMERGENCY SHARING SECTION -->
+            ${whatsappShareSectionHTML}
 
             <!-- Embedded Live Map -->
             <div style="background: rgba(255, 255, 255, 0.12); border-radius: 16px; overflow: hidden; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.15);">
@@ -578,9 +827,9 @@ class EmergencySOS {
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                   <a id="sosOpenMapsBtn" href="${mapsLink}" target="_blank" rel="noopener"
                      style="flex: 1; min-width: 140px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; background: #ffffff; border-radius: 10px; color: #b91c1c; font-weight: 800; text-decoration: none; font-size: 13px;">
-                    <i class="fas fa-map-location-dot"></i> Google Maps
+                    <i class="fas fa-map-location-dot"></i> Open in Maps
                   </a>
-                  <button onclick="window.emergencySOS._copyLiveShareLink('${shareLink}')"
+                  <button onclick="window.emergencySOS._shareLiveLink('${shareLink}')"
                      style="flex: 1; min-width: 140px; padding: 10px 14px; background: rgba(255,255,255,0.2); border: none; border-radius: 10px; color: #ffffff; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
                     <i class="fas fa-share-nodes"></i> Share Live Link
                   </button>
@@ -627,60 +876,61 @@ class EmergencySOS {
             </button>
           </div>
           <style>
+            .sos-whatsapp-btn:hover {
+              transform: translateY(-2px);
+              filter: brightness(1.08);
+            }
             @keyframes sosPulse {
               0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
               70% { transform: scale(1.05); box-shadow: 0 0 0 16px rgba(255,255,255,0); }
               100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0); }
             }
+            @keyframes sosBannerGlow {
+              0% { border-color: rgba(255,255,255,0.3); }
+              100% { border-color: #ef4444; }
+            }
           </style>`;
         document.body.appendChild(overlay);
 
-        // Render mini Google Map in overlay
-        if (window.google && window.google.maps) {
+        // Render mini MapLibre Map in overlay
+        const renderSosMap = async () => {
             const mapDiv = document.getElementById('sosActiveInlineMap');
-            if (mapDiv) {
-                const center = { lat: Number(loc.latitude), lng: Number(loc.longitude) };
-                this.activeSosMap = new google.maps.Map(mapDiv, {
-                    center,
-                    zoom: 15,
-                    mapTypeControl: false,
-                    streetViewControl: false,
-                    styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
+            if (!mapDiv) return;
+            try {
+                await window.loadMapLibreApi();
+                const lat = Number(loc.latitude);
+                const lng = Number(loc.longitude);
+                this.activeSosMap = await window.SecureStepMap.createMap(mapDiv, [lng, lat], 15);
+
+                this.activeSosMarker = window.SecureStepMap.createMarker(lat, lng, {
+                    isUser: true,
+                    popupHtml: '<strong>Emergency Location</strong>'
                 });
-                this.activeSosMarker = new google.maps.Marker({
-                    position: center,
-                    map: this.activeSosMap,
-                    title: 'Current Position',
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        scale: 10,
-                        fillColor: '#ef4444',
-                        fillOpacity: 1,
-                        strokeColor: '#ffffff',
-                        strokeWeight: 2
-                    }
-                });
+                this.activeSosMarker.addTo(this.activeSosMap);
+            } catch (err) {
+                console.warn('Failed to render inline SOS map:', err);
             }
-        } else if (window.loadGoogleMapsApi) {
-            window.loadGoogleMapsApi().then(() => {
-                const mapDiv = document.getElementById('sosActiveInlineMap');
-                if (mapDiv) {
-                    const center = { lat: Number(loc.latitude), lng: Number(loc.longitude) };
-                    this.activeSosMap = new google.maps.Map(mapDiv, {
-                        center,
-                        zoom: 15,
-                        mapTypeControl: false,
-                        streetViewControl: false
-                    });
-                    this.activeSosMarker = new google.maps.Marker({
-                        position: center,
-                        map: this.activeSosMap,
-                        title: 'Current Position'
-                    });
-                }
-            }).catch(() => {});
+        };
+
+        if (window.loadMapLibreApi) {
+            renderSosMap();
         }
     }
+
+    _shareLiveLink(link) {
+        const userName = this.getCurrentUserName();
+        const title = `🚨 Emergency Alert: ${userName} Needs Help`;
+        const text = `I am NOT SAFE and need immediate help! Real-time live tracking: ${link}`;
+
+        if (navigator.share) {
+            navigator.share({ title, text, url: link }).catch(() => {
+                this._copyLiveShareLink(link);
+            });
+        } else {
+            this._copyLiveShareLink(link);
+        }
+    }
+
 
     _copyLiveShareLink(link) {
         if (navigator.clipboard) {

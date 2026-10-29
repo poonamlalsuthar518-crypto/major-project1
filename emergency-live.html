@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Emergency Live Location | SecureStep</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
   <link rel="stylesheet" href="css/integration.css" />
   <style>
     :root {
@@ -258,7 +259,7 @@
     </div>
   </div>
 
-  <script src="js/google-maps-loader.js"></script>
+  <script src="js/map-loader.js"></script>
   <script>
     (function() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -274,7 +275,6 @@
 
       let liveMap = null;
       let userMarker = null;
-      let pathPolyline = null;
       let pathCoordinates = [];
       let pollInterval = null;
       let isResolved = false;
@@ -316,65 +316,69 @@
           </div>`;
       }
 
-      function updateMap(sos) {
-        const pos = { lat: Number(sos.latitude), lng: Number(sos.longitude) };
+      async function updateMap(sos) {
+        const lat = Number(sos.latitude);
+        const lng = Number(sos.longitude);
 
         if (!liveMap) {
           const mapDiv = document.getElementById('liveMap');
-          if (!mapDiv || !window.google || !window.google.maps) return;
+          if (!mapDiv) return;
 
-          liveMap = new google.maps.Map(mapDiv, {
-            center: pos,
-            zoom: 16,
-            mapTypeControl: false,
-            streetViewControl: false,
-            styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
-          });
+          try {
+            await window.loadMapLibreApi();
+            liveMap = await window.SecureStepMap.createMap(mapDiv, [lng, lat], 16);
 
-          userMarker = new google.maps.Marker({
-            position: pos,
-            map: liveMap,
-            title: sos.userName || 'User',
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 12,
-              fillColor: sos.status === 'resolved' ? '#10b981' : '#ef4444',
-              fillOpacity: 1,
-              strokeColor: '#ffffff',
-              strokeWeight: 3
-            }
-          });
-
-          pathCoordinates = (sos.locations || []).map(l => ({ lat: Number(l.latitude), lng: Number(l.longitude) }));
-          if (pathCoordinates.length === 0) pathCoordinates.push(pos);
-
-          pathPolyline = new google.maps.Polyline({
-            path: pathCoordinates,
-            geodesic: true,
-            strokeColor: '#ef4444',
-            strokeOpacity: 0.8,
-            strokeWeight: 4,
-            map: liveMap
-          });
-        } else {
-          liveMap.panTo(pos);
-          if (userMarker) {
-            userMarker.setPosition(pos);
-            userMarker.setIcon({
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 12,
-              fillColor: sos.status === 'resolved' ? '#10b981' : '#ef4444',
-              fillOpacity: 1,
-              strokeColor: '#ffffff',
-              strokeWeight: 3
+            userMarker = window.SecureStepMap.createMarker(lat, lng, {
+              isUser: true,
+              popupHtml: `<strong>${sos.userName || 'User'}</strong><br>Live Emergency Position`
             });
+            userMarker.addTo(liveMap);
+
+            pathCoordinates = (sos.locations || []).map(l => [Number(l.longitude), Number(l.latitude)]);
+            if (pathCoordinates.length === 0) pathCoordinates.push([lng, lat]);
+
+            liveMap.addSource('live-sos-path', {
+              type: 'geojson',
+              data: {
+                type: 'Feature',
+                geometry: {
+                  type: 'LineString',
+                  coordinates: pathCoordinates
+                }
+              }
+            });
+
+            liveMap.addLayer({
+              id: 'live-sos-path-layer',
+              type: 'line',
+              source: 'live-sos-path',
+              layout: { 'line-join': 'round', 'line-cap': 'round' },
+              paint: {
+                'line-color': '#ef4444',
+                'line-width': 5,
+                'line-opacity': 0.85
+              }
+            });
+          } catch (err) {
+            console.error('Failed to initialize live tracking map:', err);
+          }
+        } else {
+          liveMap.flyTo({ center: [lng, lat], zoom: 16 });
+          if (userMarker) {
+            userMarker.setLngLat([lng, lat]);
           }
 
-          if (pathPolyline) {
-            const currentPath = pathPolyline.getPath();
-            const last = currentPath.getLength() > 0 ? currentPath.getAt(currentPath.getLength() - 1) : null;
-            if (!last || Math.abs(last.lat() - pos.lat) > 0.00001 || Math.abs(last.lng() - pos.lng) > 0.00001) {
-              currentPath.push(new google.maps.LatLng(pos.lat, pos.lng));
+          if (pathCoordinates) {
+            pathCoordinates.push([lng, lat]);
+            const src = liveMap.getSource('live-sos-path');
+            if (src) {
+              src.setData({
+                type: 'Feature',
+                geometry: {
+                  type: 'LineString',
+                  coordinates: pathCoordinates
+                }
+              });
             }
           }
         }
@@ -437,7 +441,7 @@
               </div>
 
               <a id="openMapsLink" href="${mapsUrl}" target="_blank" rel="noopener" class="btn-maps">
-                <i class="fas fa-map-location-dot"></i> Open in Google Maps
+                <i class="fas fa-map-location-dot"></i> Open in Maps
               </a>
 
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -488,9 +492,7 @@
 
         renderLiveUI(sos);
 
-        window.loadGoogleMapsApi().then(() => {
-          updateMap(sos);
-        }).catch(() => {});
+        updateMap(sos);
 
         if (sos.status === 'active') {
           if (pollInterval) clearInterval(pollInterval);

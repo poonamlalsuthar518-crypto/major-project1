@@ -24,9 +24,20 @@
     "user_id": 2,
     "name": "Poonam Lal",
     "relationship": "Family",
-    "phone": "1234567891",
+    "phone": "7483176991",
     "email": "poonamlalsuthar518@gmail.com",
     "is_primary": 0,
-    "created_at": "2026-09-06T11:47:30.584Z"
+    "created_at": "2026-09-06T11:47:30.584Z",
+    "updated_at": "2026-09-21T15:51:58.897Z"
+  },
+  {
+    "id": 5,
+    "user_id": 2,
+    "name": "prajwal",
+    "relationship": "Friend",
+    "phone": "8105336328",
+    "email": "prajwalbraghuveer@gmail.com",
+    "is_primary": 0,
+    "created_at": "2026-09-21T15:54:22.842Z"
   }
 ]

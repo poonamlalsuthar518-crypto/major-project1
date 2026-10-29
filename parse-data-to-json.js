@@ -73,7 +73,7 @@ const locationCoords = {
     'banashankari': { lat: 12.9254, lng: 77.5468 }
 };
 
-// Simple XML parser for KML files
+// Simple XML parser for KML files (used for Police Stations)
 function parseKML(kmlContent, zone) {
     const placemarks = [];
     const placemarkRegex = /<Placemark>([\s\S]*?)<\/Placemark>/g;
@@ -92,10 +92,11 @@ function parseKML(kmlContent, zone) {
         const descMatch = descRegex.exec(placemarkContent);
         
         if (coordsMatch) {
-            const coords = coordsMatch[1].trim().split(/\s+/);
-            if (coords.length >= 2) {
-                const lng = parseFloat(coords[0]);
-                const lat = parseFloat(coords[1]);
+            // some KML files have coordinates like lon,lat,alt
+            const parts = coordsMatch[1].trim().split(',');
+            if (parts.length >= 2) {
+                const lng = parseFloat(parts[0]);
+                const lat = parseFloat(parts[1]);
                 
                 if (!isNaN(lat) && !isNaN(lng)) {
                     const name = simpleDataNameMatch ? simpleDataNameMatch[1].trim() : (nameMatch ? nameMatch[1].trim() : 'Police Station');
@@ -117,6 +118,66 @@ function parseKML(kmlContent, zone) {
     }
     
     return placemarks;
+}
+
+// XML parser specifically for Streetlights KML
+function parseStreetlightKML(kmlContent, zone) {
+    const streetlights = [];
+    const placemarkRegex = /<Placemark>([\s\S]*?)<\/Placemark>/g;
+    
+    // Regex for specific SimpleData fields
+    const latRegex = /<SimpleData name="Energy Meter Latitude">([\d\.-]+)<\/SimpleData>/;
+    const lngRegex = /<SimpleData name="Energy Meter Longitude">([\d\.-]+)<\/SimpleData>/;
+    
+    // Fallback if Energy Meter Latitude is not present
+    const poleLatRegex = /<SimpleData name="Pole Latitude">([\d\.-]+)<\/SimpleData>/;
+    const poleLngRegex = /<SimpleData name="Pole Longitude">([\d\.-]+)<\/SimpleData>/;
+
+    const coordsRegex = /<coordinates>([\s\S]*?)<\/coordinates>/;
+
+    let match;
+    while ((match = placemarkRegex.exec(kmlContent)) !== null) {
+        const placemarkContent = match[1];
+        
+        let lat = NaN;
+        let lng = NaN;
+
+        const latMatch = latRegex.exec(placemarkContent);
+        const lngMatch = lngRegex.exec(placemarkContent);
+        
+        if (latMatch && lngMatch) {
+            lat = parseFloat(latMatch[1]);
+            lng = parseFloat(lngMatch[1]);
+        } else {
+            const pLatMatch = poleLatRegex.exec(placemarkContent);
+            const pLngMatch = poleLngRegex.exec(placemarkContent);
+            if (pLatMatch && pLngMatch) {
+                lat = parseFloat(pLatMatch[1]);
+                lng = parseFloat(pLngMatch[1]);
+            }
+        }
+
+        // Validate coordinates are within Bangalore bounds roughly
+        if (!isNaN(lat) && !isNaN(lng) && lat > 12.0 && lat < 14.0 && lng > 77.0 && lng < 78.5) {
+            streetlights.push({ lat, lng, zone });
+            continue;
+        }
+
+        // If coordinates were invalid or not found, try <coordinates>
+        const coordsMatch = coordsRegex.exec(placemarkContent);
+        if (coordsMatch) {
+            const parts = coordsMatch[1].trim().split(',');
+            if (parts.length >= 2) {
+                const cLng = parseFloat(parts[0]);
+                const cLat = parseFloat(parts[1]);
+                if (!isNaN(cLat) && !isNaN(cLng) && cLat > 12.0 && cLat < 14.0 && cLng > 77.0 && cLng < 78.5) {
+                    streetlights.push({ lat: cLat, lng: cLng, zone });
+                }
+            }
+        }
+    }
+    
+    return streetlights;
 }
 
 // Parse police station CSV handling CSV quotes correctly
@@ -221,23 +282,37 @@ function main() {
     // 1. Streetlights KML
     const streetlightFiles = [
         { zone: 'RR Nagar', file: 'rr-nagar-streetlights.kml' },
-        { zone: 'Bangalore East', file: 'bangalore-east-streetlights.kml' },
-        { zone: 'Bommanahalli', file: 'bommanahalli-streetlights.kml' }
+        { zone: 'Bangalore East', file: 'bangalore-east-streetlights.kml' }
     ];
 
-    const allStreetlights = [];
+    let allStreetlights = [];
     for (const { zone, file } of streetlightFiles) {
         const filePath = path.join(__dirname, file);
         if (fs.existsSync(filePath)) {
             console.log(`Processing ${file}...`);
             const kmlContent = fs.readFileSync(filePath, 'utf8');
-            const placemarks = parseKML(kmlContent, zone);
-            console.log(`Found ${placemarks.length} streetlights in ${zone}`);
-            allStreetlights.push(...placemarks);
+            const sls = parseStreetlightKML(kmlContent, zone);
+            console.log(`Found ${sls.length} valid streetlights in ${zone}`);
+            allStreetlights.push(...sls);
         }
     }
+
+    // Downsample if there are too many (e.g. keep max 10,000)
+    const MAX_STREETLIGHTS = 10000;
+    if (allStreetlights.length > MAX_STREETLIGHTS) {
+        console.log(`Downsampling streetlights from ${allStreetlights.length} to ${MAX_STREETLIGHTS}...`);
+        const step = Math.floor(allStreetlights.length / MAX_STREETLIGHTS);
+        const downsampled = [];
+        for (let i = 0; i < allStreetlights.length; i += step) {
+            downsampled.push(allStreetlights[i]);
+            if (downsampled.length >= MAX_STREETLIGHTS) break;
+        }
+        allStreetlights = downsampled;
+    }
+
     fs.writeFileSync('data-streetlights.json', JSON.stringify(allStreetlights, null, 2));
     console.log(`Saved ${allStreetlights.length} streetlights to data-streetlights.json`);
+
 
     // 2. Police Stations CSV & KML
     const policeCSV = path.join(__dirname, 'bangalore-police-stations.csv');

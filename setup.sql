@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS sos_alerts (
   latitude DECIMAL(10, 8),
   longitude DECIMAL(11, 8),
   status ENUM('active', 'stopped', 'resolved') DEFAULT 'active',
+  token VARCHAR(64),
   started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   ended_at TIMESTAMP NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -71,7 +72,7 @@ CREATE TABLE IF NOT EXISTS sos_notifications (
   id INT AUTO_INCREMENT PRIMARY KEY,
   sos_id INT NOT NULL,
   emergency_contact_id INT,
-  notification_type ENUM('sms', 'email') NOT NULL,
+  notification_type ENUM('sms', 'whatsapp', 'email') NOT NULL,
   status ENUM('pending', 'sent', 'failed') DEFAULT 'pending',
   message TEXT,
   sent_at TIMESTAMP NULL,

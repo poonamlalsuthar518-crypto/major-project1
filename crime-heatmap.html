@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SecureStep — Crime Heatmap</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css">
   <style>
     :root{--blue:#1e3a5f;--lightBlue:#2c5282;--accent:#4fc3f7;--danger:#ef4444;--muted:#64748b;--card:#fff}
     *{box-sizing:border-box}
@@ -27,10 +28,9 @@
 
     /* Heatmap & legend */
     .map-area{display:flex;flex-direction:column;gap:10px}
-    .map-placeholder{height:520px;border-radius:10px;background:#e8f4ff;border:2px dashed #cfe8ff;display:flex;flex-direction:column}
-    .map-header{display:flex;justify-content:space-between;align-items:center;padding:12px}
-    .heat-overlay{position:relative;flex:1;border-radius:8px;margin:10px;padding:8px;display:flex;align-items:center;justify-content:center}
-    .heat-dot{position:absolute;border-radius:50%;opacity:0.85;pointer-events:none;filter:blur(10px)}
+    .map-card{border-radius:12px;background:#fff;border:1px solid #e6eef8;display:flex;flex-direction:column;overflow:hidden}
+    .map-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #f1f5f9}
+    #crimeHeatmap{width:100%;height:440px;border-radius:0;position:relative}
     .legend{display:flex;gap:10px;align-items:center}
     .legend .item{display:flex;gap:8px;align-items:center}
     .legend .sw{width:24px;height:14px;border-radius:4px}
@@ -47,14 +47,14 @@
     th{background:#f8fbff}
 
     /* Responsive */
-    @media(max-width:980px){.layout{grid-template-columns:1fr}.map-placeholder{height:360px}.stats-row{grid-template-columns:1fr}}
+    @media(max-width:980px){.layout{grid-template-columns:1fr}#crimeHeatmap{height:340px}.stats-row{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
   <div class="container">
     <div class="topbar">
       <div class="brand"><i class="fas fa-shield-alt"></i><h2>SecureStep — Crime Heatmap</h2></div>
-      <div style="color:var(--muted);font-weight:700">Demo only — no backend. Maps API placeholders included.</div>
+      <div style="color:var(--muted);font-weight:700">Interactive safety analytics and incident heatmap view.</div>
     </div>
 
     <div class="layout">
@@ -91,7 +91,7 @@
 
           <div class="filter-group">
             <label style="font-weight:700">Search Area</label>
-            <input type="text" id="searchArea" placeholder="e.g., Downtown, Park Ave">
+            <input type="text" id="searchArea" placeholder="e.g., Koramangala, Indiranagar, MG Road">
           </div>
 
           <div style="display:flex;gap:8px;margin-top:8px">
@@ -119,21 +119,18 @@
           <div class="stat card"><h4 id="recent24">--</h4><p>Last 24 hrs</p></div>
         </div>
 
-        <div class="map-placeholder card">
+        <div class="map-card card" style="padding:0;">
           <div class="map-header">
-            <div style="font-weight:800">Crime Heatmap (Placeholder)</div>
+            <div style="font-weight:800"><i class="fas fa-fire" style="color:#ef4444;margin-right:6px;"></i> Live Crime Density Heatmap (OpenFreeMap)</div>
             <div style="display:flex;gap:8px;align-items:center">
               <button class="btn" id="toggleHeat">Toggle Heat</button>
               <button class="btn" id="exportCSV" style="background:transparent;color:var(--blue);border:1px solid #d0e8ff">Export CSV</button>
             </div>
           </div>
 
-          <div class="heat-overlay" id="heatOverlay">
-            <!-- heat dots injected here -->
-            <div style="text-align:center;color:var(--muted);padding:8px">Map Placeholder — replace with Google Maps API + HeatmapLayer</div>
-          </div>
+          <div id="crimeHeatmap"></div>
 
-          <div style="margin-top:12px">
+          <div style="padding:16px;border-top:1px solid #f1f5f9;">
             <h4 style="margin:0 0 8px 0">Recent Incidents</h4>
             <div style="overflow:auto;max-height:220px">
               <table id="incidentsTable"><thead><tr><th>Type</th><th>Date</th><th>Time</th><th>Location</th><th>Severity</th></tr></thead><tbody></tbody></table>
@@ -144,126 +141,344 @@
     </div>
   </div>
 
+  <script src="js/map-loader.js"></script>
   <script>
-    // Beginner-friendly simulated incidents data
-    const incidents = [];
-    // generate demo incidents around a notional area
-    (function generateDemo(){
-      const types = ['Theft','Harassment','Assault','Accident','Suspicious'];
-      const now = new Date();
-      for(let i=0;i<80;i++){
-        const minutesAgo = Math.floor(Math.random()*60*24*7); // within last 7 days
-        const d = new Date(now.getTime() - minutesAgo*60000);
-        incidents.push({
-          id:i+1,
-          type: types[Math.floor(Math.random()*types.length)],
-          date: d.toISOString().slice(0,10),
-          time: d.toTimeString().slice(0,5),
-          loc: ['Downtown','Park Ave','Main St','Riverfront','Market'][Math.floor(Math.random()*5)],
-          severity: Math.random()>0.7? 'High' : (Math.random()>0.4?'Medium':'Low'),
-          x: Math.random()*80+10, // percent position inside placeholder
-          y: Math.random()*60+10
+    (function() {
+      'use strict';
+
+      // Known Bangalore landmark anchors for realistic spatial distribution
+      const BANGALORE_LOCATIONS = [
+        { name: 'MG Road', lat: 12.9756, lng: 77.6066 },
+        { name: 'Indiranagar', lat: 12.9784, lng: 77.6408 },
+        { name: 'Koramangala', lat: 12.9352, lng: 77.6245 },
+        { name: 'Whitefield', lat: 12.9698, lng: 77.7499 },
+        { name: 'Jayanagar', lat: 12.9308, lng: 77.5838 },
+        { name: 'Hebbal', lat: 13.0358, lng: 77.5970 },
+        { name: 'Malleshwaram', lat: 13.0031, lng: 77.5643 },
+        { name: 'Electronic City', lat: 12.8452, lng: 77.6602 },
+        { name: 'Majestic', lat: 12.9767, lng: 77.5713 },
+        { name: 'HSR Layout', lat: 12.9121, lng: 77.6446 },
+        { name: 'Frazer Town', lat: 12.9968, lng: 77.6130 },
+        { name: 'Rajajinagar', lat: 12.9982, lng: 77.5530 },
+        { name: 'BTM Layout', lat: 12.9166, lng: 77.6101 },
+        { name: 'Banashankari', lat: 12.9255, lng: 77.5468 },
+        { name: 'Yelahanka', lat: 13.1007, lng: 77.5963 }
+      ];
+
+      const incidents = [];
+      let heatmapMap = null;
+      let heatVisible = true;
+
+      // Generate realistic incidents scattered around Bangalore
+      function generateIncidents() {
+        const types = ['Theft', 'Harassment', 'Assault', 'Accident', 'Suspicious'];
+        const now = new Date();
+
+        for (let i = 0; i < 90; i++) {
+          const locAnchor = BANGALORE_LOCATIONS[Math.floor(Math.random() * BANGALORE_LOCATIONS.length)];
+          const minutesAgo = Math.floor(Math.random() * 60 * 24 * 14); // past 14 days
+          const d = new Date(now.getTime() - minutesAgo * 60000);
+          
+          // Add small jitter (~300m - 1km)
+          const latJitter = (Math.random() - 0.5) * 0.018;
+          const lngJitter = (Math.random() - 0.5) * 0.018;
+          const sev = Math.random() > 0.65 ? 'High' : (Math.random() > 0.35 ? 'Medium' : 'Low');
+
+          incidents.push({
+            id: i + 1,
+            type: types[Math.floor(Math.random() * types.length)],
+            date: d.toISOString().slice(0, 10),
+            time: d.toTimeString().slice(0, 5),
+            loc: locAnchor.name,
+            lat: locAnchor.lat + latJitter,
+            lng: locAnchor.lng + lngJitter,
+            severity: sev,
+            weight: sev === 'High' ? 1.0 : (sev === 'Medium' ? 0.6 : 0.3)
+          });
+        }
+      }
+
+      function toGeoJson(list) {
+        return {
+          type: 'FeatureCollection',
+          features: list.map(item => ({
+            type: 'Feature',
+            properties: {
+              id: item.id,
+              type: item.type,
+              date: item.date,
+              time: item.time,
+              loc: item.loc,
+              severity: item.severity,
+              weight: item.weight
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: [item.lng, item.lat]
+            }
+          }))
+        };
+      }
+
+      async function initMap() {
+        const container = document.getElementById('crimeHeatmap');
+        if (!container) return;
+
+        try {
+          await window.loadMapLibreApi();
+
+          heatmapMap = await window.SecureStepMap.createMap(container, [77.5946, 12.9716], 12);
+
+          const geojson = toGeoJson(incidents);
+
+          heatmapMap.addSource('crime-incidents', {
+            type: 'geojson',
+            data: geojson
+          });
+
+          // 1. Heatmap layer
+          heatmapMap.addLayer({
+            id: 'crime-heat',
+            type: 'heatmap',
+            source: 'crime-incidents',
+            maxzoom: 17,
+            paint: {
+              'heatmap-weight': [
+                'interpolate',
+                ['linear'],
+                ['get', 'weight'],
+                0, 0,
+                0.5, 0.5,
+                1, 1
+              ],
+              'heatmap-intensity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                0, 1,
+                14, 3
+              ],
+              'heatmap-color': [
+                'interpolate',
+                ['linear'],
+                ['heatmap-density'],
+                0, 'rgba(30,58,95,0)',
+                0.2, 'rgba(56,189,248,0.6)',
+                0.4, 'rgba(16,185,129,0.7)',
+                0.7, 'rgba(245,158,11,0.85)',
+                1, 'rgba(239,68,68,0.95)'
+              ],
+              'heatmap-radius': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                0, 4,
+                12, 22,
+                16, 32
+              ],
+              'heatmap-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                8, 0.95,
+                16, 0.5
+              ]
+            }
+          });
+
+          // 2. Point circle layer (visible as user zooms in)
+          heatmapMap.addLayer({
+            id: 'crime-points',
+            type: 'circle',
+            source: 'crime-incidents',
+            minzoom: 11,
+            paint: {
+              'circle-radius': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                11, 4,
+                16, 9
+              ],
+              'circle-color': [
+                'match',
+                ['get', 'severity'],
+                'High', '#ef4444',
+                'Medium', '#f59e0b',
+                '#10b981'
+              ],
+              'circle-stroke-color': '#ffffff',
+              'circle-stroke-width': 2,
+              'circle-opacity': 0.9
+            }
+          });
+
+          // Popup on point click
+          heatmapMap.on('click', 'crime-points', (e) => {
+            const f = e.features[0];
+            if (!f) return;
+            const props = f.properties;
+            const coords = f.geometry.coordinates.slice();
+
+            const sevColor = props.severity === 'High' ? '#ef4444' : (props.severity === 'Medium' ? '#f59e0b' : '#10b981');
+            const popupHtml = `
+              <div style="font-family:sans-serif;min-width:180px;">
+                <div style="font-weight:800;font-size:14px;color:#0f172a;margin-bottom:4px;">
+                  <i class="fas fa-exclamation-triangle" style="color:${sevColor}"></i> ${props.type}
+                </div>
+                <div style="font-size:12px;color:#64748b;margin-bottom:6px;">
+                  <i class="fas fa-location-dot"></i> ${props.loc}
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:#475569;background:#f8fafc;padding:4px 6px;border-radius:6px;">
+                  <span>${props.date} ${props.time}</span>
+                  <strong style="color:${sevColor}">${props.severity}</strong>
+                </div>
+              </div>
+            `;
+
+            new maplibregl.Popup({ offset: 12 })
+              .setLngLat(coords)
+              .setHTML(popupHtml)
+              .addTo(heatmapMap);
+          });
+
+          heatmapMap.on('mouseenter', 'crime-points', () => {
+            heatmapMap.getCanvas().style.cursor = 'pointer';
+          });
+          heatmapMap.on('mouseleave', 'crime-points', () => {
+            heatmapMap.getCanvas().style.cursor = '';
+          });
+
+          applyFilters();
+        } catch (err) {
+          console.error('Failed to initialize MapLibre Heatmap:', err);
+          container.innerHTML = '<div style="padding:20px;color:#ef4444;text-align:center;">Failed to initialize MapLibre Heatmap.</div>';
+        }
+      }
+
+      function formatNumber(n) { return n == null ? '--' : n; }
+
+      function updateStats(filtered) {
+        document.getElementById('totalIncidents').textContent = formatNumber(filtered.length);
+        const hotspots = filtered.filter(f => f.severity === 'High').length;
+        document.getElementById('hotspots').textContent = hotspots;
+        const last24 = filtered.filter(f => {
+          const dt = new Date(f.date + 'T' + f.time);
+          return (Date.now() - dt.getTime()) < 24 * 3600 * 1000;
+        }).length;
+        document.getElementById('recent24').textContent = last24;
+      }
+
+      function renderTable(filtered) {
+        const tbody = document.querySelector('#incidentsTable tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        filtered.slice(0, 100).forEach(r => {
+          const tr = document.createElement('tr');
+          const color = r.severity === 'High' ? '#ef4444' : (r.severity === 'Medium' ? '#f59e0b' : '#10b981');
+          tr.innerHTML = `
+            <td><strong>${r.type}</strong></td>
+            <td>${r.date}</td>
+            <td>${r.time}</td>
+            <td>${r.loc}</td>
+            <td><span style="color:${color};font-weight:700;">${r.severity}</span></td>
+          `;
+          tbody.appendChild(tr);
         });
       }
+
+      function applyFilters() {
+        const checked = Array.from(document.querySelectorAll('#crimeTypes input:checked')).map(i => i.value);
+        const from = document.getElementById('dateFrom').value;
+        const to = document.getElementById('dateTo').value;
+        const tFrom = document.getElementById('timeFrom').value;
+        const tTo = document.getElementById('timeTo').value;
+        const area = document.getElementById('searchArea').value.trim().toLowerCase();
+
+        let filtered = incidents.filter(i => checked.includes(i.type));
+        if (from) filtered = filtered.filter(i => i.date >= from);
+        if (to) filtered = filtered.filter(i => i.date <= to);
+        if (tFrom) filtered = filtered.filter(i => i.time >= tFrom);
+        if (tTo) filtered = filtered.filter(i => i.time <= tTo);
+        if (area) filtered = filtered.filter(i => i.loc.toLowerCase().includes(area));
+
+        // Update GeoJSON source
+        if (heatmapMap && heatmapMap.getSource('crime-incidents')) {
+          heatmapMap.getSource('crime-incidents').setData(toGeoJson(filtered));
+
+          // If specific area searched, fit to filtered bounds
+          if (area && filtered.length > 0) {
+            const coords = filtered.map(f => [f.lng, f.lat]);
+            window.SecureStepMap.fitBounds(heatmapMap, coords);
+          }
+        }
+
+        updateStats(filtered);
+        renderTable(filtered);
+      }
+
+      function resetFilters() {
+        document.querySelectorAll('#crimeTypes input').forEach(i => i.checked = true);
+        document.getElementById('dateFrom').value = '';
+        document.getElementById('dateTo').value = '';
+        document.getElementById('timeFrom').value = '';
+        document.getElementById('timeTo').value = '';
+        document.getElementById('searchArea').value = '';
+        applyFilters();
+        if (heatmapMap) {
+          heatmapMap.flyTo({ center: [77.5946, 12.9716], zoom: 12 });
+        }
+      }
+
+      // Event listeners
+      document.getElementById('applyFilters').addEventListener('click', applyFilters);
+      document.getElementById('resetFilters').addEventListener('click', resetFilters);
+
+      document.getElementById('toggleHeat').addEventListener('click', function() {
+        if (!heatmapMap) return;
+        heatVisible = !heatVisible;
+        const visibility = heatVisible ? 'visible' : 'none';
+        if (heatmapMap.getLayer('crime-heat')) {
+          heatmapMap.setLayoutProperty('crime-heat', 'visibility', visibility);
+        }
+        this.textContent = heatVisible ? 'Hide Heat' : 'Show Heat';
+      });
+
+      document.getElementById('exportCSV').addEventListener('click', function() {
+        const rows = ['Type,Date,Time,Location,Latitude,Longitude,Severity'];
+        const checked = Array.from(document.querySelectorAll('#crimeTypes input:checked')).map(i => i.value);
+        const from = document.getElementById('dateFrom').value;
+        const to = document.getElementById('dateTo').value;
+        const area = document.getElementById('searchArea').value.trim().toLowerCase();
+
+        let filtered = incidents.filter(i => checked.includes(i.type));
+        if (from) filtered = filtered.filter(i => i.date >= from);
+        if (to) filtered = filtered.filter(i => i.date <= to);
+        if (area) filtered = filtered.filter(i => i.loc.toLowerCase().includes(area));
+
+        if (filtered.length === 0) return alert('No records found to export');
+
+        filtered.forEach(r => {
+          rows.push(`"${r.type}","${r.date}","${r.time}","${r.loc}",${r.lat},${r.lng},"${r.severity}"`);
+        });
+
+        const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'crime_heatmap_incidents.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      // Initialize
+      generateIncidents();
+      document.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        updateStats(incidents);
+        renderTable(incidents);
+      });
     })();
-
-    // Helpers
-    function formatNumber(n){ return n==null? '--' : n }
-
-    function renderHeat(filtered){
-      const overlay = document.getElementById('heatOverlay');
-      overlay.querySelectorAll('.heat-dot').forEach(n=>n.remove());
-      filtered.forEach((inc,i)=>{
-        const dot = document.createElement('div');
-        dot.className = 'heat-dot';
-        const size = inc.severity==='High'? 40 : inc.severity==='Medium'? 28 : 18;
-        dot.style.width = size+'px'; dot.style.height = size+'px';
-        dot.style.left = inc.x + '%'; dot.style.top = inc.y + '%';
-        dot.style.background = inc.severity==='High'? 'rgba(239,68,68,0.9)' : inc.severity==='Medium'? 'rgba(245,158,11,0.85)' : 'rgba(16,185,129,0.85)';
-        dot.style.transform = 'translate(-50%,-50%)';
-        // subtle pulse animation
-        dot.style.transition = 'opacity 0.3s ease';
-        overlay.appendChild(dot);
-      });
-    }
-
-    function updateStats(filtered){
-      document.getElementById('totalIncidents').textContent = formatNumber(filtered.length);
-      const hotspots = filtered.filter(f=>f.severity==='High').length;
-      document.getElementById('hotspots').textContent = hotspots;
-      const last24 = filtered.filter(f=>{
-        const dt = new Date(f.date + 'T' + f.time);
-        return (Date.now() - dt.getTime()) < 24*3600*1000;
-      }).length;
-      document.getElementById('recent24').textContent = last24;
-    }
-
-    function renderTable(filtered){
-      const tbody = document.querySelector('#incidentsTable tbody');
-      tbody.innerHTML = '';
-      filtered.slice(0,200).forEach(r=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${r.type}</td><td>${r.date}</td><td>${r.time}</td><td>${r.loc}</td><td>${r.severity}</td>`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function applyFilters(){
-      // get selected types
-      const checked = Array.from(document.querySelectorAll('#crimeTypes input:checked')).map(i=>i.value);
-      const from = document.getElementById('dateFrom').value;
-      const to = document.getElementById('dateTo').value;
-      const tFrom = document.getElementById('timeFrom').value;
-      const tTo = document.getElementById('timeTo').value;
-      const area = document.getElementById('searchArea').value.trim().toLowerCase();
-
-      let filtered = incidents.filter(i=>checked.includes(i.type));
-      if(from) filtered = filtered.filter(i=>i.date >= from);
-      if(to) filtered = filtered.filter(i=>i.date <= to);
-      if(tFrom) filtered = filtered.filter(i=>i.time >= tFrom);
-      if(tTo) filtered = filtered.filter(i=>i.time <= tTo);
-      if(area) filtered = filtered.filter(i=>i.loc.toLowerCase().includes(area));
-
-      // update UI
-      renderHeat(filtered);
-      updateStats(filtered);
-      renderTable(filtered);
-    }
-
-    // Reset filters
-    function resetFilters(){
-      document.querySelectorAll('#crimeTypes input').forEach(i=>i.checked=true);
-      document.getElementById('dateFrom').value=''; document.getElementById('dateTo').value='';
-      document.getElementById('timeFrom').value=''; document.getElementById('timeTo').value='';
-      document.getElementById('searchArea').value='';
-      applyFilters();
-    }
-
-    // Toggle heat visibility
-    let heatVisible = true;
-    document.getElementById('toggleHeat').addEventListener('click', function(){
-      heatVisible = !heatVisible;
-      document.getElementById('heatOverlay').style.opacity = heatVisible? '1' : '0.12';
-      this.textContent = heatVisible? 'Hide Heat' : 'Show Heat';
-    });
-
-    document.getElementById('applyFilters').addEventListener('click', applyFilters);
-    document.getElementById('resetFilters').addEventListener('click', resetFilters);
-    document.getElementById('exportCSV').addEventListener('click', function(){
-      // simple CSV export of current visible incidents
-      const rows = ['Type,Date,Time,Location,Severity'];
-      const filtered = Array.from(document.querySelectorAll('#incidentsTable tbody tr')).map(r=>{
-        return Array.from(r.children).map(td=>td.textContent.trim().replace(/,/g,'')).join(',');
-      });
-      if(filtered.length===0) return alert('No rows to export');
-      const csv = rows.concat(filtered).join('\n');
-      const blob = new Blob([csv], {type:'text/csv'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'incidents.csv'; a.click(); URL.revokeObjectURL(url);
-    });
-
-    // init
-    applyFilters();
   </script>
 </body>
 </html>

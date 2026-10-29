@@ -2198,5 +2198,81 @@
       "Crime Reporting"
     ],
     "distance": "3.5"
+  },
+  {
+    "id": 111,
+    "code": "RWP-1",
+    "name": "Bangalore City Railway PS",
+    "lat": 12.9771270000087,
+    "lng": 77.569171999661,
+    "address": "Railway Station Premises, Bengaluru",
+    "phone": "080-22871291",
+    "jurisdiction": "Railway Protection & City Division",
+    "hours": "24/7",
+    "officers": 40,
+    "rating": "4.7",
+    "services": [
+      "Railway Patrol",
+      "Emergency SOS",
+      "Passenger Security"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 112,
+    "code": "RWP-2",
+    "name": "Bangalore Rural Railway PS",
+    "lat": 12.9794109996888,
+    "lng": 77.5695099998844,
+    "address": "Railway Station Premises, Bengaluru",
+    "phone": "080-22871291",
+    "jurisdiction": "Railway Protection & City Division",
+    "hours": "24/7",
+    "officers": 40,
+    "rating": "4.7",
+    "services": [
+      "Railway Patrol",
+      "Emergency SOS",
+      "Passenger Security"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 113,
+    "code": "RWP-3",
+    "name": "Bangalore Contonment Railway PS",
+    "lat": 12.9937459998746,
+    "lng": 77.5978789997818,
+    "address": "Railway Station Premises, Bengaluru",
+    "phone": "080-22871291",
+    "jurisdiction": "Railway Protection & City Division",
+    "hours": "24/7",
+    "officers": 40,
+    "rating": "4.7",
+    "services": [
+      "Railway Patrol",
+      "Emergency SOS",
+      "Passenger Security"
+    ],
+    "distance": "2.0"
+  },
+  {
+    "id": 114,
+    "code": "RWP-4",
+    "name": "Byappanahalli Railway PS",
+    "lat": 12.9916090002948,
+    "lng": 77.6435709998957,
+    "address": "Railway Station Premises, Bengaluru",
+    "phone": "080-22871291",
+    "jurisdiction": "Railway Protection & City Division",
+    "hours": "24/7",
+    "officers": 40,
+    "rating": "4.7",
+    "services": [
+      "Railway Patrol",
+      "Emergency SOS",
+      "Passenger Security"
+    ],
+    "distance": "2.0"
   }
 ]

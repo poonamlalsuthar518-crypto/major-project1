@@ -12,12 +12,10 @@
     <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
     <nav class="nav">
       <a href="dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a>
-      <a href="safe-navigation.html"><i class="fas fa-route"></i> Safe Navigation</a>
-      <a href="crime-heatmap.html"><i class="fas fa-map-marked-alt"></i> Heatmap</a>
       <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
       <a href="settings.html" class="active"><i class="fas fa-gear"></i> Settings</a>
     </nav>
-    <div class="user-chip"><span class="avatar">AS</span> Settings</div>
+    <div class="user-chip"><span class="avatar" id="topAvatar">U</span> <span id="userChipName">User</span></div>
   </header>
 
   <div class="layout">
@@ -25,10 +23,8 @@
       <div class="sidebar-section">
         <div class="sidebar-title">Preferences</div>
         <nav>
-          <a href="settings.html" class="active"><i class="fas fa-user-gear"></i> Account</a>
-          <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
-          <a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a>
-          <a href="help.html"><i class="fas fa-circle-question"></i> Help</a>
+          <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+          <a href="settings.html" class="active"><i class="fas fa-gear"></i> Settings</a>
         </nav>
       </div>
     </aside>
@@ -36,72 +32,71 @@
     <main class="content">
       <div class="page-header">
         <div>
-          <h1>Settings</h1>
-          <p>Customize your app preferences and privacy controls</p>
+          <h1>User Settings</h1>
+          <p>Customize your personal application preferences and privacy controls</p>
         </div>
-        <button class="btn btn-primary">Save Settings</button>
+        <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-floppy-disk"></i> Save Settings</button>
       </div>
 
       <div class="grid-2">
         <section class="card">
-          <div class="section-head"><h3>Account Settings</h3></div>
+          <div class="section-head"><h3><i class="fas fa-user-gear" style="margin-right:8px; color:#0284c7;"></i>Account Preferences</h3></div>
           <div class="form-grid">
             <div class="field">
               <label>Full Name</label>
-              <input type="text" value="Alice Sharma" />
+              <input type="text" id="settingsName" placeholder="Your full name" />
             </div>
             <div class="field">
-              <label>Email</label>
-              <input type="email" value="alice@example.com" />
+              <label>Email Address</label>
+              <input type="email" id="settingsEmail" placeholder="your.email@example.com" />
             </div>
             <div class="field full">
               <label>Language</label>
-              <select>
-                <option>English</option>
-                <option>Hindi</option>
-                <option>Kannada</option>
+              <select id="settingsLanguage">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="kn">Kannada</option>
+                <option value="ta">Tamil</option>
+                <option value="te">Telugu</option>
               </select>
             </div>
           </div>
         </section>
 
         <section class="card">
-          <div class="section-head"><h3>Privacy & Security</h3></div>
+          <div class="section-head"><h3><i class="fas fa-shield-halved" style="margin-right:8px; color:#10b981;"></i>Privacy &amp; Security</h3></div>
           <div class="form-grid">
             <div class="field full">
-              <label class="checkbox-row"><input type="checkbox" checked /> Enable location sharing for emergency alerts</label>
+              <label class="checkbox-row"><input type="checkbox" id="prefLocationShare" checked /> Enable live GPS location sharing during active SOS alerts</label>
             </div>
             <div class="field full">
-              <label class="checkbox-row"><input type="checkbox" checked /> Allow anonymous incident reports</label>
+              <label class="checkbox-row"><input type="checkbox" id="prefAnonReport" checked /> Allow anonymous community hazard reporting</label>
             </div>
             <div class="field full">
-              <label class="checkbox-row"><input type="checkbox" /> Hide my profile in nearby users</label>
+              <label class="checkbox-row"><input type="checkbox" id="prefHideProfile" /> Keep profile private from public safety leaderboards</label>
             </div>
           </div>
         </section>
 
         <section class="card">
-          <div class="section-head"><h3>Notification Settings</h3></div>
+          <div class="section-head"><h3><i class="fas fa-bell" style="margin-right:8px; color:#f59e0b;"></i>Notification Settings</h3></div>
           <div class="form-grid">
-            <div class="field full"><label class="checkbox-row"><input type="checkbox" checked /> Emergency alerts</label></div>
-            <div class="field full"><label class="checkbox-row"><input type="checkbox" checked /> Route updates</label></div>
-            <div class="field full"><label class="checkbox-row"><input type="checkbox" /> Monthly summary emails</label></div>
+            <div class="field full"><label class="checkbox-row"><input type="checkbox" id="notifEmergency" checked /> Critical emergency audio alerts</label></div>
+            <div class="field full"><label class="checkbox-row"><input type="checkbox" id="notifRouteUpdates" checked /> Real-time route safety alerts</label></div>
+            <div class="field full"><label class="checkbox-row"><input type="checkbox" id="notifCommunity" checked /> Nearby incident safety alerts</label></div>
           </div>
         </section>
 
         <section class="card">
-          <div class="section-head"><h3>Theme & Actions</h3></div>
+          <div class="section-head"><h3><i class="fas fa-palette" style="margin-right:8px; color:#8b5cf6;"></i>Theme &amp; Display</h3></div>
           <div class="form-grid">
             <div class="field full">
               <label>Theme Selection</label>
-              <select>
-                <option>Light Theme</option>
-                <option>Dark Theme</option>
-                <option>Blue Safety Theme</option>
+              <select id="settingsTheme">
+                <option value="light">Light Theme (Default)</option>
+                <option value="dark">Dark Theme</option>
+                <option value="high-contrast">High Contrast Safe Theme</option>
               </select>
-            </div>
-            <div class="field full">
-              <button class="btn btn-danger" style="width:100%;">Delete Account</button>
             </div>
           </div>
         </section>
@@ -111,5 +106,108 @@
 
   <footer class="footer">© <span id="year"></span> SecureStep • App settings</footer>
   <script src="js/securestep-ui.js"></script>
+  <script>
+    function getInitials(name) {
+      if (!name || typeof name !== 'string') return 'U';
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function getLoggedInUser() {
+      try {
+        const raw = localStorage.getItem('secureStepUser');
+        if (raw) {
+          const u = JSON.parse(raw);
+          if (u && (u.fullName || u.name || u.email)) return u;
+        }
+      } catch (e) {}
+
+      const name = localStorage.getItem('secureStepUserName') || '';
+      const email = localStorage.getItem('secureStepUserEmail') || '';
+      return { fullName: name, name: name, email: email };
+    }
+
+    function loadSettings() {
+      const user = getLoggedInUser();
+      const fullName = user.fullName || user.name || '';
+      const email = user.email || '';
+
+      const initials = getInitials(fullName || 'User');
+      const topAvatar = document.getElementById('topAvatar');
+      const userChipName = document.getElementById('userChipName');
+      if (topAvatar) topAvatar.textContent = initials;
+      if (userChipName) userChipName.textContent = fullName || 'User';
+
+      const nameInput = document.getElementById('settingsName');
+      const emailInput = document.getElementById('settingsEmail');
+      if (nameInput) nameInput.value = fullName;
+      if (emailInput) emailInput.value = email;
+
+      const savedSettings = localStorage.getItem('userAppSettings');
+      if (savedSettings) {
+        try {
+          const s = JSON.parse(savedSettings);
+          if (s.language && document.getElementById('settingsLanguage')) document.getElementById('settingsLanguage').value = s.language;
+          if (s.theme && document.getElementById('settingsTheme')) document.getElementById('settingsTheme').value = s.theme;
+          if (typeof s.locationShare === 'boolean') document.getElementById('prefLocationShare').checked = s.locationShare;
+          if (typeof s.anonReport === 'boolean') document.getElementById('prefAnonReport').checked = s.anonReport;
+          if (typeof s.hideProfile === 'boolean') document.getElementById('prefHideProfile').checked = s.hideProfile;
+          if (typeof s.notifEmergency === 'boolean') document.getElementById('notifEmergency').checked = s.notifEmergency;
+          if (typeof s.notifRouteUpdates === 'boolean') document.getElementById('notifRouteUpdates').checked = s.notifRouteUpdates;
+          if (typeof s.notifCommunity === 'boolean') document.getElementById('notifCommunity').checked = s.notifCommunity;
+        } catch (e) {}
+      }
+    }
+
+    function saveSettings() {
+      const name = document.getElementById('settingsName').value.trim();
+      const email = document.getElementById('settingsEmail').value.trim();
+
+      if (name && email) {
+        let userObj = {};
+        try {
+          userObj = JSON.parse(localStorage.getItem('secureStepUser') || '{}');
+        } catch (e) {}
+        userObj.fullName = name;
+        userObj.name = name;
+        userObj.email = email;
+        localStorage.setItem('secureStepUser', JSON.stringify(userObj));
+        localStorage.setItem('secureStepUserName', name);
+        localStorage.setItem('secureStepUserEmail', email);
+
+        const initials = getInitials(name);
+        const topAvatar = document.getElementById('topAvatar');
+        const userChipName = document.getElementById('userChipName');
+        if (topAvatar) topAvatar.textContent = initials;
+        if (userChipName) userChipName.textContent = name;
+      }
+
+      const appSettings = {
+        language: document.getElementById('settingsLanguage').value,
+        theme: document.getElementById('settingsTheme').value,
+        locationShare: document.getElementById('prefLocationShare').checked,
+        anonReport: document.getElementById('prefAnonReport').checked,
+        hideProfile: document.getElementById('prefHideProfile').checked,
+        notifEmergency: document.getElementById('notifEmergency').checked,
+        notifRouteUpdates: document.getElementById('notifRouteUpdates').checked,
+        notifCommunity: document.getElementById('notifCommunity').checked
+      };
+      localStorage.setItem('userAppSettings', JSON.stringify(appSettings));
+
+      const btn = document.querySelector('.btn-primary');
+      if (btn) {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Settings Saved!';
+        btn.style.background = '#10b981';
+        setTimeout(() => {
+          btn.innerHTML = orig;
+          btn.style.background = '';
+        }, 2000);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSettings);
+  </script>
 </body>
 </html>
