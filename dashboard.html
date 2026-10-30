@@ -112,6 +112,8 @@
         }
         .btn:hover { transform: translateY(-1px); }
         .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; }
+        .btn-outline { background: transparent; border: 1.5px solid #cbd5e1; color: var(--primary); }
+        .btn-outline:hover { background: #f8fafc; border-color: var(--primary); }
         .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
         .badge {
           display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px;
@@ -840,20 +842,21 @@
     <div class="app-container">
         <!-- TOP NAVIGATION BAR -->
         <header class="topnav">
-            <a href="#" class="topnav-brand">
+            <a href="dashboard.html" class="topnav-brand">
                 <i class="fas fa-shield-alt"></i>
                 <span>SecureStep</span>
             </a>
 
             <nav class="topnav-menu">
                 <a href="#home" class="active"><i class="fas fa-home"></i> Home</a>
-                <a href="#navigation"><i class="fas fa-route"></i> Safe Navigation</a>
+                <a href="safe-navigation.html"><i class="fas fa-route"></i> Safe Navigation</a>
                 <a href="#civicsense"><i class="fas fa-city"></i> CivicSense</a>
+                <a href="my-reports.html"><i class="fas fa-clipboard-list"></i> My Reports</a>
                 <a href="#sos" class="sos-link"><i class="fas fa-bell"></i> Emergency SOS</a>
                 <a href="emergency-contacts.html"><i class="fas fa-address-book"></i> Contacts</a>
                 <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
                 <a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
-                <a onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <a href="javascript:void(0)" onclick="handleLogout()" style="cursor: pointer;"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
 
             <div class="topnav-datetime" id="liveDateTime">
@@ -869,13 +872,14 @@
                     <div class="sidebar-title">Menu Overview</div>
                     <nav class="sidebar-menu">
                         <a href="#home" class="active"><i class="fas fa-home"></i> Home Dashboard</a>
-                        <a href="#navigation"><i class="fas fa-map-marked-alt"></i> Safe Navigation</a>
+                        <a href="safe-navigation.html"><i class="fas fa-map-marked-alt"></i> Safe Navigation</a>
                         <a href="#civicsense"><i class="fas fa-users-viewfinder"></i> CivicSense Watch</a>
+                        <a href="my-reports.html"><i class="fas fa-clipboard-list"></i> My Reports History</a>
                         <a href="#sos"><i class="fas fa-exclamation-triangle"></i> Emergency SOS</a>
                         <a href="emergency-contacts.html"><i class="fas fa-address-book"></i> Emergency Contacts</a>
                         <a href="profile.html"><i class="fas fa-user-shield"></i> User Profile</a>
                         <a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
-                        <a onclick="handleLogout()" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <a href="javascript:void(0)" onclick="handleLogout()" style="cursor: pointer;" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </nav>
                 </div>
 
@@ -913,25 +917,25 @@
 
                 <!-- ROW 2: Quick Action Cards -->
                 <div class="grid-4">
-                    <div class="quick-action-box">
+                    <div class="quick-action-box" onclick="window.location.href='safe-navigation.html'" style="cursor:pointer;" tabindex="0">
                         <div class="quick-action-icon"><i class="fas fa-directions"></i></div>
                         <h3>Navigate</h3>
                         <p>Plan optimal safe routes with high streetlighting and patrol coverage.</p>
                     </div>
 
-                    <div class="quick-action-box">
+                    <div class="quick-action-box" onclick="const el=document.querySelector('#sos');if(el){el.scrollIntoView({behavior:'smooth'});}" style="cursor:pointer;" tabindex="0">
                         <div class="quick-action-icon sos"><i class="fas fa-bell"></i></div>
                         <h3>Emergency SOS</h3>
                         <p>1-tap alert to dispatch live GPS coordinates to trusted contacts.</p>
                     </div>
 
-                    <div class="quick-action-box">
+                    <div class="quick-action-box" onclick="if(window.civicSense && typeof window.civicSense.showReportingModal==='function'){window.civicSense.showReportingModal();}else{window.location.href='my-reports.html';}" style="cursor:pointer;" tabindex="0">
                         <div class="quick-action-icon"><i class="fas fa-exclamation-triangle"></i></div>
                         <h3>Report Incident</h3>
                         <p>Submit hazards, broken streetlights, or unsafe spots to CivicSense.</p>
                     </div>
 
-                    <div class="quick-action-box" onclick="window.location.href='emergency-contacts.html'" style="cursor:pointer;">
+                    <div class="quick-action-box" onclick="window.location.href='emergency-contacts.html'" style="cursor:pointer;" tabindex="0">
                         <div class="quick-action-icon"><i class="fas fa-address-book"></i></div>
                         <h3>Emergency Contacts</h3>
                         <p>Manage primary response numbers and family alert notifications.</p>
@@ -939,21 +943,49 @@
                 </div>
 
                 <div id="civicsense" class="anchor"></div>
-                <!-- ROW 5: Recent Community Reports -->
+                <!-- ROW 5: Community Safety Reports & My Reports -->
                 <section class="card">
-                    <div class="card-title"><i class="fas fa-users-viewfinder"></i> Recent Community Safety Reports</div>
-                    <div class="reports-list" id="civicSenseReportsList">
-                        <div class="report-item success">
-                            <div class="report-text"><strong><i class="fas fa-check-circle" style="color: var(--success);"></i> High Patrol Area:</strong> Main Street corridor well lit & patrolled by local officers.</div>
-                            <div class="report-time">12 mins ago</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" id="tabCommunityBtn" class="btn" style="background: var(--primary); color: #fff; padding: 8px 16px; font-size: 13px;" onclick="switchCivicSenseTab('community')">
+                                <i class="fas fa-users-viewfinder"></i> Community Feed
+                            </button>
+                            <button type="button" id="tabMyReportsBtn" class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="switchCivicSenseTab('my-reports')">
+                                <i class="fas fa-clipboard-list"></i> My Reports (<span id="civicMyReportsCount">0</span>)
+                            </button>
                         </div>
-                        <div class="report-item warning">
-                            <div class="report-text"><strong><i class="fas fa-exclamation-circle" style="color: var(--warning);"></i> Maintenance Warning:</strong> Street light maintenance active on 5th Avenue near Metro Gate 2.</div>
-                            <div class="report-time">45 mins ago</div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <a href="my-reports.html" class="btn btn-outline" style="font-size: 12px; padding: 8px 14px;"><i class="fas fa-arrow-up-right-from-square"></i> Full History</a>
+                            <button type="button" class="btn btn-primary" style="font-size: 12px; padding: 8px 16px;" onclick="if(window.civicSense && typeof window.civicSense.showReportingModal==='function'){window.civicSense.showReportingModal();}else{window.location.href='my-reports.html';}">
+                                <i class="fas fa-plus"></i> Report Incident
+                            </button>
                         </div>
-                        <div class="report-item">
-                            <div class="report-text"><strong><i class="fas fa-info-circle" style="color: var(--accent-dark);"></i> Resolved Incident:</strong> Road obstruction cleared on Park Road intersection.</div>
-                            <div class="report-time">2 hours ago</div>
+                    </div>
+
+                    <!-- Community Reports View -->
+                    <div id="civicCommunityContainer">
+                        <div class="card-title" style="margin-bottom: 12px; font-size: 15px;"><i class="fas fa-tower-broadcast"></i> Live Safety Reports</div>
+                        <div class="reports-list" id="civicSenseReportsList">
+                            <div class="report-item success">
+                                <div class="report-text"><strong><i class="fas fa-check-circle" style="color: var(--success);"></i> High Patrol Area:</strong> Main Street corridor well lit & patrolled by local officers.</div>
+                                <div class="report-time">12 mins ago</div>
+                            </div>
+                            <div class="report-item warning">
+                                <div class="report-text"><strong><i class="fas fa-exclamation-circle" style="color: var(--warning);"></i> Maintenance Warning:</strong> Street light maintenance active on 5th Avenue near Metro Gate 2.</div>
+                                <div class="report-time">45 mins ago</div>
+                            </div>
+                            <div class="report-item">
+                                <div class="report-text"><strong><i class="fas fa-info-circle" style="color: var(--accent-dark);"></i> Resolved Incident:</strong> Road obstruction cleared on Park Road intersection.</div>
+                                <div class="report-time">2 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Reports View -->
+                    <div id="civicMyReportsContainer" style="display: none;">
+                        <div class="card-title" style="margin-bottom: 12px; font-size: 15px;"><i class="fas fa-user-clock"></i> My Reports Lifecycle &amp; Status</div>
+                        <div id="dashboardMyReportsList">
+                            <div style="text-align: center; padding: 24px; color: var(--muted);">Loading your reports...</div>
                         </div>
                     </div>
                 </section>
@@ -1123,7 +1155,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="btn-learn-more">Learn More</button>
+                        <button class="btn-learn-more" onclick="window.location.href='safe-navigation.html'">Learn More</button>
                     </section>
 
                     <!-- About SecureStep Card -->
@@ -1138,7 +1170,7 @@
                                 <li><span style="color: var(--accent-dark); font-size: 18px;">•</span> Community Reporting</li>
                             </ul>
                         </div>
-                        <button class="btn-learn-more">Learn More</button>
+                        <button class="btn-learn-more" onclick="window.location.href='about.html'">Learn More</button>
                     </section>
                 </div>
 
@@ -1188,6 +1220,8 @@
             window.handleLogout = function() {
                 localStorage.removeItem('secureStepUserName');
                 localStorage.removeItem('secureStepUserEmail');
+                localStorage.removeItem('secureStepUser');
+                sessionStorage.removeItem('currentUser');
                 window.location.href = 'index.html';
             };
 
@@ -1318,141 +1352,185 @@
             }
             window.initSOSMap = initSOSMap;
 
-            window.populateCivicSenseReports = function(){
+            
+            window.switchCivicSenseTab = function(tab) {
+                const commBtn = document.getElementById('tabCommunityBtn');
+                const myBtn = document.getElementById('tabMyReportsBtn');
+                const commContainer = document.getElementById('civicCommunityContainer');
+                const myContainer = document.getElementById('civicMyReportsContainer');
+
+                if (tab === 'my-reports') {
+                    if (commBtn) { commBtn.style.background = 'transparent'; commBtn.style.color = 'var(--primary)'; }
+                    if (myBtn) { myBtn.style.background = 'var(--primary)'; myBtn.style.color = '#fff'; }
+                    if (commContainer) commContainer.style.display = 'none';
+                    if (myContainer) myContainer.style.display = 'block';
+                    window.populateMyReports();
+                } else {
+                    if (commBtn) { commBtn.style.background = 'var(--primary)'; commBtn.style.color = '#fff'; }
+                    if (myBtn) { myBtn.style.background = 'transparent'; myBtn.style.color = 'var(--primary)'; }
+                    if (commContainer) commContainer.style.display = 'block';
+                    if (myContainer) myContainer.style.display = 'none';
+                }
+            };
+
+            window.populateMyReports = async function() {
+                const listEl = document.getElementById('dashboardMyReportsList');
+                if (!listEl || !window.civicSense) return;
+
+                const reports = await window.civicSense.fetchMyReports();
+                const countBadge = document.getElementById('civicMyReportsCount');
+                if (countBadge) countBadge.textContent = reports.length;
+
+                window.civicSense.renderMyReportsList(listEl, '');
+            };
+
+            window.populateCivicSenseReports = async function(){
                 const reportsList = document.getElementById('civicSenseReportsList');
                 if(!reportsList) return;
                 
-                // Try to get reports from CivicSense system
-                if(window.civicSense){
-                    const reports = window.civicSense.getRecentReports(5);
-                    if(reports.length > 0){
-                        reportsList.innerHTML = reports.map(report => {
-                            const display = window.civicSense.formatReportForDisplay(report);
-                            const severityClass = display.severityColor === '#ef4444' ? 'warning' : 
-                                                  display.severityColor === '#10b981' ? 'success' : '';
-                            return `
-                                <div class="report-item ${severityClass}">
-                                    <div class="report-text">
-                                        <strong><i class="fas ${display.typeIcon}" style="color: ${display.severityColor};"></i> ${display.typeName}:</strong> 
-                                        ${display.description}
+                try {
+                    if(window.civicSense){
+                        if (typeof window.civicSense.fetchRecentPublicReports === 'function') {
+                            await window.civicSense.fetchRecentPublicReports(5);
+                        }
+                        const reports = window.civicSense.getRecentReports ? window.civicSense.getRecentReports(5) : [];
+                        if(reports && reports.length > 0){
+                            reportsList.innerHTML = reports.map(report => {
+                                const display = window.civicSense.formatReportForDisplay(report);
+                                const severityClass = display.severityColor === '#ef4444' ? 'warning' : 
+                                                      display.severityColor === '#10b981' ? 'success' : '';
+                                return `
+                                    <div class="report-item ${severityClass}">
+                                        <div class="report-text">
+                                            <strong><i class="fas ${display.typeIcon}" style="color: ${display.severityColor};"></i> ${display.typeName}:</strong> 
+                                            ${display.description || ''}
+                                        </div>
+                                        <div class="report-time">${display.timeAgo}</div>
                                     </div>
-                                    <div class="report-time">${display.timeAgo}</div>
-                                </div>
-                            `;
-                        }).join('');
+                                `;
+                            }).join('');
+                        }
                     }
+                } catch(e) {
+                    console.warn('Populate civic sense error:', e);
                 }
             };
 
             // Initialize after DOM is ready
             document.addEventListener('DOMContentLoaded', function(){
-                try{
+                try {
                     setInterval(window.updateDateTime, 1000);
                     window.updateDateTime();
-                    window.loadDashboardUser();
-                    window.populateCivicSenseReports();
-                    setInterval(window.populateCivicSenseReports, 60 * 1000);
-                    renderSOSContacts();
-                    // initSOSMap is triggered by the "Show My Location" button — not auto-started
-                    // to avoid racing with the MapLibre CDN script load.
-                    window.addEventListener('emergencyContactsUpdated', renderSOSContacts);
+                } catch(e) { console.warn('Clock error', e); }
 
-                    // Populate real user name & avatar in greeting
-                    try {
-                        let userName = localStorage.getItem('secureStepUserName');
-                        if (!userName) {
-                            const u = JSON.parse(localStorage.getItem('secureStepUser') || 'null');
-                            if (u) userName = u.fullName || u.name;
-                        }
-                        if (userName) {
-                            const greetingEl = document.getElementById('dashboardGreeting');
-                            const avatarEl = document.getElementById('dashboardAvatar');
-                            const hour = new Date().getHours();
-                            const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-                            if (greetingEl) greetingEl.textContent = `${timeGreeting}, ${userName}!`;
-                            if (avatarEl) {
-                                const parts = userName.trim().split(/\s+/);
-                                const initials = parts.length === 1 ? parts[0].substring(0, 2).toUpperCase() : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-                                avatarEl.textContent = initials;
-                            }
-                        }
-                    } catch (e) { console.warn('User greeting error', e); }
+                try {
+                    if (typeof window.loadDashboardUser === 'function') window.loadDashboardUser();
+                } catch(e) { console.warn('User load error', e); }
 
-                    console.log('Dashboard scripts initialized');
-                    // Attach interactive handlers for navigation and quick actions
-                    // Topnav links: smooth scroll for anchors, SOS handles specially
-                    document.querySelectorAll('.topnav-menu a').forEach(a=>{
-                        a.addEventListener('click', function(e){
+                try {
+                    if (typeof window.populateCivicSenseReports === 'function') {
+                        window.populateCivicSenseReports();
+                        setInterval(window.populateCivicSenseReports, 60 * 1000);
+                    }
+                } catch(e) { console.warn('CivicSense reports error', e); }
+
+                try {
+                    if (typeof window.populateMyReports === 'function') window.populateMyReports();
+                } catch(e) { console.warn('My reports error', e); }
+
+                try {
+                    if (typeof renderSOSContacts === 'function') {
+                        renderSOSContacts();
+                        window.addEventListener('emergencyContactsUpdated', renderSOSContacts);
+                    }
+                } catch(e) { console.warn('SOS contacts error', e); }
+
+                try {
+                    window.addEventListener("incidentReported", function() {
+                        if (typeof window.switchCivicSenseTab === 'function') window.switchCivicSenseTab("my-reports");
+                        if (typeof window.populateMyReports === 'function') window.populateMyReports();
+                        if (typeof window.populateCivicSenseReports === 'function') window.populateCivicSenseReports();
+                    });
+                } catch(e) {}
+
+                try {
+                    let userName = localStorage.getItem('secureStepUserName');
+                    if (!userName) {
+                        const u = JSON.parse(localStorage.getItem('secureStepUser') || 'null');
+                        if (u) userName = u.fullName || u.name;
+                    }
+                    if (userName) {
+                        const greetingEl = document.getElementById('dashboardGreeting');
+                        const avatarEl = document.getElementById('dashboardAvatar');
+                        const hour = new Date().getHours();
+                        const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+                        if (greetingEl) greetingEl.textContent = `${timeGreeting}, ${userName}!`;
+                        if (avatarEl) {
+                            const parts = userName.trim().split(/\s+/);
+                            const initials = parts.length === 1 ? parts[0].substring(0, 2).toUpperCase() : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                            avatarEl.textContent = initials;
+                        }
+                    }
+                } catch (e) { console.warn('User greeting error', e); }
+
+                try {
+                    // Attach interactive handlers for navigation
+                    document.querySelectorAll('.topnav-menu a, .sidebar-menu a').forEach(a => {
+                        a.addEventListener('click', function(e) {
                             const href = a.getAttribute('href');
-                            if(a.classList.contains('sos-link')){
+                            if (a.classList.contains('sos-link')) {
                                 e.preventDefault();
-                                if(window.emergencySOS){
+                                const target = document.querySelector('#sos');
+                                if (target) target.scrollIntoView({ behavior: 'smooth' });
+                                if (window.emergencySOS && typeof window.emergencySOS.triggerSOS === 'function') {
                                     window.emergencySOS.triggerSOS();
-                                } else {
-                                    alert('Emergency SOS feature loading...');
                                 }
                                 return;
                             }
-                            // Open dedicated Safe Navigation page instead of scrolling
-                            if(href === '#navigation'){
+                            if (href === '#navigation' || href === 'safe-navigation.html') {
                                 e.preventDefault();
                                 window.location.href = 'safe-navigation.html';
                                 return;
                             }
-                            if(href && href.startsWith('#')){
+                            if (href && href.startsWith('#')) {
                                 e.preventDefault();
                                 const target = document.querySelector(href);
-                                if(target) target.scrollIntoView({behavior:'smooth'});
+                                if (target) target.scrollIntoView({ behavior: 'smooth' });
                             }
                         });
                     });
+                } catch(e) { console.warn('Navigation listener error', e); }
 
-                    // Sidebar links: similar behavior
-                    document.querySelectorAll('.sidebar-menu a').forEach(a=>{
-                        a.addEventListener('click', function(e){
-                            const href = a.getAttribute('href');
-                            if(href === '#navigation'){
-                                e.preventDefault();
-                                window.location.href = 'safe-navigation.html';
-                                return;
-                            }
-                            if(href && href.startsWith('#')){
-                                e.preventDefault();
-                                const target = document.querySelector(href);
-                                if(target) target.scrollIntoView({behavior:'smooth'});
-                            }
-                        });
-                    });
-
-                    // Quick action boxes
-                    document.querySelectorAll('.quick-action-box').forEach(box=>{
+                try {
+                    // Attach quick action click and keypress handlers
+                    document.querySelectorAll('.quick-action-box').forEach(box => {
                         box.style.cursor = 'pointer';
-                        box.setAttribute('tabindex','0');
-                        box.addEventListener('click', function(){
+                        box.setAttribute('tabindex', '0');
+                        box.addEventListener('click', function(e) {
                             const titleEl = box.querySelector('h3');
-                            const title = titleEl? titleEl.textContent.trim().toLowerCase() : '';
-                            console.log('Quick action clicked:', title);
-                            if(title.includes('navigate')){
+                            const title = titleEl ? titleEl.textContent.trim().toLowerCase() : '';
+                            if (title.includes('navigate')) {
                                 window.location.href = 'safe-navigation.html';
-                            } else if(title.includes('sos')){
+                            } else if (title.includes('sos')) {
                                 const target = document.querySelector('#sos');
-                                if(target) target.scrollIntoView({behavior:'smooth'});
-                            } else if(title.includes('report')){
-                                if(window.civicSense){
+                                if (target) target.scrollIntoView({ behavior: 'smooth' });
+                            } else if (title.includes('report')) {
+                                if (window.civicSense && typeof window.civicSense.showReportingModal === 'function') {
                                     window.civicSense.showReportingModal();
                                 } else {
-                                    alert('CivicSense feature loading...');
+                                    window.location.href = 'my-reports.html';
                                 }
-                            } else if(title.includes('contact')){
+                            } else if (title.includes('contact')) {
                                 window.location.href = 'emergency-contacts.html';
                             }
                         });
-                        box.addEventListener('keypress', function(e){ if(e.key==='Enter') box.click(); });
+                        box.addEventListener('keypress', function(e) {
+                            if (e.key === 'Enter') box.click();
+                        });
                     });
+                } catch(e) { console.warn('Quick action listener error', e); }
 
-                }catch(err){
-                    console.error('Dashboard init error', err);
-                }
+                console.log('SecureStep dashboard initialized successfully');
             });
         })();
     </script>

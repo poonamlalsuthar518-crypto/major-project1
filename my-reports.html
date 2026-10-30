@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Incident Reports | SecureStep</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/integration.css" />
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#1e3a5f">
+  <style>
+    .report-stat-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .report-stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .report-stat-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1e3a5f;
+      line-height: 1.1;
+    }
+    .report-stat-lbl {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 2px;
+    }
+    .status-tab-btn {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      font-weight: 700;
+      font-size: 13px;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-tab-btn:hover {
+      background: #f1f5f9;
+      color: #1e3a5f;
+    }
+    .status-tab-btn.active {
+      background: #1e3a5f;
+      color: #ffffff;
+      border-color: #1e3a5f;
+      box-shadow: 0 4px 12px rgba(30,58,95,0.2);
+    }
+  </style>
+</head>
+<body class="app-shell">
+  <header class="topbar">
+    <div class="brand"><i class="fas fa-shield-alt"></i> SecureStep</div>
+    <nav class="nav">
+      <a href="dashboard.html"><i class="fas fa-gauge-high"></i> Dashboard</a>
+      <a href="safe-navigation.html"><i class="fas fa-route"></i> Safe Navigation</a>
+      <a href="dashboard.html#civicsense"><i class="fas fa-city"></i> CivicSense</a>
+      <a href="my-reports.html" class="active"><i class="fas fa-clipboard-list"></i> My Reports</a>
+      <a href="emergency-contacts.html"><i class="fas fa-address-book"></i> Contacts</a>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
+    </nav>
+    <div class="user-chip"><span class="avatar" id="topNavAvatar">U</span> <span id="topNavUser">User</span></div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Safety Navigation</div>
+        <nav>
+          <a href="dashboard.html"><i class="fas fa-home"></i> Home Dashboard</a>
+          <a href="safe-navigation.html"><i class="fas fa-map-marked-alt"></i> Safe Navigation</a>
+          <a href="dashboard.html#civicsense"><i class="fas fa-users-viewfinder"></i> CivicSense Watch</a>
+          <a href="my-reports.html" class="active"><i class="fas fa-clipboard-list"></i> My Reports History</a>
+          <a href="emergency-contacts.html"><i class="fas fa-address-book"></i> Emergency Contacts</a>
+          <a href="profile.html"><i class="fas fa-user-shield"></i> User Profile</a>
+        </nav>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Quick Action</div>
+        <div style="padding: 0 4px;">
+          <button class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="window.civicSense.showReportingModal()">
+            <i class="fas fa-plus"></i> Report Incident
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-section" style="margin-top:auto;">
+        <div class="sidebar-title">Admin Operations</div>
+        <nav>
+          <a href="incident-management.html"><i class="fas fa-user-shield"></i> Admin Incident Review</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1>My Incident Reports</h1>
+          <p>Track your submitted safety hazards, verification status, and administrative feedback</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-outline" onclick="loadUserReports()"><i class="fas fa-rotate"></i> Refresh</button>
+          <button class="btn btn-primary" onclick="window.civicSense.showReportingModal()"><i class="fas fa-plus"></i> Report Incident</button>
+        </div>
+      </div>
+
+      <!-- Summary Stat Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="report-stat-card">
+          <div class="report-stat-icon" style="background: rgba(59,130,246,0.12); color: #2563eb;">
+            <i class="fas fa-folder-open"></i>
+          </div>
+          <div>
+            <div class="report-stat-val" id="statTotal">0</div>
+            <div class="report-stat-lbl">Total Reports</div>
+          </div>
+        </div>
+
+        <div class="report-stat-card">
+          <div class="report-stat-icon" style="background: rgba(245,158,11,0.12); color: #b45309;">
+            <i class="fas fa-hourglass-half"></i>
+          </div>
+          <div>
+            <div class="report-stat-val" id="statPending">0</div>
+            <div class="report-stat-lbl">Submitted / Pending</div>
+          </div>
+        </div>
+
+        <div class="report-stat-card">
+          <div class="report-stat-icon" style="background: rgba(139,92,246,0.12); color: #7c3aed;">
+            <i class="fas fa-magnifying-glass"></i>
+          </div>
+          <div>
+            <div class="report-stat-val" id="statReview">0</div>
+            <div class="report-stat-lbl">Under Review</div>
+          </div>
+        </div>
+
+        <div class="report-stat-card">
+          <div class="report-stat-icon" style="background: rgba(16,185,129,0.12); color: #047857;">
+            <i class="fas fa-check-double"></i>
+          </div>
+          <div>
+            <div class="report-stat-val" id="statResolved">0</div>
+            <div class="report-stat-lbl">Resolved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search & Status Filter Pills -->
+      <section class="card" style="margin-bottom: 22px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between;">
+          <div style="flex: 1; min-width: 260px;">
+            <input type="text" id="myReportSearch" placeholder="Search by Report ID, incident type, location, or notes..." 
+                   style="width: 100%; padding: 10px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 14px;" 
+                   oninput="renderFilteredReports()" />
+          </div>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="statusFilterPills">
+            <button class="status-tab-btn active" data-status="" onclick="setStatusFilter(this, '')">All</button>
+            <button class="status-tab-btn" data-status="Submitted" onclick="setStatusFilter(this, 'Submitted')">Submitted</button>
+            <button class="status-tab-btn" data-status="Pending" onclick="setStatusFilter(this, 'Pending')">Pending</button>
+            <button class="status-tab-btn" data-status="Under Review" onclick="setStatusFilter(this, 'Under Review')">Under Review</button>
+            <button class="status-tab-btn" data-status="Resolved" onclick="setStatusFilter(this, 'Resolved')">Resolved</button>
+            <button class="status-tab-btn" data-status="Rejected" onclick="setStatusFilter(this, 'Rejected')">Rejected</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reports List Container -->
+      <div id="myReportsContainer">
+        <div style="text-align: center; padding: 40px; color: #64748b;">
+          <i class="fas fa-spinner fa-spin fa-2x"></i>
+          <p style="margin-top: 10px;">Loading your reports history...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • Personal Safety &amp; Incident Verification</footer>
+
+  <script src="js/securestep-ui.js"></script>
+  <script src="js/civicsense-reporting.js"></script>
+  <script src="/js/pwa-register.js" defer></script>
+
+  <script>
+    let myReportsData = [];
+    let activeStatusFilter = '';
+
+    function updateUserInfo() {
+      const u = window.civicSense.getLoggedInUser();
+      const topName = document.getElementById('topNavUser');
+      const topAvatar = document.getElementById('topNavAvatar');
+      if (topName) topName.textContent = u.fullName || 'User';
+      if (topAvatar) {
+        const initials = (u.fullName || 'User').split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+        topAvatar.textContent = initials;
+      }
+    }
+
+    async function loadUserReports() {
+      const container = document.getElementById('myReportsContainer');
+      container.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #64748b;">
+          <i class="fas fa-spinner fa-spin fa-2x" style="color:#0284c7;"></i>
+          <p style="margin-top: 10px; font-weight:600;">Synchronizing reports with database...</p>
+        </div>
+      `;
+
+      try {
+        myReportsData = await window.civicSense.fetchMyReports();
+        updateStats();
+        renderFilteredReports();
+      } catch (err) {
+        console.error('Failed to load user reports:', err);
+        container.innerHTML = `
+          <div class="empty-state" style="text-align:center;padding:32px;background:#fef2f2;border-radius:14px;color:#991b1b;">
+            <p>Could not connect to reports service. Displaying cached local reports.</p>
+            <button class="btn btn-outline" onclick="loadUserReports()">Retry</button>
+          </div>
+        `;
+      }
+    }
+
+    function updateStats() {
+      const total = myReportsData.length;
+      const pending = myReportsData.filter(r => ['submitted', 'pending'].includes(String(r.status).toLowerCase())).length;
+      const review = myReportsData.filter(r => String(r.status).toLowerCase() === 'under review').length;
+      const resolved = myReportsData.filter(r => String(r.status).toLowerCase() === 'resolved').length;
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statPending').textContent = pending;
+      document.getElementById('statReview').textContent = review;
+      document.getElementById('statResolved').textContent = resolved;
+    }
+
+    function setStatusFilter(btn, status) {
+      document.querySelectorAll('#statusFilterPills button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeStatusFilter = status;
+      renderFilteredReports();
+    }
+
+    function renderFilteredReports() {
+      const query = (document.getElementById('myReportSearch').value || '').trim().toLowerCase();
+      const container = document.getElementById('myReportsContainer');
+
+      let filtered = myReportsData;
+
+      if (activeStatusFilter) {
+        filtered = filtered.filter(r => String(r.status).toLowerCase() === activeStatusFilter.toLowerCase());
+      }
+
+      if (query) {
+        filtered = filtered.filter(r => {
+          const id = String(r.reportId || r.id).toLowerCase();
+          const type = String(r.incidentType || r.type || '').toLowerCase();
+          const desc = String(r.description || '').toLowerCase();
+          const addr = String(r.address || '').toLowerCase();
+          const remarks = String(r.adminRemarks || '').toLowerCase();
+          return id.includes(query) || type.includes(query) || desc.includes(query) || addr.includes(query) || remarks.includes(query);
+        });
+      }
+
+      window.civicSense.myReports = filtered;
+      window.civicSense.renderMyReportsList(container, '');
+      // Restore full dataset
+      window.civicSense.myReports = myReportsData;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateUserInfo();
+      loadUserReports();
+
+      window.addEventListener('incidentReported', () => {
+        loadUserReports();
+      });
+
+      window.addEventListener('incidentStatusUpdated', () => {
+        loadUserReports();
+      });
+    });
+  </script>
+</body>
+</html>
+

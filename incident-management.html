@@ -6,8 +6,79 @@
   <title>Incident Management | SecureStep</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="css/integration.css" />
-    <link rel="manifest" href="/manifest.webmanifest">
-    <meta name="theme-color" content="#1e3a5f">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#1e3a5f">
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 26px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.22);
+      border: 1px solid #e2e8f0;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 12px;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+      color: #1e3a5f;
+      font-size: 13px;
+    }
+    .form-group select, .form-group textarea, .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .table-actions button {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      transition: all 0.2s;
+    }
+    .table-actions button:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+    .table-actions button.btn-review {
+      background: #1e3a5f;
+      color: #ffffff;
+      border-color: #1e3a5f;
+    }
+    .table-actions button.btn-review:hover {
+      background: #2b517e;
+    }
+  </style>
 </head>
 <body class="app-shell">
   <header class="topbar">
@@ -16,9 +87,10 @@
       <a href="admin-dashboard.html"><i class="fas fa-gauge-high"></i> Admin</a>
       <a href="incident-management.html" class="active"><i class="fas fa-folder-open"></i> Incident Management</a>
       <a href="analytics.html"><i class="fas fa-chart-line"></i> Analytics</a>
+      <a href="dashboard.html"><i class="fas fa-desktop"></i> Website App</a>
       <a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
     </nav>
-    <div class="user-chip"><span class="avatar">AD</span> Staff</div>
+    <div class="user-chip"><span class="avatar">AD</span> Administrator</div>
   </header>
 
   <div class="layout">
@@ -28,7 +100,15 @@
         <nav>
           <a href="incident-management.html" class="active"><i class="fas fa-list-check"></i> All Incidents</a>
           <a href="admin-dashboard.html"><i class="fas fa-house"></i> Dashboard</a>
+          <a href="user-management.html"><i class="fas fa-users"></i> Users</a>
           <a href="analytics.html"><i class="fas fa-chart-pie"></i> Reports</a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Quick Actions</div>
+        <nav>
+          <a href="dashboard.html"><i class="fas fa-arrow-left"></i> User Dashboard</a>
+          <a href="my-reports.html"><i class="fas fa-clipboard-list"></i> My Reports Module</a>
         </nav>
       </div>
     </aside>
@@ -37,66 +117,58 @@
       <div class="page-header">
         <div>
           <h1>Incident Management</h1>
-          <p>Monitor and verify community reports</p>
+          <p>Review community reports, update lifecycle status, and dispatch official remarks</p>
         </div>
-        <button class="btn btn-primary"><i class="fas fa-filter"></i> Apply Filters</button>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-outline" onclick="loadIncidents()"><i class="fas fa-rotate"></i> Refresh</button>
+          <button class="btn btn-primary" onclick="window.civicSense.showReportingModal()"><i class="fas fa-plus"></i> New Report</button>
+        </div>
       </div>
 
+      <!-- Search and Filter Bar -->
       <section class="card" style="margin-bottom:20px;">
         <div class="form-grid">
           <div class="field">
-            <label>Search</label>
-            <input type="text" placeholder="Search incidents or location" />
+            <label>Search Reports</label>
+            <input type="text" id="adminSearchInput" placeholder="Search by ID, keyword, submitter or location..." oninput="filterTable()" />
           </div>
           <div class="field">
-            <label>Filter By</label>
-            <select>
-              <option>All Status</option>
-              <option>Open</option>
-              <option>Verified</option>
-              <option>Resolved</option>
+            <label>Filter By Status</label>
+            <select id="adminStatusFilter" onchange="filterTable()">
+              <option value="">All Statuses</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Pending">Pending</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Rejected">Rejected</option>
             </select>
           </div>
         </div>
       </section>
 
+      <!-- Incidents Table Section -->
       <section class="card">
+        <div class="section-head" style="margin-bottom: 14px;">
+          <h3 id="tableCountHeading">All Incident Reports</h3>
+          <span id="activeFilterBadge" style="font-size: 12px; color: #64748b;">Showing all records</span>
+        </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Incident</th>
-                <th>Area</th>
+                <th>Report ID</th>
+                <th>Incident Type</th>
+                <th>Location / Area</th>
                 <th>Severity</th>
+                <th>Submitted By</th>
+                <th>Date</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="incidentsTableBody">
               <tr>
-                <td>#INC-1042</td>
-                <td>Harassment</td>
-                <td>MG Road</td>
-                <td><span class="severity high">High</span></td>
-                <td><span class="status urgent">Open</span></td>
-                <td class="table-actions"><button>View</button><button>Verify</button><button>Delete</button></td>
-              </tr>
-              <tr>
-                <td>#INC-1048</td>
-                <td>Street Light Failure</td>
-                <td>Koramangala</td>
-                <td><span class="severity medium">Medium</span></td>
-                <td><span class="status active">Verified</span></td>
-                <td class="table-actions"><button>View</button><button>Verify</button><button>Delete</button></td>
-              </tr>
-              <tr>
-                <td>#INC-1052</td>
-                <td>Suspicious Vehicle</td>
-                <td>Domlur</td>
-                <td><span class="severity low">Low</span></td>
-                <td><span class="status resolved">Resolved</span></td>
-                <td class="table-actions"><button>View</button><button>Verify</button><button>Delete</button></td>
+                <td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Loading incident reports from database...</td>
               </tr>
             </tbody>
           </table>
@@ -105,8 +177,286 @@
     </main>
   </div>
 
-  <footer class="footer">© <span id="year"></span> SecureStep • Incident operations</footer>
+  <!-- Admin Review & Status Update Modal -->
+  <div id="adminReviewModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-head">
+        <div>
+          <span style="font-size:11px;font-weight:800;color:#64748b;letter-spacing:0.04em;text-transform:uppercase;">Admin Review &amp; Dispatch</span>
+          <h2 id="modalReportId" style="margin:2px 0 0;color:#1e3a5f;font-size:20px;font-weight:800;">#INC-2026-1042</h2>
+        </div>
+        <button type="button" onclick="closeReviewModal()" 
+                style="background:#f1f5f9;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;color:#64748b;">&times;</button>
+      </div>
+
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:18px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Incident Type</div>
+            <div id="modalIncidentType" style="font-weight:700;color:#1e3a5f;font-size:14px;">Harassment</div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Severity</div>
+            <div id="modalSeverity">High</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;padding-top:10px;border-top:1px solid #e2e8f0;">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Submitted By</div>
+            <div id="modalSubmitter" style="font-size:13px;color:#1e293b;">Alex Johnson</div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Date &amp; Time</div>
+            <div id="modalDate" style="font-size:13px;color:#1e293b;">Oct 29, 2026</div>
+          </div>
+        </div>
+
+        <div style="padding-top:10px;border-top:1px solid #e2e8f0;">
+          <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Location &amp; Coordinates</div>
+          <div id="modalLocation" style="font-size:13px;color:#1e293b;margin-top:2px;">MG Road, Bengaluru</div>
+        </div>
+
+        <div style="padding-top:10px;border-top:1px solid #e2e8f0;margin-top:10px;">
+          <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Description</div>
+          <div id="modalDescription" style="font-size:13px;color:#334155;margin-top:3px;line-height:1.5;">Description text</div>
+        </div>
+      </div>
+
+      <!-- Update Form -->
+      <form id="adminUpdateForm" onsubmit="saveAdminUpdates(event)">
+        <input type="hidden" id="modalTargetId" />
+
+        <div class="form-group">
+          <label>Update Lifecycle Status *</label>
+          <select id="modalStatusSelect" required style="font-weight:700;color:#1e3a5f;">
+            <option value="Submitted">Submitted (New Report Received)</option>
+            <option value="Pending">Pending (Queued for Inspection)</option>
+            <option value="Under Review">Under Review (Assigned / Investigating)</option>
+            <option value="Resolved">Resolved (Action Completed)</option>
+            <option value="Rejected">Rejected (Invalid / Duplicate / Unverified)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Admin Remarks / Official Feedback</label>
+          <textarea id="modalAdminRemarks" rows="3" 
+                    placeholder="Enter official action taken, patrol notes, municipal referral, or resolution reason visible to the user..."></textarea>
+          <div style="font-size:11px;color:#64748b;margin-top:4px;">
+            These remarks will synchronize across web and mobile apps for the reporting user.
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+          <button type="button" class="btn btn-outline" onclick="closeReviewModal()">Cancel</button>
+          <button type="submit" id="btnSaveStatus" class="btn btn-primary">
+            <i class="fas fa-check"></i> Save Status &amp; Remarks
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">© <span id="year"></span> SecureStep • Administrative incident operations</footer>
+
   <script src="js/securestep-ui.js"></script>
-    <script src="/js/pwa-register.js" defer></script>
+  <script src="js/civicsense-reporting.js"></script>
+  <script src="/js/pwa-register.js" defer></script>
+
+  <script>
+    let allIncidents = [];
+    let currentIncident = null;
+
+    async function loadIncidents() {
+      const tbody = document.getElementById('incidentsTableBody');
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;"><i class="fas fa-spinner fa-spin"></i> Fetching reports...</td></tr>`;
+
+      try {
+        const res = await fetch('/api/civicsense/reports?admin=true&limit=200');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.reports)) {
+          allIncidents = data.reports;
+          renderIncidentsTable(allIncidents);
+        } else {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#ef4444;">Failed to load incident reports from backend.</td></tr>`;
+        }
+      } catch (err) {
+        console.error('Error fetching incidents:', err);
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#ef4444;">Connection error while fetching reports.</td></tr>`;
+      }
+    }
+
+    function renderIncidentsTable(incidents) {
+      const tbody = document.getElementById('incidentsTableBody');
+      document.getElementById('tableCountHeading').textContent = `All Incident Reports (${incidents.length})`;
+
+      if (incidents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:#64748b;">No incident reports found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = incidents.map(report => {
+        const typeMeta = window.civicSense.getTypeMeta(report.incidentType || report.type);
+        const statusBadge = window.civicSense.getStatusBadgeHtml(report.status);
+        const severityBadge = window.civicSense.getSeverityBadgeHtml(report.severity);
+        const dateStr = new Date(report.createdAt || report.timestamp).toLocaleDateString(undefined, {
+          month: 'short', day: 'numeric', year: 'numeric'
+        });
+
+        const submitter = report.isAnonymous 
+          ? `<em>Anonymous</em> <span style="font-size:11px;color:#94a3b8;">(${report.userName || report.userEmail || 'Guest'})</span>`
+          : (report.userName || report.userEmail || 'User');
+
+        const escapedReport = JSON.stringify(report).replace(/'/g, "&apos;");
+
+        return `
+          <tr id="row-${report.id || report.reportId}">
+            <td><strong>#${report.reportId || report.id}</strong></td>
+            <td><i class="fas ${typeMeta.icon}" style="color:#0284c7;margin-right:6px;"></i> ${typeMeta.name}</td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${report.address || ''}">
+              ${report.address || 'GPS Coordinates'}
+            </td>
+            <td>${severityBadge}</td>
+            <td>${submitter}</td>
+            <td style="white-space:nowrap;">${dateStr}</td>
+            <td>${statusBadge}</td>
+            <td class="table-actions">
+              <button class="btn-review" onclick='openReviewModal(${escapedReport})'>
+                <i class="fas fa-pen-to-square"></i> Review
+              </button>
+              <button style="color:#ef4444;" title="Delete report" onclick="deleteIncident('${report.id || report.reportId}')">
+                <i class="fas fa-trash-can"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterTable() {
+      const search = (document.getElementById('adminSearchInput').value || '').trim().toLowerCase();
+      const statusFilter = (document.getElementById('adminStatusFilter').value || '').trim().toLowerCase();
+
+      let filtered = allIncidents.filter(r => {
+        const matchStatus = !statusFilter || String(r.status).toLowerCase() === statusFilter;
+        if (!matchStatus) return false;
+
+        if (!search) return true;
+        const id = String(r.reportId || r.id).toLowerCase();
+        const type = String(r.incidentType || r.type || '').toLowerCase();
+        const desc = String(r.description || '').toLowerCase();
+        const addr = String(r.address || '').toLowerCase();
+        const user = String(r.userName || r.userEmail || '').toLowerCase();
+
+        return id.includes(search) || type.includes(search) || desc.includes(search) || addr.includes(search) || user.includes(search);
+      });
+
+      const badge = document.getElementById('activeFilterBadge');
+      if (statusFilter || search) {
+        badge.textContent = `Filtered: ${filtered.length} of ${allIncidents.length} records`;
+      } else {
+        badge.textContent = `Showing all records`;
+      }
+
+      renderIncidentsTable(filtered);
+    }
+
+    function openReviewModal(report) {
+      currentIncident = report;
+      document.getElementById('modalTargetId').value = report.reportId || report.id;
+      document.getElementById('modalReportId').textContent = `#${report.reportId || report.id}`;
+      
+      const typeMeta = window.civicSense.getTypeMeta(report.incidentType || report.type);
+      document.getElementById('modalIncidentType').innerHTML = `<i class="fas ${typeMeta.icon}"></i> ${typeMeta.name}`;
+      document.getElementById('modalSeverity').innerHTML = window.civicSense.getSeverityBadgeHtml(report.severity);
+      
+      document.getElementById('modalSubmitter').innerHTML = report.isAnonymous 
+        ? `<em>Anonymous</em> (${report.userName || report.userEmail || 'Guest'})`
+        : `${report.userName || 'User'} (${report.userEmail || 'No email'})`;
+
+      document.getElementById('modalDate').textContent = new Date(report.createdAt || report.timestamp).toLocaleString();
+      document.getElementById('modalLocation').textContent = `${report.address || 'GPS'} ${report.latitude && report.longitude ? `(${Number(report.latitude).toFixed(4)}, ${Number(report.longitude).toFixed(4)})` : ''}`;
+      document.getElementById('modalDescription').textContent = report.description || 'No description provided';
+
+      // Set form inputs
+      document.getElementById('modalStatusSelect').value = report.status || 'Submitted';
+      document.getElementById('modalAdminRemarks').value = report.adminRemarks || '';
+
+      document.getElementById('adminReviewModal').classList.add('active');
+    }
+
+    function closeReviewModal() {
+      document.getElementById('adminReviewModal').classList.remove('active');
+      currentIncident = null;
+    }
+
+    async function saveAdminUpdates(event) {
+      event.preventDefault();
+      const reportIdentifier = document.getElementById('modalTargetId').value;
+      const newStatus = document.getElementById('modalStatusSelect').value;
+      const remarks = document.getElementById('modalAdminRemarks').value.trim();
+
+      const btn = document.getElementById('btnSaveStatus');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+
+      try {
+        const res = await window.civicSense.updateReportStatus(reportIdentifier, newStatus, remarks);
+        if (res.success) {
+          closeReviewModal();
+          // Update in local array
+          const idx = allIncidents.findIndex(r => String(r.id) === String(reportIdentifier) || String(r.reportId) === String(reportIdentifier));
+          if (idx !== -1) {
+            allIncidents[idx].status = newStatus;
+            allIncidents[idx].adminRemarks = remarks;
+          }
+          filterTable();
+          showNotificationToast(`Report #${reportIdentifier} updated to "${newStatus}"`);
+        } else {
+          alert('Update failed: ' + (res.message || 'Please try again.'));
+        }
+      } catch (e) {
+        console.error('Update failed:', e);
+        alert('Server error updating report status');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fas fa-check"></i> Save Status &amp; Remarks`;
+      }
+    }
+
+    async function deleteIncident(id) {
+      if (!confirm(`Are you sure you want to permanently delete report #${id}?`)) return;
+      try {
+        const res = await fetch(`/api/civicsense/reports/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          allIncidents = allIncidents.filter(r => String(r.id) !== String(id) && String(r.reportId) !== String(id));
+          filterTable();
+          showNotificationToast(`Report #${id} deleted successfully.`);
+        } else {
+          alert('Failed to delete report: ' + (data.message || 'Server error'));
+        }
+      } catch (err) {
+        alert('Connection error deleting report.');
+      }
+    }
+
+    function showNotificationToast(msg) {
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white;
+        padding: 14px 20px; border-radius: 10px; font-weight: 700; z-index: 10005;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px;
+      `;
+      toast.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadIncidents();
+      window.addEventListener('incidentReported', () => loadIncidents());
+    });
+  </script>
 </body>
 </html>

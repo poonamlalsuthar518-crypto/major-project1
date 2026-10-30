@@ -111,7 +111,7 @@
       </section>
 
       <section class="card">
-        <div class="section-head"><h3>Incident Management</h3><button class="btn btn-outline">Review</button></div>
+        <div class="section-head"><h3>Incident Management</h3><button class="btn btn-outline" onclick="window.location.href='incident-management.html'">Review All</button></div>
         <div class="table-wrap">
           <table>
             <thead>
@@ -148,5 +148,43 @@
   <footer class="footer">© <span id="year"></span> SecureStep • Admin operations</footer>
   <script src="js/securestep-ui.js"></script>
     <script src="/js/pwa-register.js" defer></script>
+
+  <script src="js/civicsense-reporting.js"></script>
+  <script>
+    async function loadAdminDashboardIncidents() {
+      try {
+        const res = await fetch('/api/civicsense/reports?admin=true&limit=5');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.reports)) {
+          const tbody = document.querySelector('section.card:last-of-type table tbody');
+          if (tbody && data.reports.length > 0) {
+            tbody.innerHTML = data.reports.map(r => {
+              const statusBadge = window.civicSense ? window.civicSense.getStatusBadgeHtml(r.status) : r.status;
+              const sevBadge = window.civicSense ? window.civicSense.getSeverityBadgeHtml(r.severity) : r.severity;
+              return '<tr>' +
+                '<td><strong>#' + (r.reportId || r.id) + '</strong> - ' + (r.incidentType || r.type) + '</td>' +
+                '<td>' + (r.address || 'GPS Location') + '</td>' +
+                '<td>' + sevBadge + '</td>' +
+                '<td>' + statusBadge + '</td>' +
+                '<td class="table-actions">' +
+                  '<button onclick="window.location.href=\'incident-management.html\'"><i class="fas fa-arrow-right"></i> Review</button>' +
+                '</td>' +
+              '</tr>';
+            }).join('');
+          }
+          // Update Total Reports stat card if exists
+          const statCards = document.querySelectorAll('.stat-card');
+          if (statCards.length >= 2) {
+            const val = statCards[1].querySelector('.stat-value');
+            if (val) val.textContent = data.reports.length;
+          }
+        }
+      } catch (e) {
+        console.warn('Could not load dashboard incidents preview', e);
+      }
+    }
+    document.addEventListener('DOMContentLoaded', loadAdminDashboardIncidents);
+  </script>
+
 </body>
 </html>

@@ -223,6 +223,9 @@ textarea { min-height: 120px; resize: vertical; }
 .badge.moderate, .status.pending, .severity.medium { background: var(--warning-soft); color: #b45309; }
 .badge.critical, .status.urgent, .severity.high { background: var(--danger-soft); color: #b91c1c; }
 .badge.info, .status.active { background: var(--accent-soft); color: #0369a1; }
+.status.submitted { background: rgba(59,130,246,0.12); color: #1d4ed8; }
+.status.under-review { background: rgba(139,92,246,0.12); color: #6d28d9; }
+.status.rejected { background: rgba(239,68,68,0.12); color: #b91c1c; }
 
 .list, .report-list, .contact-list, .notification-list {
   display: flex; flex-direction: column; gap: 12px;

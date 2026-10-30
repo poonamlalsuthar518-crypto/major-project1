@@ -12,6 +12,7 @@ const DATABASE_FILE = path.join(__dirname, 'users.json');
 const CONTACTS_FILE = path.join(__dirname, 'emergency_contacts.json');
 const SOS_ALERTS_FILE = path.join(__dirname, 'sos_alerts.json');
 const SOS_NOTIFICATIONS_FILE = path.join(__dirname, 'sos_notifications.json');
+const INCIDENT_REPORTS_FILE = path.join(__dirname, 'incident_reports.json');
 let dbConnection = null;
 
 app.use(express.json({ limit: '1mb' }));
@@ -50,6 +51,89 @@ function saveUsersJson(users) {
   }
 }
 
+function getIncidentReportsJson() {
+  try {
+    if (!fs.existsSync(INCIDENT_REPORTS_FILE)) {
+      const initialReports = [
+        {
+          id: 1,
+          reportId: 'INC-2026-1042',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'harassment',
+          description: 'Verbal harassment and stalking observed near bus stop on MG Road after 9 PM.',
+          latitude: 12.9756,
+          longitude: 77.6067,
+          address: 'MG Road Metro Station, Bengaluru',
+          isAnonymous: false,
+          severity: 'high',
+          status: 'Under Review',
+          adminRemarks: 'Night patrol unit dispatched to monitor bus stops and metro exit gates.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 2,
+          reportId: 'INC-2026-1048',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'poor_lighting',
+          description: 'Multiple street lights malfunctioning on 5th Main Koramangala. Area completely pitch black at night.',
+          latitude: 12.9352,
+          longitude: 77.6245,
+          address: '5th Main, 4th Block Koramangala, Bengaluru',
+          isAnonymous: false,
+          severity: 'medium',
+          status: 'Pending',
+          adminRemarks: 'Issue ticket #BBMP-4481 logged with civic municipal electrical department.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 3,
+          reportId: 'INC-2026-1052',
+          userId: 2,
+          userEmail: 'poonamlalsuthar518@gmail.com',
+          userName: 'Poonam Lal',
+          incidentType: 'suspicious_activity',
+          description: 'Suspicious vehicle idling near the residential alleyway with turned-off lights.',
+          latitude: 12.9601,
+          longitude: 77.6412,
+          address: 'Domlur Inner Ring Road, Bengaluru',
+          isAnonymous: true,
+          severity: 'low',
+          status: 'Resolved',
+          adminRemarks: 'Area verified by local station beat police. Driver questioned and moved.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 3600000 * 6).toISOString(),
+          updatedAt: new Date(Date.now() - 3600000 * 2).toISOString()
+        }
+      ];
+      fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(initialReports, null, 2));
+      return initialReports;
+    }
+    const data = fs.readFileSync(INCIDENT_REPORTS_FILE, 'utf8');
+    return JSON.parse(data || '[]');
+  } catch (error) {
+    console.error('Error reading incident_reports.json:', error);
+    return [];
+  }
+}
+
+function saveIncidentReportsJson(reports) {
+  try {
+    fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(reports, null, 2));
+    return true;
+  } catch (error) {
+    console.error('Error saving incident_reports.json:', error);
+    return false;
+  }
+}
+
 function getContactsJson() {
   try {
     if (fs.existsSync(CONTACTS_FILE)) {
@@ -69,6 +153,89 @@ function saveContactsJson(contacts) {
     return true;
   } catch (error) {
     console.error('Error saving emergency_contacts.json:', error);
+    return false;
+  }
+}
+
+function getIncidentReportsJson() {
+  try {
+    if (!fs.existsSync(INCIDENT_REPORTS_FILE)) {
+      const initialReports = [
+        {
+          id: 1,
+          reportId: 'INC-2026-1042',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'harassment',
+          description: 'Verbal harassment and stalking observed near bus stop on MG Road after 9 PM.',
+          latitude: 12.9756,
+          longitude: 77.6067,
+          address: 'MG Road Metro Station, Bengaluru',
+          isAnonymous: false,
+          severity: 'high',
+          status: 'Under Review',
+          adminRemarks: 'Night patrol unit dispatched to monitor bus stops and metro exit gates.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 2,
+          reportId: 'INC-2026-1048',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'poor_lighting',
+          description: 'Multiple street lights malfunctioning on 5th Main Koramangala. Area completely pitch black at night.',
+          latitude: 12.9352,
+          longitude: 77.6245,
+          address: '5th Main, 4th Block Koramangala, Bengaluru',
+          isAnonymous: false,
+          severity: 'medium',
+          status: 'Pending',
+          adminRemarks: 'Issue ticket #BBMP-4481 logged with civic municipal electrical department.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 3,
+          reportId: 'INC-2026-1052',
+          userId: 2,
+          userEmail: 'poonamlalsuthar518@gmail.com',
+          userName: 'Poonam Lal',
+          incidentType: 'suspicious_activity',
+          description: 'Suspicious vehicle idling near the residential alleyway with turned-off lights.',
+          latitude: 12.9601,
+          longitude: 77.6412,
+          address: 'Domlur Inner Ring Road, Bengaluru',
+          isAnonymous: true,
+          severity: 'low',
+          status: 'Resolved',
+          adminRemarks: 'Area verified by local station beat police. Driver questioned and moved.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 3600000 * 6).toISOString(),
+          updatedAt: new Date(Date.now() - 3600000 * 2).toISOString()
+        }
+      ];
+      fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(initialReports, null, 2));
+      return initialReports;
+    }
+    const data = fs.readFileSync(INCIDENT_REPORTS_FILE, 'utf8');
+    return JSON.parse(data || '[]');
+  } catch (error) {
+    console.error('Error reading incident_reports.json:', error);
+    return [];
+  }
+}
+
+function saveIncidentReportsJson(reports) {
+  try {
+    fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(reports, null, 2));
+    return true;
+  } catch (error) {
+    console.error('Error saving incident_reports.json:', error);
     return false;
   }
 }
@@ -96,6 +263,89 @@ function saveSosAlertsJson(alerts) {
   }
 }
 
+function getIncidentReportsJson() {
+  try {
+    if (!fs.existsSync(INCIDENT_REPORTS_FILE)) {
+      const initialReports = [
+        {
+          id: 1,
+          reportId: 'INC-2026-1042',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'harassment',
+          description: 'Verbal harassment and stalking observed near bus stop on MG Road after 9 PM.',
+          latitude: 12.9756,
+          longitude: 77.6067,
+          address: 'MG Road Metro Station, Bengaluru',
+          isAnonymous: false,
+          severity: 'high',
+          status: 'Under Review',
+          adminRemarks: 'Night patrol unit dispatched to monitor bus stops and metro exit gates.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 2,
+          reportId: 'INC-2026-1048',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'poor_lighting',
+          description: 'Multiple street lights malfunctioning on 5th Main Koramangala. Area completely pitch black at night.',
+          latitude: 12.9352,
+          longitude: 77.6245,
+          address: '5th Main, 4th Block Koramangala, Bengaluru',
+          isAnonymous: false,
+          severity: 'medium',
+          status: 'Pending',
+          adminRemarks: 'Issue ticket #BBMP-4481 logged with civic municipal electrical department.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 3,
+          reportId: 'INC-2026-1052',
+          userId: 2,
+          userEmail: 'poonamlalsuthar518@gmail.com',
+          userName: 'Poonam Lal',
+          incidentType: 'suspicious_activity',
+          description: 'Suspicious vehicle idling near the residential alleyway with turned-off lights.',
+          latitude: 12.9601,
+          longitude: 77.6412,
+          address: 'Domlur Inner Ring Road, Bengaluru',
+          isAnonymous: true,
+          severity: 'low',
+          status: 'Resolved',
+          adminRemarks: 'Area verified by local station beat police. Driver questioned and moved.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 3600000 * 6).toISOString(),
+          updatedAt: new Date(Date.now() - 3600000 * 2).toISOString()
+        }
+      ];
+      fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(initialReports, null, 2));
+      return initialReports;
+    }
+    const data = fs.readFileSync(INCIDENT_REPORTS_FILE, 'utf8');
+    return JSON.parse(data || '[]');
+  } catch (error) {
+    console.error('Error reading incident_reports.json:', error);
+    return [];
+  }
+}
+
+function saveIncidentReportsJson(reports) {
+  try {
+    fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(reports, null, 2));
+    return true;
+  } catch (error) {
+    console.error('Error saving incident_reports.json:', error);
+    return false;
+  }
+}
+
 function getSosNotificationsJson() {
   try {
     if (fs.existsSync(SOS_NOTIFICATIONS_FILE)) {
@@ -115,6 +365,173 @@ function saveSosNotificationsJson(notifications) {
     return true;
   } catch (error) {
     console.error('Error saving sos_notifications.json:', error);
+    return false;
+  }
+}
+
+
+function getIncidentReportsJson() {
+  try {
+    if (!fs.existsSync(INCIDENT_REPORTS_FILE)) {
+      const initialReports = [
+        {
+          id: 1,
+          reportId: 'INC-2026-1042',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'harassment',
+          description: 'Verbal harassment and stalking observed near bus stop on MG Road after 9 PM.',
+          latitude: 12.9756,
+          longitude: 77.6067,
+          address: 'MG Road Metro Station, Bengaluru',
+          isAnonymous: false,
+          severity: 'high',
+          status: 'Under Review',
+          adminRemarks: 'Night patrol unit dispatched to monitor bus stops and metro exit gates.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 2,
+          reportId: 'INC-2026-1048',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'poor_lighting',
+          description: 'Multiple street lights malfunctioning on 5th Main Koramangala. Area completely pitch black at night.',
+          latitude: 12.9352,
+          longitude: 77.6245,
+          address: '5th Main, 4th Block Koramangala, Bengaluru',
+          isAnonymous: false,
+          severity: 'medium',
+          status: 'Pending',
+          adminRemarks: 'Issue ticket #BBMP-4481 logged with civic municipal electrical department.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 3,
+          reportId: 'INC-2026-1052',
+          userId: 2,
+          userEmail: 'poonamlalsuthar518@gmail.com',
+          userName: 'Poonam Lal',
+          incidentType: 'suspicious_activity',
+          description: 'Suspicious vehicle idling near the residential alleyway with turned-off lights.',
+          latitude: 12.9601,
+          longitude: 77.6412,
+          address: 'Domlur Inner Ring Road, Bengaluru',
+          isAnonymous: true,
+          severity: 'low',
+          status: 'Resolved',
+          adminRemarks: 'Area verified by local station beat police. Driver questioned and moved.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 3600000 * 6).toISOString(),
+          updatedAt: new Date(Date.now() - 3600000 * 2).toISOString()
+        }
+      ];
+      fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(initialReports, null, 2));
+      return initialReports;
+    }
+    const data = fs.readFileSync(INCIDENT_REPORTS_FILE, 'utf8');
+    return JSON.parse(data || '[]');
+  } catch (error) {
+    console.error('Error reading incident_reports.json:', error);
+    return [];
+  }
+}
+
+function saveIncidentReportsJson(reports) {
+  try {
+    fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(reports, null, 2));
+    return true;
+  } catch (error) {
+    console.error('Error saving incident_reports.json:', error);
+    return false;
+  }
+}
+
+function getIncidentReportsJson() {
+  try {
+    if (!fs.existsSync(INCIDENT_REPORTS_FILE)) {
+      const initialReports = [
+        {
+          id: 1,
+          reportId: 'INC-2026-1042',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'harassment',
+          description: 'Verbal harassment and stalking observed near bus stop on MG Road after 9 PM.',
+          latitude: 12.9756,
+          longitude: 77.6067,
+          address: 'MG Road Metro Station, Bengaluru',
+          isAnonymous: false,
+          severity: 'high',
+          status: 'Under Review',
+          adminRemarks: 'Night patrol unit dispatched to monitor bus stops and metro exit gates.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 2,
+          reportId: 'INC-2026-1048',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'poor_lighting',
+          description: 'Multiple street lights malfunctioning on 5th Main Koramangala. Area completely pitch black at night.',
+          latitude: 12.9352,
+          longitude: 77.6245,
+          address: '5th Main, 4th Block Koramangala, Bengaluru',
+          isAnonymous: false,
+          severity: 'medium',
+          status: 'Pending',
+          adminRemarks: 'Issue ticket #BBMP-4481 logged with civic municipal electrical department.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 3,
+          reportId: 'INC-2026-1052',
+          userId: 2,
+          userEmail: 'poonamlalsuthar518@gmail.com',
+          userName: 'Poonam Lal',
+          incidentType: 'suspicious_activity',
+          description: 'Suspicious vehicle idling near the residential alleyway with turned-off lights.',
+          latitude: 12.9601,
+          longitude: 77.6412,
+          address: 'Domlur Inner Ring Road, Bengaluru',
+          isAnonymous: true,
+          severity: 'low',
+          status: 'Resolved',
+          adminRemarks: 'Area verified by local station beat police. Driver questioned and moved.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 3600000 * 6).toISOString(),
+          updatedAt: new Date(Date.now() - 3600000 * 2).toISOString()
+        }
+      ];
+      fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(initialReports, null, 2));
+      return initialReports;
+    }
+    const data = fs.readFileSync(INCIDENT_REPORTS_FILE, 'utf8');
+    return JSON.parse(data || '[]');
+  } catch (error) {
+    console.error('Error reading incident_reports.json:', error);
+    return [];
+  }
+}
+
+function saveIncidentReportsJson(reports) {
+  try {
+    fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(reports, null, 2));
+    return true;
+  } catch (error) {
+    console.error('Error saving incident_reports.json:', error);
     return false;
   }
 }
@@ -366,11 +783,130 @@ async function ensureMySqlConnection() {
       )
     `);
 
+    
+    await dbConnection.execute(`
+      CREATE TABLE IF NOT EXISTS civicsense_reports (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        report_id VARCHAR(50) UNIQUE,
+        user_id INT,
+        user_email VARCHAR(191),
+        user_name VARCHAR(191),
+        incident_type VARCHAR(50) NOT NULL,
+        description TEXT,
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8),
+        address VARCHAR(255),
+        is_anonymous BOOLEAN DEFAULT FALSE,
+        severity ENUM('low', 'medium', 'high', 'critical') DEFAULT 'medium',
+        status VARCHAR(50) DEFAULT 'Submitted',
+        admin_remarks TEXT,
+        image_url VARCHAR(500),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+      )
+    `);
+    const civicsenseColumns = [
+      { name: 'report_id', type: 'VARCHAR(50)' },
+      { name: 'user_email', type: 'VARCHAR(191)' },
+      { name: 'user_name', type: 'VARCHAR(191)' },
+      { name: 'status', type: 'VARCHAR(50) DEFAULT "Submitted"' },
+      { name: 'admin_remarks', type: 'TEXT' }
+    ];
+    for (const col of civicsenseColumns) {
+      try {
+        await dbConnection.execute(`ALTER TABLE civicsense_reports ADD COLUMN ${col.name} ${col.type}`);
+      } catch (e) {}
+    }
+
     console.log('MySQL persistence is active.');
     return true;
   } catch (error) {
     console.warn('MySQL unavailable. Using local JSON fallback for now.');
     dbConnection = null;
+    return false;
+  }
+}
+
+function getIncidentReportsJson() {
+  try {
+    if (!fs.existsSync(INCIDENT_REPORTS_FILE)) {
+      const initialReports = [
+        {
+          id: 1,
+          reportId: 'INC-2026-1042',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'harassment',
+          description: 'Verbal harassment and stalking observed near bus stop on MG Road after 9 PM.',
+          latitude: 12.9756,
+          longitude: 77.6067,
+          address: 'MG Road Metro Station, Bengaluru',
+          isAnonymous: false,
+          severity: 'high',
+          status: 'Under Review',
+          adminRemarks: 'Night patrol unit dispatched to monitor bus stops and metro exit gates.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 2,
+          reportId: 'INC-2026-1048',
+          userId: 1,
+          userEmail: 'alex@example.com',
+          userName: 'Alex Johnson',
+          incidentType: 'poor_lighting',
+          description: 'Multiple street lights malfunctioning on 5th Main Koramangala. Area completely pitch black at night.',
+          latitude: 12.9352,
+          longitude: 77.6245,
+          address: '5th Main, 4th Block Koramangala, Bengaluru',
+          isAnonymous: false,
+          severity: 'medium',
+          status: 'Pending',
+          adminRemarks: 'Issue ticket #BBMP-4481 logged with civic municipal electrical department.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 3,
+          reportId: 'INC-2026-1052',
+          userId: 2,
+          userEmail: 'poonamlalsuthar518@gmail.com',
+          userName: 'Poonam Lal',
+          incidentType: 'suspicious_activity',
+          description: 'Suspicious vehicle idling near the residential alleyway with turned-off lights.',
+          latitude: 12.9601,
+          longitude: 77.6412,
+          address: 'Domlur Inner Ring Road, Bengaluru',
+          isAnonymous: true,
+          severity: 'low',
+          status: 'Resolved',
+          adminRemarks: 'Area verified by local station beat police. Driver questioned and moved.',
+          imageUrl: null,
+          createdAt: new Date(Date.now() - 3600000 * 6).toISOString(),
+          updatedAt: new Date(Date.now() - 3600000 * 2).toISOString()
+        }
+      ];
+      fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(initialReports, null, 2));
+      return initialReports;
+    }
+    const data = fs.readFileSync(INCIDENT_REPORTS_FILE, 'utf8');
+    return JSON.parse(data || '[]');
+  } catch (error) {
+    console.error('Error reading incident_reports.json:', error);
+    return [];
+  }
+}
+
+function saveIncidentReportsJson(reports) {
+  try {
+    fs.writeFileSync(INCIDENT_REPORTS_FILE, JSON.stringify(reports, null, 2));
+    return true;
+  } catch (error) {
+    console.error('Error saving incident_reports.json:', error);
     return false;
   }
 }
@@ -1340,64 +1876,350 @@ app.get('/api/location/history/:userId', async (req, res) => {
   }
 });
 
-// CivicSense Incident Reporting API endpoints with MySQL backend
+// CivicSense Incident Reporting API endpoints with permanent MySQL + JSON file persistence
 app.post('/api/civicsense/report', async (req, res) => {
   try {
-    const { userId, incidentType, description, latitude, longitude, address, isAnonymous, severity, imageUrl } = req.body;
+    const { userId, userEmail, userName, incidentType, description, latitude, longitude, address, isAnonymous, severity, imageUrl } = req.body;
     
     if (!incidentType || !description) {
       return res.status(400).json({ success: false, message: 'Incident type and description are required' });
     }
 
+    const reportId = 'INC-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+    const nowIso = new Date().toISOString();
+    const cleanSeverity = ['low', 'medium', 'high', 'critical'].includes(String(severity).toLowerCase())
+      ? String(severity).toLowerCase()
+      : 'medium';
+    const status = 'Submitted';
+    const adminRemarks = '';
+
+    let newReport = null;
+
     if (dbConnection) {
-      const [result] = await dbConnection.execute(
-        'INSERT INTO civicsense_reports (user_id, incident_type, description, latitude, longitude, address, is_anonymous, severity, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [userId || null, incidentType, description, latitude || null, longitude || null, address || null, isAnonymous || false, severity || 'medium', imageUrl || null]
-      );
+      try {
+        const [result] = await dbConnection.execute(
+          `INSERT INTO civicsense_reports 
+            (report_id, user_id, user_email, user_name, incident_type, description, latitude, longitude, address, is_anonymous, severity, status, admin_remarks, image_url, created_at, updated_at) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+          [
+            reportId,
+            userId || null,
+            userEmail || null,
+            userName || null,
+            incidentType,
+            description,
+            latitude || null,
+            longitude || null,
+            address || null,
+            Boolean(isAnonymous),
+            cleanSeverity,
+            status,
+            adminRemarks,
+            imageUrl || null
+          ]
+        );
 
-      const [newReport] = await dbConnection.execute(
-        'SELECT id, incident_type, description, latitude, longitude, address, is_anonymous, severity, status, created_at FROM civicsense_reports WHERE id = ?',
-        [result.insertId]
-      );
-
-      res.json({ success: true, report: newReport[0] });
-    } else {
-      res.status(503).json({ success: false, message: 'Database not available' });
+        const [rows] = await dbConnection.execute(
+          `SELECT id, report_id AS reportId, user_id AS userId, user_email AS userEmail, user_name AS userName, 
+                  incident_type AS incidentType, description, latitude, longitude, address, is_anonymous AS isAnonymous, 
+                  severity, status, admin_remarks AS adminRemarks, image_url AS imageUrl, created_at AS createdAt, updated_at AS updatedAt 
+           FROM civicsense_reports WHERE id = ?`,
+          [result.insertId]
+        );
+        if (rows.length > 0) newReport = rows[0];
+      } catch (dbErr) {
+        console.warn('MySQL insert failed, using JSON fallback:', dbErr.message);
+      }
     }
+
+    // Always keep JSON fallback updated permanently
+    const reports = getIncidentReportsJson();
+    const nextId = reports.length ? Math.max(...reports.map(r => Number(r.id || 0))) + 1 : 1;
+    if (!newReport) {
+      newReport = {
+        id: nextId,
+        reportId,
+        userId: userId || null,
+        userEmail: userEmail || null,
+        userName: userName || null,
+        incidentType,
+        description,
+        latitude: latitude || null,
+        longitude: longitude || null,
+        address: address || null,
+        isAnonymous: Boolean(isAnonymous),
+        severity: cleanSeverity,
+        status,
+        adminRemarks,
+        imageUrl: imageUrl || null,
+        createdAt: nowIso,
+        updatedAt: nowIso
+      };
+    }
+    reports.unshift(newReport);
+    saveIncidentReportsJson(reports);
+
+    res.status(201).json({
+      success: true,
+      message: 'Incident report submitted successfully',
+      report: newReport
+    });
   } catch (error) {
     console.error('CivicSense report error:', error);
     res.status(500).json({ success: false, message: 'Failed to submit report' });
   }
 });
 
+// Private: My Reports endpoint for logged-in users
+app.get('/api/civicsense/my-reports', async (req, res) => {
+  try {
+    const { userId, email } = req.query;
+
+    if (!userId && !email) {
+      return res.status(401).json({ success: false, message: 'User identification required to access My Reports' });
+    }
+
+    if (dbConnection) {
+      try {
+        const [rows] = await dbConnection.execute(
+          `SELECT id, report_id AS reportId, user_id AS userId, user_email AS userEmail, user_name AS userName, 
+                  incident_type AS incidentType, description, latitude, longitude, address, is_anonymous AS isAnonymous, 
+                  severity, status, admin_remarks AS adminRemarks, image_url AS imageUrl, created_at AS createdAt, updated_at AS updatedAt 
+           FROM civicsense_reports 
+           WHERE (user_id IS NOT NULL AND user_id = ?) OR (user_email IS NOT NULL AND LOWER(user_email) = LOWER(?))
+           ORDER BY created_at DESC`,
+          [userId || -1, email || '']
+        );
+        return res.json({ success: true, reports: rows });
+      } catch (dbErr) {
+        console.warn('MySQL my-reports query failed, fallback to JSON:', dbErr.message);
+      }
+    }
+
+    const reports = getIncidentReportsJson();
+    const userReports = reports.filter(r => {
+      const matchId = userId && String(r.userId) === String(userId);
+      const matchEmail = email && String(r.userEmail || '').toLowerCase() === String(email).toLowerCase();
+      return matchId || matchEmail;
+    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    res.json({ success: true, reports: userReports });
+  } catch (error) {
+    console.error('My Reports error:', error);
+    res.status(500).json({ success: false, message: 'Failed to get user reports' });
+  }
+});
+
+// All Reports endpoint with admin filter and privacy mask
 app.get('/api/civicsense/reports', async (req, res) => {
   try {
-    const { limit = 50, type, severity } = req.query;
-    
+    const { limit = 100, type, severity, status, search, admin } = req.query;
+    const isAdmin = String(admin).toLowerCase() === 'true';
+
     if (dbConnection) {
-      let query = 'SELECT id, incident_type, description, latitude, longitude, address, is_anonymous, severity, status, created_at FROM civicsense_reports WHERE 1=1';
-      const params = [];
+      try {
+        let query = `SELECT id, report_id AS reportId, user_id AS userId, user_email AS userEmail, user_name AS userName, 
+                            incident_type AS incidentType, description, latitude, longitude, address, is_anonymous AS isAnonymous, 
+                            severity, status, admin_remarks AS adminRemarks, image_url AS imageUrl, created_at AS createdAt, updated_at AS updatedAt 
+                     FROM civicsense_reports WHERE 1=1`;
+        const params = [];
 
-      if (type) {
-        query += ' AND incident_type = ?';
-        params.push(type);
+        if (type) {
+          query += ' AND incident_type = ?';
+          params.push(type);
+        }
+        if (severity) {
+          query += ' AND severity = ?';
+          params.push(severity);
+        }
+        if (status) {
+          query += ' AND status = ?';
+          params.push(status);
+        }
+        if (search) {
+          query += ' AND (description LIKE ? OR address LIKE ? OR report_id LIKE ?)';
+          const s = `%${search}%`;
+          params.push(s, s, s);
+        }
+
+        query += ' ORDER BY created_at DESC LIMIT ?';
+        params.push(parseInt(limit));
+
+        const [rows] = await dbConnection.execute(query, params);
+
+        const reports = rows.map(r => {
+          if (!isAdmin && r.isAnonymous) {
+            return { ...r, userName: 'Anonymous', userEmail: null, userId: null };
+          }
+          return r;
+        });
+
+        return res.json({ success: true, reports });
+      } catch (dbErr) {
+        console.warn('MySQL reports query failed, fallback to JSON:', dbErr.message);
       }
-      if (severity) {
-        query += ' AND severity = ?';
-        params.push(severity);
-      }
-
-      query += ' ORDER BY created_at DESC LIMIT ?';
-      params.push(parseInt(limit));
-
-      const [rows] = await dbConnection.execute(query, params);
-      res.json({ success: true, reports: rows });
-    } else {
-      res.json({ success: true, reports: [] });
     }
+
+    let reports = getIncidentReportsJson();
+
+    if (type) reports = reports.filter(r => r.incidentType === type);
+    if (severity) reports = reports.filter(r => r.severity === severity);
+    if (status) reports = reports.filter(r => String(r.status).toLowerCase() === String(status).toLowerCase());
+    if (search) {
+      const q = String(search).toLowerCase();
+      reports = reports.filter(r =>
+        String(r.description || '').toLowerCase().includes(q) ||
+        String(r.address || '').toLowerCase().includes(q) ||
+        String(r.reportId || '').toLowerCase().includes(q)
+      );
+    }
+
+    reports.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    reports = reports.slice(0, parseInt(limit));
+
+    // Privacy mask if not admin
+    const sanitized = reports.map(r => {
+      if (!isAdmin && r.isAnonymous) {
+        return { ...r, userName: 'Anonymous', userEmail: null, userId: null };
+      }
+      return r;
+    });
+
+    res.json({ success: true, reports: sanitized });
   } catch (error) {
     console.error('CivicSense reports error:', error);
     res.status(500).json({ success: false, message: 'Failed to get reports' });
+  }
+});
+
+// Single report endpoint
+app.get('/api/civicsense/reports/:id', async (req, res) => {
+  try {
+    const reportIdentifier = req.params.id;
+
+    if (dbConnection) {
+      try {
+        const [rows] = await dbConnection.execute(
+          `SELECT id, report_id AS reportId, user_id AS userId, user_email AS userEmail, user_name AS userName, 
+                  incident_type AS incidentType, description, latitude, longitude, address, is_anonymous AS isAnonymous, 
+                  severity, status, admin_remarks AS adminRemarks, image_url AS imageUrl, created_at AS createdAt, updated_at AS updatedAt 
+           FROM civicsense_reports WHERE id = ? OR report_id = ?`,
+          [reportIdentifier, reportIdentifier]
+        );
+        if (rows.length > 0) return res.json({ success: true, report: rows[0] });
+      } catch (dbErr) {
+        console.warn('MySQL report by ID query failed:', dbErr.message);
+      }
+    }
+
+    const reports = getIncidentReportsJson();
+    const report = reports.find(r => String(r.id) === String(reportIdentifier) || String(r.reportId) === String(reportIdentifier));
+    if (!report) {
+      return res.status(404).json({ success: false, message: 'Report not found' });
+    }
+
+    res.json({ success: true, report });
+  } catch (error) {
+    console.error('Single report fetch error:', error);
+    res.status(500).json({ success: false, message: 'Failed to get report' });
+  }
+});
+
+// Admin status and remarks update endpoint
+app.put(['/api/civicsense/reports/:id/status', '/api/civicsense/reports/:id'], async (req, res) => {
+  try {
+    const reportIdentifier = req.params.id;
+    const { status, adminRemarks } = req.body;
+
+    const validStatuses = ['Submitted', 'Pending', 'Under Review', 'Resolved', 'Rejected'];
+    if (status && !validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status. Allowed values: ${validStatuses.join(', ')}`
+      });
+    }
+
+    let updatedReport = null;
+    const nowIso = new Date().toISOString();
+
+    if (dbConnection) {
+      try {
+        let updateSql = 'UPDATE civicsense_reports SET updated_at = NOW()';
+        const params = [];
+        if (status) {
+          updateSql += ', status = ?';
+          params.push(status);
+        }
+        if (adminRemarks !== undefined) {
+          updateSql += ', admin_remarks = ?';
+          params.push(adminRemarks);
+        }
+
+        updateSql += ' WHERE id = ? OR report_id = ?';
+        params.push(reportIdentifier, reportIdentifier);
+
+        await dbConnection.execute(updateSql, params);
+
+        const [rows] = await dbConnection.execute(
+          `SELECT id, report_id AS reportId, user_id AS userId, user_email AS userEmail, user_name AS userName, 
+                  incident_type AS incidentType, description, latitude, longitude, address, is_anonymous AS isAnonymous, 
+                  severity, status, admin_remarks AS adminRemarks, image_url AS imageUrl, created_at AS createdAt, updated_at AS updatedAt 
+           FROM civicsense_reports WHERE id = ? OR report_id = ?`,
+          [reportIdentifier, reportIdentifier]
+        );
+        if (rows.length > 0) updatedReport = rows[0];
+      } catch (dbErr) {
+        console.warn('MySQL status update failed, fallback to JSON:', dbErr.message);
+      }
+    }
+
+    // Always update JSON file
+    const reports = getIncidentReportsJson();
+    const idx = reports.findIndex(r => String(r.id) === String(reportIdentifier) || String(r.reportId) === String(reportIdentifier));
+    if (idx !== -1) {
+      if (status) reports[idx].status = status;
+      if (adminRemarks !== undefined) reports[idx].adminRemarks = adminRemarks;
+      reports[idx].updatedAt = nowIso;
+      saveIncidentReportsJson(reports);
+      if (!updatedReport) updatedReport = reports[idx];
+    }
+
+    if (!updatedReport) {
+      return res.status(404).json({ success: false, message: 'Report not found' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Report status updated successfully',
+      report: updatedReport
+    });
+  } catch (error) {
+    console.error('Update report error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update report' });
+  }
+});
+
+// Admin delete report endpoint
+app.delete('/api/civicsense/reports/:id', async (req, res) => {
+  try {
+    const reportIdentifier = req.params.id;
+
+    if (dbConnection) {
+      try {
+        await dbConnection.execute('DELETE FROM civicsense_reports WHERE id = ? OR report_id = ?', [reportIdentifier, reportIdentifier]);
+      } catch (dbErr) {
+        console.warn('MySQL delete report error:', dbErr.message);
+      }
+    }
+
+    const reports = getIncidentReportsJson();
+    const filtered = reports.filter(r => String(r.id) !== String(reportIdentifier) && String(r.reportId) !== String(reportIdentifier));
+    saveIncidentReportsJson(filtered);
+
+    res.json({ success: true, message: 'Report deleted successfully' });
+  } catch (error) {
+    console.error('Delete report error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete report' });
   }
 });
 
@@ -1409,23 +2231,30 @@ app.get('/api/civicsense/reports/nearby', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Latitude and longitude required' });
     }
 
+    let allReports = [];
     if (dbConnection) {
-      const [rows] = await dbConnection.execute(
-        'SELECT id, incident_type, description, latitude, longitude, address, is_anonymous, severity, status, created_at FROM civicsense_reports WHERE latitude IS NOT NULL AND longitude IS NOT NULL',
-      );
-
-      const nearbyReports = rows.filter(report => {
-        const distance = calculateDistance(
-          parseFloat(lat), parseFloat(lng),
-          report.latitude, report.longitude
+      try {
+        const [rows] = await dbConnection.execute(
+          `SELECT id, report_id AS reportId, user_id AS userId, incident_type AS incidentType, description, latitude, longitude, address, is_anonymous AS isAnonymous, severity, status, admin_remarks AS adminRemarks, created_at AS createdAt 
+           FROM civicsense_reports WHERE latitude IS NOT NULL AND longitude IS NOT NULL`
         );
-        return distance <= parseFloat(radius);
-      });
-
-      res.json({ success: true, reports: nearbyReports });
+        allReports = rows;
+      } catch (dbErr) {
+        allReports = getIncidentReportsJson().filter(r => r.latitude && r.longitude);
+      }
     } else {
-      res.json({ success: true, reports: [] });
+      allReports = getIncidentReportsJson().filter(r => r.latitude && r.longitude);
     }
+
+    const nearbyReports = allReports.filter(report => {
+      const distance = calculateDistance(
+        parseFloat(lat), parseFloat(lng),
+        parseFloat(report.latitude), parseFloat(report.longitude)
+      );
+      return distance <= parseFloat(radius);
+    });
+
+    res.json({ success: true, reports: nearbyReports });
   } catch (error) {
     console.error('Nearby reports error:', error);
     res.status(500).json({ success: false, message: 'Failed to get nearby reports' });
@@ -1434,46 +2263,57 @@ app.get('/api/civicsense/reports/nearby', async (req, res) => {
 
 app.get('/api/civicsense/statistics', async (req, res) => {
   try {
-    const { timeRange = 24 } = req.query;
+    const { timeRange = 720 } = req.query; // default 30 days
     const cutoff = new Date(Date.now() - timeRange * 60 * 60 * 1000);
     
+    let reports = [];
     if (dbConnection) {
-      const [rows] = await dbConnection.execute(
-        'SELECT id, incident_type, severity, status, created_at FROM civicsense_reports WHERE created_at >= ?',
-        [cutoff]
-      );
-
-      const stats = {
-        total: rows.length,
-        byType: {},
-        bySeverity: { critical: 0, high: 0, medium: 0, low: 0 },
-        byStatus: { pending: 0, verified: 0, resolved: 0 }
-      };
-
-      rows.forEach(report => {
-        if (!stats.byType[report.incident_type]) stats.byType[report.incident_type] = 0;
-        stats.byType[report.incident_type]++;
-        
-        if (stats.bySeverity[report.severity] !== undefined) {
-          stats.bySeverity[report.severity]++;
-        }
-        
-        if (stats.byStatus[report.status] !== undefined) {
-          stats.byStatus[report.status]++;
-        }
-      });
-
-      res.json({ success: true, stats });
+      try {
+        const [rows] = await dbConnection.execute(
+          `SELECT id, report_id AS reportId, incident_type AS incidentType, severity, status, created_at AS createdAt 
+           FROM civicsense_reports WHERE created_at >= ?`,
+          [cutoff]
+        );
+        reports = rows;
+      } catch (dbErr) {
+        reports = getIncidentReportsJson().filter(r => new Date(r.createdAt) >= cutoff);
+      }
     } else {
-      res.json({ success: true, stats: { total: 0, byType: {}, bySeverity: { critical: 0, high: 0, medium: 0, low: 0 }, byStatus: { pending: 0, verified: 0, resolved: 0 } } });
+      reports = getIncidentReportsJson().filter(r => new Date(r.createdAt) >= cutoff);
     }
+
+    const stats = {
+      total: reports.length,
+      byType: {},
+      bySeverity: { critical: 0, high: 0, medium: 0, low: 0 },
+      byStatus: { Submitted: 0, Pending: 0, 'Under Review': 0, Resolved: 0, Rejected: 0 }
+    };
+
+    reports.forEach(report => {
+      const t = report.incidentType || report.incident_type || 'other';
+      if (!stats.byType[t]) stats.byType[t] = 0;
+      stats.byType[t]++;
+      
+      const s = String(report.severity).toLowerCase();
+      if (stats.bySeverity[s] !== undefined) {
+        stats.bySeverity[s]++;
+      }
+      
+      const st = report.status;
+      if (stats.byStatus[st] !== undefined) {
+        stats.byStatus[st]++;
+      } else {
+        stats.byStatus[st] = 1;
+      }
+    });
+
+    res.json({ success: true, stats });
   } catch (error) {
     console.error('Statistics error:', error);
     res.status(500).json({ success: false, message: 'Failed to get statistics' });
   }
 });
 
-// Helper function to calculate distance between two coordinates
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371; // Earth's radius in km
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1518,6 +2358,7 @@ app.use((req, res) => {
 
 async function startServer() {
   const mysqlReady = await ensureMySqlConnection();
+  getIncidentReportsJson();
   const server = app.listen(PORT, () => {
     console.log('\n========================================');
     console.log('SecureStep project is running.');
@@ -1544,8 +2385,12 @@ async function startServer() {
   });
 }
 
-startServer().catch((error) => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
+if (require.main === module) {
+  startServer().catch((error) => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  });
+}
+
+module.exports = { app, startServer };
 
