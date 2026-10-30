@@ -301,6 +301,10 @@
       window.addEventListener('incidentStatusUpdated', () => {
         loadUserReports();
       });
+
+      window.addEventListener('incidentDeleted', () => {
+        loadUserReports();
+      });
     });
   </script>
 </body>

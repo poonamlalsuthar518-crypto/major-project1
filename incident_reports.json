@@ -1,24 +1,5 @@
 [
   {
-    "id": 4,
-    "reportId": "INC-2026-9421",
-    "userId": 2,
-    "userEmail": "poonamlalsuthar518@gmail.com",
-    "userName": "Poonam Lal",
-    "incidentType": "theft",
-    "description": "wfdghdfsf",
-    "latitude": 12.867448663011057,
-    "longitude": 77.58032197919307,
-    "address": "Lat: 12.8674, Lng: 77.5803",
-    "isAnonymous": false,
-    "severity": "critical",
-    "status": "Submitted",
-    "adminRemarks": "",
-    "imageUrl": null,
-    "createdAt": "2026-10-30T16:46:50.115Z",
-    "updatedAt": "2026-10-30T16:46:50.115Z"
-  },
-  {
     "id": 1,
     "reportId": "INC-2026-1042",
     "userId": 1,

@@ -30,6 +30,9 @@ class CivicSenseReporting {
         this.getRecentReports = this.getRecentReports.bind(this);
         this.formatReportForDisplay = this.formatReportForDisplay.bind(this);
         this.fetchRecentPublicReports = this.fetchRecentPublicReports.bind(this);
+        this.deleteReport = this.deleteReport.bind(this);
+        this.deleteReportPrompt = this.deleteReportPrompt.bind(this);
+        this.showToast = this.showToast.bind(this);
     }
 
     loadLocalReports() {
@@ -548,6 +551,93 @@ class CivicSenseReporting {
         }
     }
 
+    
+    async deleteReport(reportId) {
+        if (!reportId) return { success: false, message: 'Invalid report ID' };
+        const user = this.getLoggedInUser();
+        try {
+            const url = `/api/civicsense/reports/${encodeURIComponent(reportId)}?userId=${encodeURIComponent(user.id || '')}&email=${encodeURIComponent(user.email || '')}`;
+            const res = await fetch(url, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                this.myReports = this.myReports.filter(r => String(r.id) !== String(reportId) && String(r.reportId) !== String(reportId));
+                this.recentReports = this.recentReports.filter(r => String(r.id) !== String(reportId) && String(r.reportId) !== String(reportId));
+                this.saveReports();
+                return { success: true };
+            } else {
+                return { success: false, message: data.message || 'Failed to delete report' };
+            }
+        } catch (err) {
+            console.error('Delete report error:', err);
+            return { success: false, message: err.message };
+        }
+    }
+
+    async deleteReportPrompt(reportId, closeModal = false) {
+        if (!reportId) return;
+        const confirmed = confirm(`Are you sure you want to delete incident report #${reportId}?\n\nThis report will be permanently removed from your history and the database.`);
+        if (!confirmed) return;
+
+        const result = await this.deleteReport(reportId);
+        if (result.success) {
+            if (closeModal) {
+                const modal = document.getElementById('report-detail-modal');
+                if (modal) modal.remove();
+            }
+            this.showToast('Report Deleted', `Incident report #${reportId} has been successfully deleted.`, 'danger');
+
+            // Dispatch global event so all pages/tabs update in real-time
+            window.dispatchEvent(new CustomEvent('incidentDeleted', { detail: { reportId } }));
+
+            // Update local components if available
+            if (typeof window.loadUserReports === 'function') {
+                window.loadUserReports();
+            }
+            if (typeof window.populateMyReports === 'function') {
+                window.populateMyReports();
+            }
+            if (typeof window.populateCivicSenseReports === 'function') {
+                window.populateCivicSenseReports();
+            }
+        } else {
+            alert('Failed to delete report: ' + (result.message || 'Please try again.'));
+        }
+    }
+
+    showToast(title, message, type = 'success') {
+        const toast = document.createElement('div');
+        const isDanger = type === 'danger';
+        const bg = isDanger ? '#ef4444' : '#10b981';
+        const icon = isDanger ? 'fa-trash-can' : 'fa-check';
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1e3a5f;
+            color: #ffffff;
+            padding: 16px 22px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            z-index: 100001;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            max-width: 420px;
+            animation: slideUp 0.3s ease;
+        `;
+        toast.innerHTML = `
+            <div style="width: 38px; height: 38px; border-radius: 50%; background: ${bg}; display: grid; place-items: center; color: white; font-size: 18px; flex-shrink: 0;">
+                <i class="fas ${icon}"></i>
+            </div>
+            <div>
+                <div style="font-weight: 800; font-size: 14px;">${title}</div>
+                <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">${message}</div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
     showSuccessToast(report) {
         const toast = document.createElement('div');
         toast.style.cssText = `
@@ -650,8 +740,11 @@ class CivicSenseReporting {
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: flex-end;">
-                    <button type="button" class="btn btn-primary" onclick="document.getElementById('report-detail-modal').remove()" style="padding: 10px 20px;">Close</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <button type="button" class="btn btn-outline" style="padding: 9px 18px; font-size: 13px; color: #ef4444; border-color: #fecaca; background: #fff5f5; display: inline-flex; align-items: center; gap: 6px; font-weight: 700;" onclick="window.civicSense.deleteReportPrompt('${report.reportId || report.id}', true)">
+                        <i class="fas fa-trash-can"></i> Delete Report
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('report-detail-modal').remove()" style="padding: 10px 22px;">Close</button>
                 </div>
             </div>
         `;
@@ -718,9 +811,14 @@ class CivicSenseReporting {
                         <div style="font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 6px;">
                             <i class="fas fa-location-dot" style="color: #0284c7;"></i> ${report.address || 'Location captured via GPS'}
                         </div>
-                        <button class="btn btn-outline" style="padding: 6px 14px; font-size: 12px;" onclick='window.civicSense.showReportDetailsModal(${JSON.stringify(report).replace(/'/g, "&apos;")})'>
-                            <i class="fas fa-circle-info"></i> View Details
-                        </button>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button class="btn btn-outline" style="padding: 6px 14px; font-size: 12px;" onclick='window.civicSense.showReportDetailsModal(${JSON.stringify(report).replace(/'/g, "&apos;")})'>
+                                <i class="fas fa-circle-info"></i> View Details
+                            </button>
+                            <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; color: #ef4444; border-color: #fecaca; background: #fff5f5; display: inline-flex; align-items: center; gap: 5px; font-weight: 600;" title="Delete this report" onclick='window.civicSense.deleteReportPrompt("${report.reportId || report.id}")'>
+                                <i class="fas fa-trash-can"></i> Delete
+                            </button>
+                        </div>
                     </div>
 
                     ${report.adminRemarks ? `
